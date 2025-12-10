@@ -1,0 +1,394 @@
+/* Version 12/8/2025 */
+a.navbutton{
+    border: 0px;
+    padding: 0.5vw 1vw;
+    margin: 0px 0.4vw;
+    font-size: 3vw;
+    background-color: rgb(164, 255, 164);
+    border-radius: 5vw;
+    color: black;
+    font-family: Arial;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    display: inline;
+}
+a.navbutton:hover{
+    background-color: darkgreen;
+    cursor: pointer;
+}
+nav{
+    padding: 5vw 0px 0px 0px;
+    margin: 0px;
+    border: 0px;
+    text-align: center;
+    display: inline;
+    margin-left: auto;
+    font-size: 0px;
+}
+header{
+    background-color: lightgreen;
+    padding: 3vw 2vw 1vw 2vw;
+    display: flex;
+}
+.toptitle{
+    padding: 0vw 0vw 0vw 3vw;
+    margin: 0px;
+    font-size: 4vw;
+    font-weight: 400;
+    letter-spacing: 2px;
+    font-style: italic;
+    color: black;
+    display: inline;
+}
+a.blogbutton{
+    border: 0px;
+    padding: .5vw 1.5vw;
+    margin: 5px;
+    font-size: 2vw;
+    background-color: rgb(164, 255, 164);
+    border-radius: 100px;
+    color: black;
+    font-family: Arial
+}
+a{
+    text-decoration: none;
+}
+.contactlink{
+    font-weight: bold;
+}
+.main{
+    margin: 2% 5%;
+    flex-grow: 1;
+}
+button:hover{
+    background-color: darkgreen;
+    cursor: pointer;
+}
+button:active, .toptitle:active{
+    cursor: wait;
+}
+body{
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+p, li{
+    font-size: 1.5vw;
+    margin: 0.5vw;
+}
+.webview{
+    height: 100vh;
+    width: 100vw;
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
+}
+h1{
+    font-size: 2.5vw;
+    margin: 1vw;
+}
+h2{
+    font-size: 2vw;
+    margin: 1vw;
+}
+footer{
+    background-color: lightgreen;
+    padding: 1vw;
+    margin-top: 2vw;
+    bottom: 0px;
+    width: 100%;
+    text-align: center;
+    font-size: 0px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+.footer, button.footer{
+    display: inline-block;
+    color: black;
+    margin: 1vw;
+    font-size: 1.5vw;
+    padding: 0px;
+    border: 0px;
+}
+button.footer:hover{
+    background-color: lightgreen;
+}
+#lightmode{
+    display: inline-block;
+    font-family: "Times New Roman", Times;
+    background-color: lightgreen;
+}
+.cookies{
+    background-color: lightgreen;
+    position: fixed;
+    bottom: 0px;
+    color: black;
+    padding: 0px;
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    text-align: center;
+    border-top-width: 0.5vw;
+    border-color: black;
+    border-bottom-width: 0.5vw;
+    border-top-style: solid;
+    border-bottom-style: solid;
+}
+.cookieheading{
+    position: relative;
+    padding: 1vw;
+    margin-bottom: 0px;
+    font-weight: bold;
+}
+.cookiebutton{
+    position: relative;
+    display: inline;
+    width: 10vw;
+    background-color: rgb(164, 255, 164);
+    border: none;
+    padding: 1vw 2vw;
+    border-radius: 5vw;
+    cursor: pointer;
+    font-weight: bold;
+    margin: 1vw;
+    margin-top: 0px;
+}
+.cookiebutton:hover {
+    background-color: darkgreen;
+}
+button.counter {
+    margin: 0px;
+    border-radius: 0px;
+    background-color:rgb(164, 255, 164);
+    border: lightgreen 4px solid;
+    padding: 1vw;
+    font-size: 2vw;
+    color: black;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+button.counter:hover {
+    background-color: darkgreen;
+}
+div.counter {
+    font-size: 0px;
+}
+.blogheader {
+    text-align: center;
+    background-color:lightgreen;
+    font-size: 0px;
+    padding: 0px;
+    margin: 0px;
+    display: flex;
+}
+a.blogfind {
+    font-size: 3vw;
+    color: black;
+    padding-top: 1vw;
+    padding-bottom: 0.5vw;
+    margin: 0px;
+    margin-top: 0.5vw;
+    border: 0.2vw solid black;
+    border-top-width: 0px;
+    border-bottom-width: 0px;
+    background-color: rgb(164, 255, 164);
+    display: inline;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    flex: 1;
+}
+a.blogfind:hover {
+    background-color: darkgreen;
+}
+/* Dark Mode Settings */
+button.darkmode:hover, a.navbutton.darkmode:hover{
+    background-color:green;
+}
+.toptitle.darkmode, .footer.darkmode, a.blogbutton.darkmode, header.darkmode, 
+footer.darkmode, button.darkmode, button.footer.darkmode:hover, a.navbutton.darkmode{
+    background-color: darkgreen;
+    color: #f2f2f2;
+}
+body.darkmode{
+    background-color: #121212;
+    color: #f2f2f2;
+}
+a.darkmode{
+    color: #869ad1;
+}
+.footer-middle.darkmode{
+    color: darkgreen;
+}
+#lightmode.darkmode{
+    background-color: darkgreen;
+}
+button.counter.darkmode{
+    border-color: darkgreen;
+}
+/* The modifications of the webpage for different screen sizes (Increase in size for smaller screen widthes) */
+@media (max-width: 450px) {
+    nav{
+        flex-direction: column;
+    }
+    a.navbutton{
+        padding: 1vw 3vw;
+        font-size: 8vw;
+        margin: 0vw;
+    }
+    a.blogbutton{
+        padding: 1vw 3vw;
+        font-size: 8vw;
+    }
+    a.blogfind{
+        font-size: 8vw;
+    }
+    .toptitle{
+        font-size: 10vw;
+    }
+    p,li{
+        font-size: 5vw;
+    }
+    h1{
+        font-size: 8vw;
+    }
+    h2{
+        font-size: 6vw;
+    }
+    .footer, button.footer{
+        font-size: 5vw;
+    }
+    .cookiebutton{
+        display: inline;
+        padding: 1vw 35vw 1vw 5vw;
+    }
+    button.counter{
+        font-size: 8vw;
+    }
+}
+@media (min-width: 451px) and (max-width: 700px) {
+    nav{
+        flex-direction: column;
+    }
+    a.navbutton{
+        padding: 0.5vw 2vw;
+        font-size: 6vw;
+    }
+    a.blogbutton, a.blogfind{
+        font-size: 6vw;
+    }
+    .toptitle{
+        font-size: 9vw;
+    }
+    p,li{
+        font-size: 4vw;
+    }
+    h1{
+        font-size: 6vw;
+    }
+    h2{
+        font-size: 5vw;
+    }
+    .cookiebutton{
+        padding: 1vw 22vw 1vw 3vw;
+    }
+    .footer, button.footer{
+        font-size: 4vw;
+    }
+}
+@media (min-width: 701px) and (max-width: 950px) {
+    nav{
+        flex-direction: row;
+    }
+    a.navbutton{
+        padding: 0.5vw 2vw;
+        font-size: 5vw;
+    }
+    a.blogbutton, a.blogfind{
+        font-size: 5vw;
+    }
+    .toptitle{
+        font-size: 6.5vw;
+    }
+    p,li{
+        font-size: 3vw;
+    }
+    h1{
+        font-size: 5vw;
+    }
+    h2{
+        font-size: 4vw;
+    }
+    .footer, button.footer{
+        font-size: 3vw;
+    }
+    .cookiebutton{
+        font-size: 3vw;
+        padding: 1vw 12vw 1vw 2vw;
+    }
+}
+@media (min-width: 1400px) and (max-width: 1700px) {
+    nav{
+        flex-direction: row;
+    }
+    a.navbutton{
+        padding: .25vw 1vw;
+        font-size: 2.5vw;
+    }
+    a.blogbutton, a.blogfind{
+        font-size: 2.5vw;
+    }
+    .toptitle{
+        font-size: 4vw;
+    }
+    p,li{
+        font-size: 1.5vw;
+    }
+    h1{
+        font-size: 3vw;
+    }
+    h2{
+        font-size: 2vw;
+    }
+    .cookiebutton{
+        font-size: 1.5vw;
+    }
+}
+@media (min-width: 1701px){
+    nav{
+        flex-direction: row;
+    }
+    a.navbutton{
+        padding: 6px 18px;
+        font-size: 2vw;
+    }
+    a.blogbutton, a.blogfind{
+        font-size: 2vw;
+    }
+    .toptitle{
+        font-size: 50px;
+    }
+    p,li{
+        font-size: 20px;
+    }
+    h1{
+        font-size: 30px;
+    }
+    h2{
+        font-size: 25px;
+    }
+    .footer, button.footer{
+        font-size: 1.2vw;
+        margin: 0vw 1vw;
+    }
+    .cookiebutton{
+        font-size: 1vw;
+        padding: 1vw 0vw;
+    }
+}

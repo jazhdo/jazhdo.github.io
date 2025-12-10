@@ -1,0 +1,60 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testing - jazhdo</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" href="/icon.png">
+</head>
+<body>
+    <header>
+        <a href="/" draggable="false" class="toptitle">jazhdo</a>
+        <nav>
+            <a href="/" draggable="false" class="navbutton">Home</a>
+            <a href="/blog/" draggable="false" class="navbutton">Blog</a>
+            <a href="/contact.html" draggable="false" class="navbutton">Contact</a>
+            <a href="/about.html" draggable="false" class="navbutton">About</a>
+        </nav>
+    </header>
+    <div class="main">
+        <h1>Test Page</h1>
+        <p>This is a test page for testing purposes.</p>
+        <button onclick="testa()">test body</button>
+        <button onclick="testh1()">test header</button>
+        <button onclick="testdelete()">test delete text</button>
+        <h2 id="demo"></h2>
+        <h1 class="counter">Counter</h1>
+        <button id="disableCounter" onclick="disableCounterPreset()">Click to disable counter settings</button>
+        <form id="counterForm">
+            <label for="number">Type the number to start with if you want here.</label>
+            <input type="number" id="presetCounter">
+            <button type="submit">Click to set</button>
+        </form>
+        <button id="counterSettings" onclick="commaCounter()">Click to add/take away commas</button>
+        <h2 class="counter" id="counterDisplay">0</h2>
+        <div class="counter">
+            <button class="counter" onclick="addCounter()">Add 1</button>
+            <button class="counter" onclick="minusCounter()">Minus 1</button>
+            <button class="counter" onclick="resetCounter()">Reset</button>
+        </div>
+        <button onclick="document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen()">Toggle fullscreen</button>
+    </div>
+    <div class="cookies">
+        <h2 class="cookieheading">This website uses cookies</h2>
+        <p>
+            Your perference will be stored until you clear your browser's cache. 
+            By clicking accept, you also accept to the <a href="/privacy.html">privacy policy</a>.
+            <button onclick="cookiemanage(true)" class="cookiebutton">Accept</button>
+            <button onclick="cookiemanage(false)" class="cookiebutton">Decline</button>
+        </p>
+    </div>
+    <footer>
+        <p id="darktest" class="footer">Updated: 12/8/2025 - jazhdo</p>
+        <a class="footer" href="/privacy.html">Privacy</a>
+        <a class="footer" href="/terms.html">Terms</a>
+        <button onclick="lightmode()" id="lightmode" class="footer lightmode"></button>
+        <script src="/script.js"></script>
+    </footer>
+</body>
+</html>

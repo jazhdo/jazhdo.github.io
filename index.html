@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="This is a personal website where I blog and make random things to put onto the website.">
+    <title>Home - jazhdo</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" href="/icon.png">
+</head> 
+<body>
+    <header>
+        <a href="/" draggable="false" class="toptitle">jazhdo</a>
+        <nav>
+            <a href="/" draggable="false" class="navbutton">Home</a>
+            <a href="/blog/" draggable="false" class="navbutton">Blog</a>
+            <a href="/contact.html" draggable="false" class="navbutton">Contact</a>
+            <a href="/about.html" draggable="false" class="navbutton">About</a>
+        </nav>
+    </header>
+    <div class="main">
+        <h1>Home</h1>
+        <h2>Site Info</h2>
+        <p>
+            This is my personal website where I post stuff.
+        </p>
+        <h2>Comments/Bugs</h2>
+        <p><a href="/contact.html">Contact me</a> to tell me about bugs so I can improve this website.</p>
+        <h2>Javascript Test (runs on page load)</h2>
+        <p id="jstest">This text will change if the test succeeds.</p>
+        <button onclick="jstest()">Click here to redo the test.</button>
+    </div>
+    <div class="cookies">
+        <h2 class="cookieheading">This website uses cookies</h2>
+        <p>
+            Your perference will be stored until you clear your browser's cache. 
+            By clicking accept, you also accept to the <a href="/privacy.html">privacy policy</a>.
+            <button onclick="cookiemanage(true)" class="cookiebutton">Accept</button>
+            <button onclick="cookiemanage(false)" class="cookiebutton">Decline</button>
+        </p>
+    </div>
+    <footer>
+        <p id="darktest" class="footer">Updated: 12/8/2025 - jazhdo</p>
+        <a class="footer" href="/privacy.html">Privacy</a>
+        <a class="footer" href="/terms.html">Terms</a>
+        <button onclick="lightmode()" id="lightmode" class="footer lightmode"></button>
+        <script src="/script.js"></script>
+    </footer>
+</body>
+</html>
