@@ -1,4 +1,4 @@
-// Version 12/8/2025
+// Version 12/10/2025
 function testa() {
     document.getElementById("demo").innerHTML = "<a>test successful</a>";
 }
@@ -15,9 +15,9 @@ function hide(list) {
         });
     }
 }
-let jstestcount = 0
+let jstestcount = 1
 function jstest() {
-    document.getElementById("jstest").innerText = "Test Successful. Test #"+jstestcount;
+    document.getElementById("jstest").innerText = "Test #" + jstestcount + " Successful.";
     jstestcount += 1
 }
 function addCounter() {
@@ -156,6 +156,13 @@ function lightmode() {
     darkmode();
     document.getElementById('lightmode').innerHTML = 'Current Mode: ' + localStorage.getItem('lightmode');
 }
+function refreshDate(elementId, year, month, day, subject) {
+    const now = new Date();
+    now.setHours(0,0,0,0);
+    const goal = new Date(year, month - 1, day);
+    const until = (goal - now)/1000/60/60/24;
+    document.getElementById(elementId).innerText = subject + ": in " + until + " days";
+}
 // Initial check
 if (localStorage.getItem('lightmode') === 'auto' || localStorage.getItem('lightmode') === null) {
     if (window.matchMedia("(prefers-color-scheme: dark)").matches) { 
@@ -233,4 +240,8 @@ if (document.getElementById('counterForm') !== null) {
     });
 }
 jstest();
+refreshDate('untilChristmas', 2025, 12, 25, 'Christmas');
+refreshDate('untilNewYears', 2026, 1, 1, 'New Years');
+refreshDate('untilValentines', 2026, 2, 14, 'Valentines Day')
+refreshDate('untilChineseNewYears', 2026, 2, 17, 'Chinese New Years')
 console.log("Initial Code Completed.");
