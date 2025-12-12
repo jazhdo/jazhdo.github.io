@@ -31,6 +31,9 @@ header{
     padding: 3vw 2vw 1vw 2vw;
     display: flex;
 }
+button{
+    margin: 1vw;
+}
 .toptitle{
     padding: 0vw 0vw 0vw 3vw;
     margin: 0px;
@@ -78,7 +81,10 @@ body{
 }
 p, li{
     font-size: 1.5vw;
-    margin: 0.5vw;
+    margin: 0.5vw 1.5vw;
+}
+ul, ol {
+    padding-left: 1vw;
 }
 .webview{
     height: 100vh;

@@ -161,7 +161,7 @@ function refreshDate(elementId, year, month, day, subject) {
     now.setHours(0,0,0,0);
     const goal = new Date(year, month - 1, day);
     const until = (goal - now)/1000/60/60/24;
-    document.getElementById(elementId).innerText = subject + ": in " + until + " days";
+    document.getElementById(elementId).innerText = subject + " (" + month + "/" + day + "/" + year + "): in " + until + " days" ;
 }
 // Initial check
 if (localStorage.getItem('lightmode') === 'auto' || localStorage.getItem('lightmode') === null) {
@@ -242,6 +242,6 @@ if (document.getElementById('counterForm') !== null) {
 jstest();
 refreshDate('untilChristmas', 2025, 12, 25, 'Christmas');
 refreshDate('untilNewYears', 2026, 1, 1, 'New Years');
-refreshDate('untilValentines', 2026, 2, 14, 'Valentines Day')
-refreshDate('untilChineseNewYears', 2026, 2, 17, 'Chinese New Years')
+refreshDate('untilValentines', 2026, 2, 14, 'Valentines Day');
+refreshDate('untilChineseNewYears', 2026, 2, 17, 'Chinese New Years');
 console.log("Initial Code Completed.");
