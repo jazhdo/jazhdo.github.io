@@ -18,18 +18,32 @@
         </nav>
     </header>
     <div class="main">
-        <h1>Contact Info</h1>
-        <p>You can contact me at:</p>
+        <form id="contactForm">
+            <h1>Contact Form</h1>
+            <label>Email Address:</label></br>
+            <input type="email" id="contactEmail"></br>
+            <label>What you want to say:</label></br>
+            <textarea placeholder="Type here" id="contactMessage"></textarea></br>
+            <button type="submit" class="form">Submit</button>
+        </form>
+        <h1>Social Sites</h1>
+        <p>These are links to my social accounts:</p>
         <ul>
-            <li>Email: <a class="contactlink" href="mailto:fences.hallow1p@icloud.com" target="_blank">fences.hallow1p@icloud.com</a></li>
+            <!-- <li>Email: <a class="contactlink" href="mailto:fences.hallow1p@icloud.com" target="_blank">fences.hallow1p@icloud.com</a></li> -->
             <li>Scratch: <a class="contactlink" href="https://scratch.mit.edu/users/Jazhdo/" target="_blank">jazhdo</a></li>
-            <!-- <li>Tiktok: <a class="contactlink" href="https://www.tiktok.com/@jazhdo" target="_blank">jazhdo</a></li> -->
+            <li>Tiktok: <a class="contactlink" href="https://www.tiktok.com/@jazhdo" target="_blank">jazhdo</a></li>
             <li>Github: <a class="contactlink" href="https://github.com/jazhdo" target="_blank">jazhdo</a></li>
             <li>Discord: <a class="contactlink" href="https://discordapp.com/users/1357884575262572604" target="_blank">jazhdo</a></li>
             <!-- <li>Roblox: <a class="contactlink" href="https://www.roblox.com/users/4384303115/profile" target="_blank">jazhdo</a></li> -->
             <li>Pixilart: <a class="contactlink" href="https://www.pixil.art/jazhdo/about" target="_blank">jazhdo</a></li>
             <li>Some more may be coming soon... or they might be removed</li>
         </ul>
+        <h1>Socials' Status</h1>
+        <p>Here would be the status on whether I'm active or not on these social platforms.</p>
+    </div>
+    <div id="customAlert" class="hidden">
+        <p id="alertMessage"></p>
+        <button id="alertClose">OK</button>
     </div>
     <div class="cookies">
         <h2 class="cookieheading">This website uses cookies</h2>
@@ -41,10 +55,11 @@
         </p>
     </div>
     <footer>
-        <p id="darktest" class="footer">Updated: 12/10/2025 - jazhdo</p>
+        <p id="darktest" class="footer">Updated: 12/12/2025 - jazhdo</p>
         <a class="footer" href="/privacy.html">Privacy</a>
         <a class="footer" href="/terms.html">Terms</a>
         <button onclick="lightmode()" id="lightmode" class="footer lightmode"></button>
+        <script type="module" src="backend.js"></script>
         <script src="/script.js"></script>
     </footer>
 </body>

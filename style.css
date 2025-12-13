@@ -1,4 +1,4 @@
-/* Version 12/10/2025 */
+/* Version 12/12/2025 */
 a.navbutton{
     border: 0px;
     padding: 0.5vw 1vw;
@@ -81,6 +81,9 @@ body{
 }
 p, li{
     font-size: 1.5vw;
+    margin: 0.5vw 1.5vw;
+}
+label, input, textarea{
     margin: 0.5vw 1.5vw;
 }
 ul, ol {
@@ -211,6 +214,38 @@ a.blogfind {
     flex: 1;
 }
 a.blogfind:hover {
+    background-color: darkgreen;
+}
+textarea {
+    width: 50vw;
+    height: 15vw;
+}
+button.form{
+    margin: 0.5vw 1.5vw;
+}
+#customAlert {
+    position: fixed;
+    top: 25vw;
+    left: 30vw;
+    right: 30vw;
+    padding: 20px 30px;
+    border-radius: 8px;
+    text-align: center;
+    background-color: lightgreen;
+}
+#customAlert.hidden {
+    display: none;
+}
+#customAlert button {
+    margin-top: 10px;
+    margin-bottom: 0px;
+    padding: 5px 12px;
+    background-color: rgb(164, 255, 164);
+    color: black;
+    border-width: 0px;
+    border-radius: 4px;
+}
+#customAlert button:hover {
     background-color: darkgreen;
 }
 /* Dark Mode Settings */

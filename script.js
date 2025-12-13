@@ -1,4 +1,4 @@
-// Version 12/10/2025
+// Version 12/12/2025
 function testa() {
     document.getElementById("demo").innerHTML = "<a>test successful</a>";
 }
@@ -163,6 +163,16 @@ function refreshDate(elementId, year, month, day, subject) {
     const until = (goal - now)/1000/60/60/24;
     document.getElementById(elementId).innerText = subject + " (" + month + "/" + day + "/" + year + "): in " + until + " days" ;
 }
+function showAlert(message) {
+    const alertBox = document.getElementById("customAlert");
+    document.getElementById("alertMessage").innerText = message;
+    alertBox.classList.remove("hidden");
+
+    document.getElementById("alertClose").onclick = () => {
+        alertBox.classList.add("hidden");
+    };
+}
+window.showAlert = showAlert;
 // Initial check
 if (localStorage.getItem('lightmode') === 'auto' || localStorage.getItem('lightmode') === null) {
     if (window.matchMedia("(prefers-color-scheme: dark)").matches) { 
@@ -239,9 +249,11 @@ if (document.getElementById('counterForm') !== null) {
         });
     });
 }
-jstest();
-refreshDate('untilChristmas', 2025, 12, 25, 'Christmas');
-refreshDate('untilNewYears', 2026, 1, 1, 'New Years');
-refreshDate('untilValentines', 2026, 2, 14, 'Valentines Day');
-refreshDate('untilChineseNewYears', 2026, 2, 17, 'Chinese New Years');
+if (document.getElementById("jstest") !== null) {
+    jstest();
+    refreshDate('untilChristmas', 2025, 12, 25, 'Christmas');
+    refreshDate('untilNewYears', 2026, 1, 1, 'New Years');
+    refreshDate('untilValentines', 2026, 2, 14, 'Valentines Day');
+    refreshDate('untilChineseNewYears', 2026, 2, 17, 'Chinese New Years');
+}
 console.log("Initial Code Completed.");
