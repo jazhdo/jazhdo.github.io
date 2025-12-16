@@ -9,7 +9,10 @@
 </head>
 <body>
     <header>
-        <a href="/" draggable="false" class="toptitle">jazhdo</a>
+        <div id="header-top">
+            <a href="/" draggable="false" class="toptitle">jazhdo</a>
+            <a href="/login.html" id="login-link">Login</a>
+        </div>
         <nav>
             <a href="/" draggable="false" class="navbutton">Home</a>
             <a href="/blog/" draggable="false" class="navbutton">Blog</a>
@@ -29,6 +32,10 @@
         <p><a href="https://github.com/jazhdo/main-website">Here</a> is the GitHub to the website.</p>
         <p>If you can figure out how to get onto their home page, then you can see my friends website <a href="https://bobbyreichert.pages.dev">here</a>.</p>
         <p>If you are a admin, click here: <a href="/admin.html">Admin Page</a></p>
+    </div>
+    <div id="customAlert" class="hidden">
+        <p id="alertMessage"></p>
+        <button id="alertClose">OK</button>
     </div>
     <div class="cookies">
         <h2 class="cookieheading">This website uses cookies</h2>

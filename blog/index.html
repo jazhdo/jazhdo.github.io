@@ -9,7 +9,10 @@
 </head>
 <body>
     <header>
-        <a href="/" draggable="false" class="toptitle">jazhdo</a>
+        <div id="header-top">
+            <a href="/" draggable="false" class="toptitle">jazhdo</a>
+            <a href="/login.html" id="login-link">Login</a>
+        </div>
         <nav>
             <a href="/" draggable="false" class="navbutton">Home</a>
             <a href="/blog/" draggable="false" class="navbutton">Blog</a>
@@ -29,6 +32,10 @@
         <h2>Blogs</h2>
         <a href="/blog/2025/4/" class="blogbutton">2025 Quarter 4</a>
         <!-- <a href="/blog/2026/1" class="blogbutton">2026 Quarter 1</a> -->
+    </div>
+    <div id="customAlert" class="hidden">
+        <p id="alertMessage"></p>
+        <button id="alertClose">OK</button>
     </div>
     <div class="cookies">
         <h2 class="cookieheading">This website uses cookies</h2>

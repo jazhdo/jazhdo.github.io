@@ -9,7 +9,10 @@
 </head>
 <body>
     <header>
-        <a href="/" draggable="false" class="toptitle">jazhdo</a>
+        <div id="header-top">
+            <a href="/" draggable="false" class="toptitle">jazhdo</a>
+            <a href="/login.html" id="login-link">Login</a>
+        </div>
         <nav>
             <a href="/" draggable="false" class="navbutton">Home</a>
             <a href="/blog/" draggable="false" class="navbutton">Blog</a>
@@ -20,11 +23,6 @@
     <div id="main">
         <h1>Test Page</h1>
         <p>This is a test page for testing purposes.</p>
-        <div popover>
-            <a>Content 1</a>
-            <a>Content 2</a>
-            <a>Content 3</a>
-        </div>
         <button onclick="testa()">test body</button>
         <button onclick="testh1()">test header</button>
         <button onclick="testdelete()">test delete text</button>
@@ -44,6 +42,10 @@
             <button class="counter" onclick="resetCounter()">Reset</button>
         </div>
         <button onclick="document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen()">Toggle fullscreen</button>
+    </div>
+    <div id="customAlert" class="hidden">
+        <p id="alertMessage"></p>
+        <button id="alertClose">OK</button>
     </div>
     <div class="cookies">
         <h2 class="cookieheading">This website uses cookies</h2>

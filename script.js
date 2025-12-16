@@ -167,7 +167,11 @@ function showAlert(message) {
     const alertBox = document.getElementById("customAlert");
     document.getElementById("alertMessage").innerText = message;
     alertBox.classList.remove("hidden");
-
+    if (localStorage.getItem('lightmode') === 'light' || window.matchMedia("(prefers-color-scheme: light)").matches) {
+        document.getElementById("customAlert").classList.add("darkmode");
+        document.getElementById("alertMessage").classList.add("darkmode");
+        document.getElementById("alertClose").classList.add("darkmode");
+    }
     document.getElementById("alertClose").onclick = () => {
         alertBox.classList.add("hidden");
     };

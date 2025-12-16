@@ -9,18 +9,24 @@
 </head>
 <body>
     <header>
-        <a href="/" draggable="false" class="toptitle">jazhdo</a>
+        <div id="header-top">
+            <a href="/" draggable="false" class="toptitle">jazhdo</a>
+            <a href="/login.html" id="login-link">Login</a>
+        </div>
         <nav>
             <a href="/" draggable="false" class="navbutton">Home</a>
             <a href="/blog/" draggable="false" class="navbutton">Blog</a>
             <a href="/contact.html" draggable="false" class="navbutton">Contact</a>
             <a href="/about.html" draggable="false" class="navbutton">About</a>
         </nav>
-        <a href="/login.html" id="login-link"><img src="/icon.png" alt="Login"></a>
     </header>
     <div id="main">
         <h1>Sample Page</h1>
         <p>This is some sample text.</p>
+    </div>
+    <div id="customAlert" class="hidden">
+        <p id="alertMessage"></p>
+        <button id="alertClose">OK</button>
     </div>
     <div class="cookies">
         <h2 class="cookieheading">This website uses cookies</h2>

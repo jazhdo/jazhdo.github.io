@@ -9,7 +9,10 @@
 </head>
 <body>
     <header>
-        <a href="/" draggable="false" class="toptitle">jazhdo</a>
+        <div id="header-top">
+            <a href="/" draggable="false" class="toptitle">jazhdo</a>
+            <a href="/login.html" id="login-link">Login</a>
+        </div>
         <nav>
             <a href="/" draggable="false" class="navbutton">Home</a>
             <a href="/blog/" draggable="false" class="navbutton">Blog</a>
@@ -40,6 +43,12 @@
         </ul>
         <h1>Socials' Status</h1>
         <p>Here would be the status on whether I'm active or not on these social platforms.</p>
+        <h2>Other</h2>
+        <p>A chat site made by a friend: <a href="https://bobbyreichert.pages.dev/chat/">Main url</a>, <a href="https://idiotsandinnovation.github.io/bobbyreichert-chat/chat/">Alternate url</a></p>
+    </div>
+    <div id="customAlert" class="hidden">
+        <p id="alertMessage"></p>
+        <button id="alertClose">OK</button>
     </div>
     <div id="customAlert" class="hidden">
         <p id="alertMessage"></p>

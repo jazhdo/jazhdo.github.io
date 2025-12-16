@@ -6,7 +6,7 @@ import {
     getFirestore, collection, addDoc, getDocs, query, orderBy, doc, getDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import {
-    getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut 
+    getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // Firebase references
@@ -112,24 +112,24 @@ function redirectToHome() {
 }
 
 // What to do after login
-function showAdminContent(uid, number) {
+function showAdminContent(user) {
     loginForm.style.display = "none";
     const message = document.createElement("p");
-    if (number == 0) {
-        message.textContent = `You have successfully logged in! Your UID: ${uid}`;
-    }
-    else if (number == 1) {
-        message.textContent = `Welcome. Your UID: ${uid}`;
-    }
+    message.textContent = `Welcome. You are signed in as UID: ${user.uid} Email: ${user.email}`;
     document.getElementById("message-bottom").before(message);
     loadContacts();
     document.getElementById("logout").style.display = "";
     document.getElementById("message-bottom").innerText = "";
 }
 
+function profileLoad(user) {
+    document.getElementById("profileUID").innerText = `User UID: ${user.uid}`
+    document.getElementById("profileEmail").innerText = `User Email: ${user.email}`
+}
+
 if (document.getElementById("message-bottom") !== null) {
     // Handle login form submission
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    document.getElementById("adminLoginForm").addEventListener("submit", async (e) => {
         e.preventDefault();
 
         const email = document.getElementById("email").value.trim();
@@ -144,7 +144,7 @@ if (document.getElementById("message-bottom") !== null) {
             // Check if user is admin
             const adminSnap = await getDoc(doc(db, "admins", user.uid));
             if (!adminSnap.exists()) {
-                window.showAlert("Access denied: You are not an admin.");
+                alert("Access denied: You are not an admin. (If you actually are, ask to be added to the admins file)");
                 await signOut(auth);
                 redirectToHome();
             }
@@ -158,7 +158,7 @@ if (document.getElementById("message-bottom") !== null) {
         if (user) {
             const adminSnap = await getDoc(doc(db, "admins", user.uid));
             if (adminSnap.exists()) {
-                showAdminContent(user.uid, 1);
+                showAdminContent(user);
             } else {
                 await signOut(auth);
                 redirectToHome();
@@ -173,6 +173,132 @@ if (document.getElementById("message-bottom") !== null) {
             redirectToHome();
         } catch (err) {
             window.showAlert("Logout failed because of error:", err);
+        }
+    });
+}
+let loginOption = true;
+let loginError = false;
+if (document.getElementById("loginForm") !== null) {
+    document.getElementById("otherInstead").addEventListener("click", () => {
+        if (loginOption === true) {
+            document.getElementById("loginTitle").innerText = "Sign Up";
+            document.getElementById("loginRules").innerText = "Requirements: Valid email address, 6+ characters password";
+            document.getElementById("loginSubmit").innerText = "Sign Up";
+            document.getElementById("otherInstead").innerText = "Login instead";
+            loginOption = false
+        } else if (loginOption === false) {
+            document.getElementById("loginTitle").innerText = "Login";
+            document.getElementById("loginRules").innerText = "";
+            document.getElementById("loginSubmit").innerText = "Login";
+            document.getElementById("otherInstead").innerText = "Sign up instead";
+            loginOption = true
+        }
+    });
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            console.log(`User Email: ${user.email}`);
+            console.log(`User UID: ${user.uid}`);
+            
+            document.getElementById("login").style.display = "none";
+            document.getElementById("content").style.display = "";
+            
+            profileLoad(user)
+        }
+    });
+    document.getElementById("signOut").addEventListener("click", async () => {
+        try {
+            await signOut(auth);
+            window.location.reload();
+        } catch (err) {
+            window.showAlert("Logout failed because of error:", err);
+        }
+    });
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+
+        if (loginOption === true) {
+            console.log("Logging in...");
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                window.showAlert(`You have successfully logged in with your email address: ${user.email}.`);
+
+                // Admin authorization stuff for later coding after current admin stuff is removed
+                // // Check if user is admin
+                // const adminSnap = await getDoc(doc(db, "admins", user.uid));
+                // if (!adminSnap.exists()) {
+                //     window.showAlert("Access denied: You are not an admin.");
+                //     await signOut(auth);
+                //     redirectToHome();
+                // }
+            } catch (error) {
+                const err = error.code;
+                let message = '';
+                switch (err) {
+                    case "auth/invalid-email":
+                        message = "That is a invalid email. Please enter a valid one.";
+                        break;
+                    case "auth/wrong-password":
+                        message = "You have entered the wrong password. Please try again.";
+                        break;
+                    case "auth/user-not-found":
+                        message = "You have not yet signed up. Please do so by clicking the text 'Sign up' below.";
+                        break;
+                    case "auth/user-disabled":
+                        message = "A admin of this site has disabled your account. Please go to the contact page and submit a message to learn more.";
+                        break;
+                    case "auth/too-many-requests":
+                        message = "Unusual activity has been detected from this source. Please wait a while and then try again.";
+                        break;
+                    case "auth/unauthorized-domain":
+                        message = "You cannot sign in with a email address ending in that domain. Please try another. (I do not make the rules, firebase does)";
+                        break;
+                    case "auth/invalid-credential":
+                        message = "You have either entered a email that is not valid or a password that is shorter than 6 characters."
+                        break;
+                    default:
+                        message = `Your login has failed because of error: ${error}. Please report this error with code ${err} to the developers.`;
+                        break;
+                };
+                window.showAlert(message);
+            };
+        } else if (loginOption === false) {
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                loginError = true;
+                let message = '';
+                switch (error.code) {
+                    case "auth/weak-password":
+                        message = "Your password must be at least 6 characters long.";
+                        break;
+                    case "auth/email-already-in-use":
+                        message = "This email is already linked to a account. Please try another email.";
+                        break;
+                    case "auth/too-many-requests":
+                        message = "Unusual activity has been detected from this source. Please wait a while and then try again.";
+                        break;
+                    default:
+                        message = `Account creation error: ${error}. Please report this error with code ${error.code} to the developers.`;
+                        break;
+                }
+                window.showAlert(message);
+            };
+            if (loginError === false) {
+                try {
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+                    window.showAlert(`You have successfully logged in with your email address: ${user.email}.`);
+                } catch (error) {
+                    window.showAlert(`Automatic sign in after sign up error: ${error}. Please report this error with code ${error.code} to the developers`);
+                }
+            }
+        } else {
+            window.showAlert(`Variable loginOption has not returned true or false. Please report the status "${loginOption}" of loginOption to the developers.`);
         }
     });
 }
