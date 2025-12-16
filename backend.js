@@ -2,12 +2,19 @@
 
 // Firebase stuff
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { 
+    getFirestore, collection, addDoc, getDocs, query, orderBy, doc, getDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+    getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// Your web app's Firebase configuration
+// Firebase references
+// https://firebase.google.com/docs/reference/js/app.md
+// https://firebase.google.com/docs/reference/js/firestore_.md
+// https://firebase.google.com/docs/reference/js/auth.md
+
+// Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyAHm5_zvReOaA6RpttJ1KlIhoONis99MKA",
     authDomain: "jazhdo-backend.firebaseapp.com",
@@ -17,16 +24,17 @@ const firebaseConfig = {
     appId: "1:535780894340:web:ca78bc82bbe1ff0a8204d1"
 };
 
-// Initialize Firebase
+// Variables
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 // Check if the form is submitted
 if (document.getElementById("contactForm") !== null) {
     document.getElementById("contactForm").addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        // Get trimmed values
+        // Get trimmed values (Whitespace in front & back removed)
         const email = document.getElementById("contactEmail").value.trim();
         const message = document.getElementById("contactMessage").value.trim();
         const sentDate = new Date()
@@ -42,17 +50,22 @@ if (document.getElementById("contactForm") !== null) {
                 message: message,
                 createdAt: sentDate
             });
-            window.showAlert("Thank you! Your message was successfully sent. Here's your ID for future inquiries: " + record.id);
+            window.showAlert("Thank you! Your message was successfully sent. \
+                Here's your message ID for future inquiries: " + record.id);
             document.getElementById("contactForm").reset();
         } catch (error) {
-            console.error("Error saving message:", error);
+            window.showAlert("There was an error sending the message: ", error, ". \
+                Please try again later or on a different device.");
             window.showAlert("Oops! Something went wrong.");
         }
     });
 }
 function timestampToDate(ts) {
-    if (!ts) return null;
-    if (ts.toDate) return ts.toDate(); // normal SDK case
+    if (!ts) {
+        console.error("Nothing was provided when timestampToDate was called.");
+        return null;
+    }
+    if (ts.toDate) return ts.toDate();
     if (ts.seconds) {
         return new Date(ts.seconds * 1000 + (ts.nanoseconds || 0) / 1_000_000);
     }
@@ -86,12 +99,13 @@ async function loadContacts() {
         box.className = "posts";
         if (document.getElementById("darktest").classList.contains('darkmode')) {
             box.className += ' darkmode';
-            console.log("Darkmode added to div")
+            console.log("Darkmode added to posts")
         }
         box.append(id, time, email, message);
         document.getElementById("message-bottom").before(box);
     });
 }
+window.loadContacts = loadContacts;
 
 function redirectToHome() {
     window.location.href = "/about.html";
@@ -114,11 +128,8 @@ function showAdminContent(uid, number) {
 }
 
 if (document.getElementById("message-bottom") !== null) {
-    const auth = getAuth(app);
-    const loginForm = document.getElementById("loginForm");
-
     // Handle login form submission
-    loginForm.addEventListener("submit", async (e) => {
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
         e.preventDefault();
 
         const email = document.getElementById("email").value.trim();
@@ -132,17 +143,13 @@ if (document.getElementById("message-bottom") !== null) {
 
             // Check if user is admin
             const adminSnap = await getDoc(doc(db, "admins", user.uid));
-            if (adminSnap.exists()) {
-            // showAdminContent(user.uid, 0);
-            }
-            else {
-            alert("Access denied: You are not an admin.");
-            await signOut(auth);
-            redirectToHome();
+            if (!adminSnap.exists()) {
+                window.showAlert("Access denied: You are not an admin.");
+                await signOut(auth);
+                redirectToHome();
             }
         } catch (error) {
-            console.error("Login failed:", error);
-            alert("Login failed: " + error.message);
+            window.showAlert("Login failed because of error: " + error);
         }
     });
 
@@ -165,8 +172,7 @@ if (document.getElementById("message-bottom") !== null) {
             await signOut(auth);
             redirectToHome();
         } catch (err) {
-            console.error("Logout failed:", err);
+            window.showAlert("Logout failed because of error:", err);
         }
     });
 }
-window.loadContacts = loadContacts;

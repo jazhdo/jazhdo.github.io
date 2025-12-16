@@ -106,7 +106,7 @@ h2{
 }
 footer{
     background-color: lightgreen;
-    padding: 1vw;
+    padding: 1vw 0px;
     margin-top: 2vw;
     bottom: 0px;
     width: 100%;
@@ -253,6 +253,12 @@ div.posts {
     padding: 1vw;
     margin: 1vw 0px;
     background-color: lightgray;
+}
+a#login-link {
+    border-radius: 100px;
+}
+img {
+    border-radius: 2vw;
 }
 /* Dark Mode Settings */
 button.darkmode:hover, a.navbutton.darkmode:hover{
@@ -451,12 +457,15 @@ div.cookies.darkmode {
     }
     p,li{
         font-size: 20px;
+        margin: 0.5vw;
     }
     h1{
         font-size: 30px;
+        margin: 0.5vw;
     }
     h2{
         font-size: 25px;
+        margin: 0.5vw;
     }
     .footer, button.footer{
         font-size: 1.2vw;
@@ -465,5 +474,12 @@ div.cookies.darkmode {
     .cookiebutton{
         font-size: 1vw;
         padding: 1vw 0vw;
+    }
+    button{
+        margin: 0px;
+    }
+    button.counter{
+        font-size: 1vw;
+        padding: 0.5vw;
     }
 }
