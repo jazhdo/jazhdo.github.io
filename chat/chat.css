@@ -400,3 +400,18 @@ h2#settingsTitle {
         font-size: 1.5vw;
     }
 }
+@media (min-width: 1401px) {
+    #toptitle {
+        font-size: max(calc(100px - 3vw), 10px);
+        
+    }
+    #chatsTitle {
+        font-size: max(calc(35px - 1vw), 10px);
+    }
+    #chatTitle, #addUser, #removeUser{
+        font-size: max(calc(50px - 1vw), 10px);
+    }
+    .posts, footer {
+        font-size: max(calc(35px - 1vw), 10px);
+    }
+}
