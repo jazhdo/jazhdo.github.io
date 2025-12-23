@@ -3,7 +3,7 @@
 // Firebase stuff
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { 
-    getFirestore, collection, addDoc, getDocs, query, orderBy, doc, getDoc, setDoc, updateDoc, arrayUnion, increment, arrayRemove, where, onSnapshot, deleteField, deleteDoc 
+    getFirestore, collection, addDoc, query, orderBy, doc, getDoc, setDoc, arrayUnion, increment, arrayRemove, where, onSnapshot, deleteDoc 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import {
     getAuth, onAuthStateChanged
@@ -65,6 +65,7 @@ async function updateChat(user) {
     if (!chatId) {
         document.getElementById('chatTitle').innerText = '';
         document.getElementById('chatBar').style.display = 'none';
+        document.getElementById('typeBar').style.display = 'none';
         document.querySelectorAll('.posts').forEach((e) => {
             e.remove();
         });
@@ -128,6 +129,7 @@ async function getChatList(snapshot, user) {
             chatId = doc.id;
             updateChat(user);
             document.getElementById('chatBar').style.display = '';
+            document.getElementById('typeBar').style.display = '';
 
             if (window.innerWidth <= 600) {
                 document.body.classList.add('chat-open');
