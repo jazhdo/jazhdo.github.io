@@ -127,28 +127,20 @@ body {
     flex: none !important;
     width: 0 !important;
     min-width: 0 !important;
-    /* margin: 0 !important;
-    padding: 0 !important; */
     opacity: 0;
     pointer-events: none;
 }
 .hidden-sidebar + #resizer {
     display: none;
 }
-#chatCreate {
+.chats, #chatCreate {
     border-radius: 2vw;
     padding: 0.5px 1vw;
     background-color: rgb(228, 228, 228);
     margin-bottom: 1vw;
     cursor: pointer;
 }
-.chats {
-    border-radius: 2vw;
-    padding: 0.5px 1vw;
-    background-color: rgb(228, 228, 228);
-    margin-bottom: 1vw;
-}
-.chats:hover {
+.chats:hover, #chatCreate:hover {
     background-color: rgb(220, 220, 220);
     cursor: pointer;
 }
@@ -261,7 +253,7 @@ body {
     cursor: pointer;
 }
 #typeBar button:hover {
-    background-color: rgb(150, 150, 150);
+    background-color: rgb(164, 255, 164);
 }
 footer {
     font-size: 2.5vw;
@@ -278,6 +270,15 @@ footer {
     -webkit-user-select: none;
     -moz-user-select: none;
     user-select: none;
+}
+button#lightmode:hover {
+    cursor: pointer;
+}
+button#lightmode {
+    font-size: 2.5vw;
+    border-width: 0px;
+    font-family: 'Times New Roman', Times, serif;
+    background-color: lightgreen;
 }
 h2#addUserTitle, h2#createChatTitle, h2#removeUserTitle, h2#settingsTitle {
     margin: 1vw 0px;
@@ -307,6 +308,77 @@ h2#settingsTitle {
 #settingsTopBox {
     display: flex;
     justify-content: space-between;
+}
+/* Darkmode settings */
+body.darkmode {
+    color: #f2f2f2;
+}
+header.darkmode {
+    background-color: darkgreen;
+}
+#menuIconButton.darkmode, #settingsIconButton.darkmode {
+    background-color: darkgreen;
+}
+#settingsIconButton.darkmode:hover {
+    background-color: green;
+}
+#toptitle.darkmode {
+    color: #f2f2f2;
+}
+div#chatsList.darkmode {
+    background-color: #424242;
+}
+div#chatsBox.darkmode {
+    background-color: #323232;
+}
+div#chatCreate.darkmode, div.chats.darkmode {
+    background-color: #222222;
+}
+div#chatCreate.darkmode:hover, div.chats.darkmode:hover {
+    background-color: #323232;
+}
+div#resizer.darkmode {
+    background-color: #525252;
+}
+div#resizer.darkmode:hover {
+    background-color: #727272;
+}
+div#messagesBox.darkmode {
+    background-color: #121212;
+}
+div#chatBar.darkmode {
+    background-color: #424242;
+    color: #f2f2f2;
+}
+div.posts.right.darkmode {
+    background-color: #000080;
+}
+div.posts.left.darkmode {
+    background-color: #323240;
+}
+div#typeBar.darkmode {
+    background-color: #323232;
+}
+textarea#typeInput.darkmode {
+    background-color: #424242;
+    border-color: #727272;
+    color: #f2f2f2;
+}
+textarea#typeInput.darkmode:focus {
+    border-color: darkgreen;
+}
+footer.darkmode, .footer.darkmode, button#lightmode.darkmode {
+    background-color: darkgreen;
+    color: #f2f2f2;
+}
+#typeBar button.darkmode {
+    background-color: darkgreen;
+    color: #f2f2f2;
+    border-color: #525252;
+}
+#typeBar button.darkmode:hover {
+    background-color: green;
+    border-color: #727272;
 }
 @media (max-width: 600px) {
     #main {
@@ -351,11 +423,10 @@ h2#settingsTitle {
     #settingsIconButton:hover {
         background-color: lightgreen;
     }
-
     body.chat-open #menuIconButton {
         visibility: visible;
     }
-    footer {
+    footer, button#lightmode {
         font-size: 4vw;
     }
     #toptitle {
@@ -396,7 +467,7 @@ h2#settingsTitle {
     .posts {
         font-size: 1.5vw;
     }
-    footer {
+    footer, button#lightmode {
         font-size: 1.5vw;
     }
 }
@@ -411,7 +482,7 @@ h2#settingsTitle {
     #chatTitle, #addUser, #removeUser{
         font-size: max(calc(50px - 1vw), 10px);
     }
-    .posts, footer {
+    .posts, footer, button#lightmode {
         font-size: max(calc(35px - 1vw), 10px);
     }
 }

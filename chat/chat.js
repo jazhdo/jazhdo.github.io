@@ -99,6 +99,10 @@ async function updateChat(user) {
         const p = document.createElement("p");
         box.className = 'posts';
 
+        if (document.getElementById("darktest").classList.contains('darkmode')) {
+            box.className += ' darkmode';
+        };
+
         if (e.user == user.uid) {
             box.classList.add('right');
             p.textContent = e.text;
@@ -133,6 +137,9 @@ async function getChatList(snapshot, user) {
         box.className = "chats";
         h2.textContent = data.title || doc.id;
         p.textContent = data.lastMessage || 'none';
+        if (document.getElementById("darktest").classList.contains('darkmode')) {
+            box.className += ' darkmode';
+        };
 
         box.addEventListener('click', (e) => {
             e.preventDefault();
@@ -171,6 +178,10 @@ async function createChatMenu(userUID) {
     cancel.id = 'createChatCancel';
     submit.type = 'submit';
     
+    if (document.getElementById("darktest").classList.contains('darkmode')) {
+        box.className += ' darkmode';
+    };
+
     form.append(h2, title, submit, cancel);
     box.append(form);
     document.getElementById("main").after(box);
@@ -291,6 +302,10 @@ onAuthStateChanged(auth, async (user) => {
             cancel.id = 'addUserCancel';
             submit.type = 'submit';
 
+            if (document.getElementById("darktest").classList.contains('darkmode')) {
+                box.className += ' darkmode';
+            };
+
             form.append(h2, input, submit, cancel);
             box.append(form);
             document.getElementById('main').after(box);
@@ -331,6 +346,10 @@ onAuthStateChanged(auth, async (user) => {
             cancel.id = 'removeUserCancel';
             submit.type = 'submit';
             
+            if (document.getElementById("darktest").classList.contains('darkmode')) {
+                box.className += ' darkmode';
+            };
+
             const listRef = doc(db, 'chats', chatId);
             const list = await getDoc(listRef);
             const participants = list.data().participants;
