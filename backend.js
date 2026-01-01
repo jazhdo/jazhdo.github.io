@@ -1,4 +1,4 @@
-// Version 12/23/2025
+// Version 12/31/2025
 
 // Firebase stuff
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -115,12 +115,10 @@ async function loadContacts() {
         box.append(id, time, email, message);
         document.getElementById("message-bottom").before(box);
     });
-}
-
+};
 function redirectToHome() {
     window.location.href = "/login.html";
-}
-
+};
 // Show after logged in on admin page
 let showMessages = false;
 function showAdminContent(user) {
@@ -143,7 +141,7 @@ function showAdminContent(user) {
             showMessages = false;
         }
     };
-    message.textContent = `Welcome. You are signed in as UID: ${user.uid} Email: ${user.email}`;
+    message.textContent = `Welcome.`;
     document.getElementById("message-bottom").before(message, showButton);
     loadContacts();
     document.querySelectorAll(".posts").forEach(e => {
@@ -152,8 +150,7 @@ function showAdminContent(user) {
     document.getElementById("adminTitle").style.display = "";
     document.getElementById("goBack").style.display = "";
     document.getElementById("message-bottom").innerText = "";
-}
-
+};
 async function profileLoad(user) {
     document.getElementById("profileUID").innerText = `User UID: ${user.uid}`
     document.getElementById("profileEmail").innerText = `User Email: ${user.email}`

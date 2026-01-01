@@ -30,19 +30,17 @@
         </p>
         <h2>Comments/Bugs</h2>
         <p><a href="/contact.html">Contact me</a> to tell me about bugs so I can improve this website.</p>
-        <h2>Upcoming Holidays</h2>
-        <p id="untilChristmas"></p>
-        <p id="untilNewYears"></p>
-        <p id="untilValentines"></p>
-        <p id="untilChineseNewYears"></p>
+        <h2 id="until"></h2>
+        <p id="until1"></p>
+        <p id="until2"></p>
+        <p id="until3"></p>
+        <p id="until4"></p>
         <h2>Javascript Test (runs on page load)</h2>
-        <p id="jstest">
-            Javascript test failed. Please click the button below to try again.
-        </p>
+        <p id="jstest">Javascript test failed. Please click the button below to try again.</p>
         <button onclick="jstest();">Click here to redo the test.</button>
     </div>
     <footer>
-        <p id="darktest" class="footer">Updated: 12/23/2025 - jazhdo</p>
+        <p id="darktest" class="footer">Updated: 12/31/2025 - jazhdo</p>
         <a class="footer" href="/privacy.html">Privacy</a>
         <a class="footer" href="/terms.html">Terms</a>
         <button onclick="lightmode()" id="lightmode" class="footer"></button>
@@ -53,19 +51,63 @@
             function jstest() {
                 document.getElementById("jstest").innerText = "Test #" + jstestcount + " Successful.";
                 jstestcount += 1;
-                refreshDate('untilChristmas', 2025, 12, 25, 'Christmas');
-                refreshDate('untilNewYears', 2026, 1, 1, 'New Years');
-                refreshDate('untilValentines', 2026, 2, 14, 'Valentines Day');
-                refreshDate('untilChineseNewYears', 2026, 2, 17, 'Chinese New Years');
+            };
+            // Mod is '%'
+            function timeS(time, measure) {
+                return (time)?(Math.abs(time) > 1)?`${time} ${measure}s`:`${time} ${measure}`:'';
             };
             function refreshDate(elementId, year, month, day, subject) {
                 const now = new Date();
-                now.setHours(0,0,0,0);
                 const goal = new Date(year, month - 1, day);
-                const until = (goal - now)/1000/60/60/24;
-                document.getElementById(elementId).innerText = subject + " (" + month + "/" + day + "/" + year + "): in " + until + " days" ;
+                let until = (goal - now)/1000/60/60/24;
+                let seconds = Math.floor((goal - now)/1000%60);
+                let minutes = Math.floor((goal - now)/1000/60%60);
+                let hours = Math.floor((goal - now)/1000/60/60%24);
+                let days = Math.floor((goal - now)/1000/60/60/24%7);
+                let weeks = Math.floor((goal - now)/1000/60/60/24/7);
+                let message = '';
+
+                seconds = timeS(seconds, 'second');
+                minutes = timeS(minutes, 'minute');
+                hours = timeS(hours, 'hour');
+                days = timeS(days, 'day');
+                weeks = timeS(weeks, 'week');
+
+                parts = [weeks, days, hours, minutes, seconds];
+                sections = [];
+                parts.forEach(e => {
+                    if (e) {
+                        sections.push(e);
+                    };
+                });
+                if (sections.length >= 3) {
+                    let numberOn = 0
+                    sections.forEach((e) => {
+                        if (sections.length - numberOn > 1) {
+                            message += `${e}, `;
+                        } else {
+                            message += `and ${e}`;
+                        }
+                        numberOn ++;
+                    });
+                } else if (sections.length == 2) {
+                    message = `${sections[0]} and ${sections[0]}`;
+                } else if (sections.length == 1) {
+                    message = `${sections[0]}`;
+                } else {
+                    alert(`There has been an error with getting how long it is until a date. Please report this error at the contact page`);
+                };
+                // Make this more modular (add weeks if more than 0, add days if more than 0, etc... also add hours and minutes and seconds (live countdown for new yearss))
+                document.getElementById(elementId).innerText = subject + " (" + month + "/" + day + "/" + year + "): " + message;
             };
             jstest();
+            setInterval(() => {
+                document.getElementById('until').innerText = 'Upcoming Holidays:';
+                refreshDate('until1', 2025, 12, 31, 'New Years Eve');
+                refreshDate('until2', 2026, 1, 1, 'New Years');
+                refreshDate('until3', 2026, 2, 14, 'Valentines Day');
+                refreshDate('until4', 2026, 2, 17, 'Chinese New Years');
+            }, 1000);
         </script>
     </footer>
 </body>

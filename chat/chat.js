@@ -1,9 +1,9 @@
-// Version 12/23/2025
+// Version 12/31/2025
 
 // Firebase stuff
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { 
-    getFirestore, collection, addDoc, query, orderBy, doc, getDoc, getDocs, setDoc, arrayUnion, increment, arrayRemove, where, onSnapshot, deleteDoc 
+    getFirestore, collection, addDoc, query, orderBy, doc, getDoc, getDocs, setDoc, arrayUnion, increment, arrayRemove, where, onSnapshot, deleteDoc, runTransaction 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import {
     getAuth, onAuthStateChanged
@@ -30,12 +30,28 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 const messageCollection = collection(db, 'chats');
 let chatId = '';
+let popupActive = false;
+let editMessageStatus = {
+    status: false,
+    docId: '',
+    index: 0
+};
+let replyMessageStatus = {
+    status: false,
+    text: '',
+    user: ''
+};
 
 // Functions
-async function sendMessage(messageData) {
+async function sendMessage(messageData, user) {
     if (!messageData.text.trim() || !chatId) {
         return;
-    }; 
+    } else if (editMessageStatus.status === true) {
+        await editMessage(editMessageStatus.docId, editMessageStatus.index, messageData.text);
+        editMessageStatus.status = false;
+        updateChat(user);
+        return;
+    };
     // metaRef is main data doc, metaSnap is a snapshot of that main data doc
     const metaRef = doc(db, "chats", chatId);
     const metaSnap = await getDoc(metaRef);
@@ -45,12 +61,25 @@ async function sendMessage(messageData) {
     const bucketRef = doc(db, "chats", `${chatId}_${targetBucket}`);
 
     // Add info to bucket doc
-    await setDoc(bucketRef, {
-        messages: arrayUnion({
-        ...messageData,
-        timestamp: new Date().toISOString()
-        })
-    }, { merge: true }); // This is to add the bucket doc (doc_1, doc_2, doc_3, etc. for the same chat) in case it has not yet been created
+    if (replyMessageStatus.status === false) {
+        await setDoc(bucketRef, {
+            messages: arrayUnion({
+            ...messageData,
+            timestamp: new Date().toISOString()
+            })
+        }, { merge: true }); // This is to add the bucket doc (doc_1, doc_2, doc_3, etc. for the same chat) in case it has not yet been created
+    } else if (replyMessageStatus.status === true) {
+        await setDoc(bucketRef, {
+            messages: arrayUnion({
+            replyToUser: replyMessageStatus.user,
+            replyToText: replyMessageStatus.text,
+            ...messageData,
+            timestamp: new Date().toISOString()
+            })
+        }, { merge: true });
+        document.getElementById('replyBar').remove();
+        replyMessageStatus.status = false;
+    };
 
     // Add info to main data doc
     console.log(`targetBucket: ${targetBucket}, messageData.text: ${messageData.text}, date: ${new Date().toISOString()}`)
@@ -60,6 +89,126 @@ async function sendMessage(messageData) {
         lastMessage: messageData.text,
         updatedAt: new Date().toISOString()
     }, { merge: true });
+};
+function openContextMenu(a, e, user, option, b, metaSnap, messagesArray) {
+    const menu = document.createElement('div');
+    const title = document.createElement('h2');
+    const x = document.createElement('h2');
+    const reply = document.createElement('p');
+    const copy = document.createElement('p');
+    const back = document.createElement('div');
+
+    [menu, reply, copy].forEach((e) => e.className += document.getElementById("darktest").classList.contains('darkmode')? ' darkmode' : '');
+
+    menu.id = 'contextMenuBox';
+    title.textContent = 'Menu';
+    title.id = 'contextMenuTitle';
+    reply.textContent = 'Reply';
+    reply.id = 'contextMenuReply';
+    x.textContent = 'X';
+    x.id = 'contextMenuClose';
+    copy.textContent = 'Copy';
+    copy.id = 'contextMenuCopy';
+    back.id = 'clickableBackground';
+
+    back.style.width = '100vw';
+    back.style.height = '100vh';
+    back.style.zIndex = '1000';
+    back.style.position = 'absolute';
+    back.style.opacity = '0';
+    menu.append(title, x);
+    if (e.user == user.uid) {
+        const edit = document.createElement('p');
+        edit.textContent = 'Edit';
+        edit.id = 'contextMenuEdit';
+        edit.className += document.getElementById("darktest").classList.contains('darkmode')? ' darkmode' : '';
+        menu.append(copy, edit, reply);
+    } else {
+        menu.append(copy, reply);
+    };
+    document.getElementById('main').after(menu, back);
+
+    const menuBoxElement = document.getElementById('contextMenuBox');
+    if (option == 'computer') {
+        const menuWidth = menu.offsetWidth;
+        const menuHeight = menu.offsetHeight;
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+
+        // 2. Calculate Horizontal Position (Left/Right)
+        let left = a.pageX;
+        if (a.clientX + menuWidth > windowWidth) {
+            // If it goes off the right edge, move it to the left of the cursor
+            left = a.pageX - menuWidth;
+        }
+
+        // 3. Calculate Vertical Position (Top/Bottom)
+        let top = a.pageY;
+        if (a.clientY + menuHeight > windowHeight) {
+            // If it goes off the bottom edge, move it above the cursor
+            top = a.pageY - menuHeight;
+        }
+
+        // 4. Apply the safe coordinates
+        menuBoxElement.style.left = left + 'px';
+        menuBoxElement.style.top = top + 'px';
+    } else if (option == 'mobile') {
+        let m = menuBoxElement.style;
+        m.position = 'absolute';
+        m.backgroundColor = 'lightgreen';
+        m.top = '50%';
+        m.left = '50%';
+        m.transform = 'translate(-50%, -50%)';
+        m.borderRadius =  '3vw';
+        m.padding = '2vw';
+        m.zIndex = '1000';
+    } else {
+        console.log('Option has not returned true or false.');
+    };
+    
+    const close = () => {
+        document.getElementById('contextMenuBox').remove();
+        document.getElementById('clickableBackground').remove();
+        popupActive = false;
+    };
+
+    document.getElementById('contextMenuReply').addEventListener('click', async () => {
+        document.getElementById('typeInput').focus();
+        replyMessageStatus.status = true;
+        replyMessageStatus.text = (messagesArray.length - 1) - b;
+        const usersSnap = await getDoc(doc(db, 'users', e.user));
+        replyMessageStatus.user = usersSnap.exists() ? usersSnap.data().displayName : e.user;
+        const bar = document.createElement('div');
+        const text = document.createElement('p');
+        text.textContent = `Replying to: ${e.text}`;
+        bar.id = 'replyBar';
+        bar.append(text);
+        document.getElementById('typeBar').before(bar);
+        close();
+    });
+
+    if (e.user == user.uid) {
+        document.getElementById('contextMenuEdit').addEventListener('click', async () => {
+            document.getElementById('typeInput').focus();
+            document.getElementById('typeInput').value = e.text;
+
+            editMessageStatus.status = true;
+            editMessageStatus.docId = `${chatId}_${metaSnap.data().currentBucket}`;
+            editMessageStatus.index = (messagesArray.length - 1) - b;
+            close();
+        });
+    };
+    document.getElementById('contextMenuCopy').addEventListener('click', async () => {
+        try {
+            await navigator.clipboard.writeText(e.text);
+            console.log(`Copied message: '${e.text}'`);
+        } catch (error) {
+            console.error("Failed to copy: ", error);
+        };
+        close();
+    });
+    document.getElementById('contextMenuClose').addEventListener('click', close)
+    document.getElementById('clickableBackground').addEventListener('click', close);
 };
 async function updateChat(user) {
     if (!chatId) {
@@ -94,14 +243,12 @@ async function updateChat(user) {
 
     const nameCache = {}; 
 
-    for (const e of messagesArray) {
+    for (const [b, e] of messagesArray.entries()) {
         const box = document.createElement("div");
         const p = document.createElement("p");
         box.className = 'posts';
 
-        if (document.getElementById("darktest").classList.contains('darkmode')) {
-            box.className += ' darkmode';
-        };
+        box.className += document.getElementById("darktest").classList.contains('darkmode')? ' darkmode' : '';
 
         if (e.user == user.uid) {
             box.classList.add('right');
@@ -119,13 +266,50 @@ async function updateChat(user) {
                 p.textContent = `${name}: ${e.text}`;
             };
         };
-
-        box.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-
-            
+        if (e.edited) {
+            p.textContent = p.textContent + ' (edited)';
+        };
+        if (e.replyToText && e.replyToUser) {
+            const replyBox = document.createElement('div');
+            const replyUser = document.createElement('p');
+            const replyText = document.createElement('p');
+            replyBox.className = 'replyBox';
+            replyUser.textContent = e.replyToUser;
+            const unsortedMessages = [...messagesArray].sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+            try {
+                replyText.textContent = unsortedMessages[e.replyToText].text;
+            } catch {
+                replyText.textContent = e.replyToText;
+            };
+            replyBox.append(replyUser, replyText);
+            box.append(replyBox);
+        };
+        
+        let pressTimer;
+        box.addEventListener("pointerdown", (a) => {
+            a.preventDefault();
+            // body.classList.
+            pressTimer = setTimeout(() => {
+                clearTimeout(pressTimer);
+                openContextMenu(a, e, user, 'mobile', b, metaSnap, messagesArray);
+            }, 500);
         });
 
+        box.addEventListener("pointerup", cancel);
+        box.addEventListener("pointerleave", cancel);
+        box.addEventListener("pointercancel", cancel);
+
+        function cancel() {
+            clearTimeout(pressTimer);
+        };
+
+        box.addEventListener('contextmenu', (a) => {
+            a.preventDefault();
+            if (popupActive === false) {
+                popupActive = true;
+                openContextMenu(a, e, user, 'computer', b, metaSnap, messagesArray);
+            };
+        });
         box.append(p);
         document.getElementById("messageBottom").before(box);
     };
@@ -232,14 +416,14 @@ async function addUser(userUID) {
             participants: arrayUnion(userUID),
             updatedAt: new Date()
         }, { merge: true });
-    } else if (!userSnap.docs[0].empty) {
+    } else if (!userSnap.empty) {
         console.log('Adding user with username.');
         await setDoc(metaRef, {
             participants: arrayUnion(userSnap.docs[0].id),
             updatedAt: new Date()
         }, { merge: true });
     } else {
-        console.log(`The entered user id or username has not been found to match any in the database.`)
+        console.log(`The entered user id or username has not been found to match any in the database.`);
     }
 };
 async function removeUser(userUID, removeChatId) {
@@ -263,7 +447,41 @@ async function renameChat(name) {
         updatedAt: new Date()
     }, { merge: true });
 };
+async function editMessage(docId, indexToEdit, newText) {
+    const docRef = doc(db, "chats", docId);
+    const metaRef = doc(db, "chats", chatId);
+    
+    try {
+        await runTransaction(db, async (transaction) => {
+            const sfDoc = await transaction.get(docRef);
+            if (!sfDoc.exists()) return;
+            let messages = sfDoc.data().messages || [];
+            if (messages[indexToEdit]) {
+                messages[indexToEdit].text = newText;
+                messages[indexToEdit].edited = true;
 
+                transaction.update(docRef, { messages: messages });
+            } else {
+                alert("Index not found in array");
+            }
+        });
+        console.log(`Message #${indexToEdit + 1} has been edited to'${newText}'`);
+    } catch (e) {
+        alert(`Editing the message has failed because of error: ${e}`);
+    };
+    const metaSnap = await getDoc(metaRef);
+    if (metaSnap.data().totalMessages === messages.length - 1) {
+        console.log('Changing lastMessage...');
+        await setDoc(metaRef, {
+            lastMessage: newText,
+            updatedAt: new Date().toISOString()
+        }, { merge: true });
+    } else {
+        await setDoc(metaRef, {
+            updatedAt: new Date().toISOString()
+        }, { merge: true });
+    }
+};
 onAuthStateChanged(auth, async (user) => {
     // Detect if user is logged in or not. If not, this leads them to the login page to be redirected back here.
     if (!user) {
@@ -271,8 +489,6 @@ onAuthStateChanged(auth, async (user) => {
         window.location.href = '/login.html?redirect=/chat/';
     };
     // Below should be code to run after firebase firestore load
-
-    let popupActive = false;
     const q = query(messageCollection, where('participants', 'array-contains', user.uid), orderBy('updatedAt', 'desc'));
 
     onSnapshot(q, async (snapshot) => {
@@ -309,9 +525,7 @@ onAuthStateChanged(auth, async (user) => {
             cancel.id = 'addUserCancel';
             submit.type = 'submit';
 
-            if (document.getElementById("darktest").classList.contains('darkmode')) {
-                box.className += ' darkmode';
-            };
+            box.className += document.getElementById('darktest').classList.contains('darkmode')?' darkmode':'';
 
             form.append(h2, input, submit, cancel);
             box.append(form);
@@ -353,9 +567,7 @@ onAuthStateChanged(auth, async (user) => {
             cancel.id = 'removeUserCancel';
             submit.type = 'submit';
             
-            if (document.getElementById("darktest").classList.contains('darkmode')) {
-                box.className += ' darkmode';
-            };
+            box.className += document.getElementById('darktest').classList.contains('darkmode')?' darkmode':'';
 
             const listRef = doc(db, 'chats', chatId);
             const list = await getDoc(listRef);
@@ -431,6 +643,9 @@ onAuthStateChanged(auth, async (user) => {
             const title = list.data().title;
             let participants = list.data().participants;
 
+            box.className += document.getElementById('darktest').classList.contains('darkmode')?' darkmode':'';
+            profile.className += document.getElementById('darktest').classList.contains('darkmode')?' darkmode':'';
+
             box.id = 'settingsBox';
             h2.textContent = 'Chat  Settings';
             h2.id = 'settingsTitle';
@@ -499,7 +714,7 @@ onAuthStateChanged(auth, async (user) => {
                 user: user.uid,
                 text: document.getElementById("typeInput").value.trim()
             };
-            sendMessage(message);
+            sendMessage(message, user);
             document.getElementById("typeInput").value = "";
             this.style.height = "auto";
             this.style.height = (this.scrollTop + this.scrollHeight) + "px";
@@ -511,7 +726,7 @@ onAuthStateChanged(auth, async (user) => {
             user: user.uid,
             text: document.getElementById("typeInput").value.trim()
         };
-        sendMessage(message);
+        sendMessage(message, user);
         document.getElementById("typeInput").value = "";
         tx.style.height = "auto";
         tx.style.height = (tx.scrollTop + tx.scrollHeight) + "px";
