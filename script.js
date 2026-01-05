@@ -3,7 +3,7 @@
 //Check and update mode (Not set dark mode)
 function darkmode() {
     let mode = localStorage.getItem('lightmode');
-    document.querySelectorAll('*').forEach(element => element.classList(mode == 'dark')? += " darkmode":(mode == 'light')?.remove('darkmode'));
+    document.querySelectorAll('*').forEach(element => (mode == 'dark')?element.classList += " darkmode":(mode == 'light')?element.classList.remove('darkmode'):null);
 };
 //Response to the light mode/dark mode button being clicked (Not set light mode)
 function lightmode() {
