@@ -58,6 +58,7 @@
                 return (time)?(Math.abs(time) > 1)?`${time} ${measure}s`:`${time} ${measure}`:'';
             };
             function refreshDate(elementId, year, month, day, subject) {
+                document.getElementById(elementId).remvove();
                 const now = new Date();
                 let goal = new Date(year, month - 1, day);
                 let until = (goal - now)/1000/60/60/24;
