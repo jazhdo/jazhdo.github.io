@@ -26,19 +26,20 @@
         <h1>Home</h1>
         <h2>Site Info</h2>
         <p>
-            This is my personal website where I post stuff.
+            This is my personal website where I post stuff. 
+        </p>
+        <h2>Branches</h2>
+        <p>
+            <a href="/chat/">Chat Site</a>
+            <a href="/games/">Game Site</a>
+            <a href="/blog/">Blog Site</a>
         </p>
         <h2>Comments/Bugs</h2>
         <p><a href="/contact.html">Contact me</a> to tell me about bugs so I can improve this website.</p>
         <h2 id="until"></h2>
-        <p id="until1"></p>
-        <p id="until2"></p>
-        <p id="until3"></p>
-        <p id="until4"></p>
-        <p id="until5"></p>
         <h2>Javascript Test (runs on page load)</h2>
         <p id="jstest">Javascript test failed. Please click the button below to try again.</p>
-        <button onclick="jstest();">Click here to redo the test.</button>
+        <button onclick="jstest();" id="jstestButton">Click here to redo the test.</button>
     </div>
     <footer>
         <p id="darktest" class="footer">Updated: 1/4/2026 - jazhdo</p>
@@ -48,10 +49,9 @@
         <script type="module" src="/backend.js"></script>
         <script src="/script.js"></script>
         <script>
-            let jstestcount = 1;
             function jstest() {
-                document.getElementById("jstest").innerText = "Test #" + jstestcount + " Successful.";
-                jstestcount += 1;
+                document.getElementById("jstest").innerText = "Test Successful.";
+                document.getElementById('jstestButton').style.display = 'none';
             };
             // Mod is '%'
             function timeS(time, measure) {
@@ -102,8 +102,10 @@
                 } else {
                     alert(`There has been an error with getting how long it is until a date. Please report this error at the contact page`);
                 };
-                // Make this more modular (add weeks if more than 0, add days if more than 0, etc... also add hours and minutes and seconds (live countdown for new yearss))
-                document.getElementById(elementId).innerText = subject + " (" + month + "/" + day + "): " + message;
+                let element = document.createElement('p');
+                element.id = elementId;
+                element.innerText = subject + " (" + month + "/" + day + "): " + message;
+                document.getElementById('until').after(element);
             };
             jstest();
             setInterval(() => {
@@ -112,7 +114,7 @@
                 refreshDate('until2', 2026, 2, 14, 'Valentines Day');
                 refreshDate('until3', 2026, 2, 16, 'Presidents Day');
                 refreshDate('until4', 2026, 2, 17, 'Chinese New Years');
-                refreshDate('until5', 2021, 5, 28, 'Last Day of School');
+                refreshDate('until5', 2026, 5, 28, 'Last Day of School');
             }, 1000);
         </script>
     </footer>
