@@ -1,4 +1,4 @@
-// Version 12/31/2025
+// Version 1/4/2026
 
 // Firebase stuff
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -98,7 +98,7 @@ function openContextMenu(a, e, user, option, b, metaSnap, messagesArray) {
     const copy = document.createElement('p');
     const back = document.createElement('div');
 
-    [menu, reply, copy].forEach((e) => e.className += document.getElementById("darktest").classList.contains('darkmode')? ' darkmode' : '');
+    [menu, reply, copy, x].forEach((e) => e.className += document.getElementById("darktest").classList.contains('darkmode')? ' darkmode' : '');
 
     menu.id = 'contextMenuBox';
     title.textContent = 'Menu';
@@ -155,7 +155,7 @@ function openContextMenu(a, e, user, option, b, metaSnap, messagesArray) {
     } else if (option == 'mobile') {
         let m = menuBoxElement.style;
         m.position = 'absolute';
-        m.backgroundColor = 'lightgreen';
+        m.backgroundColor = `${document.getElementById('darktest').classList.contains('darkmode')?'dark':'light'}green`;
         m.top = '50%';
         m.left = '50%';
         m.transform = 'translate(-50%, -50%)';
@@ -242,7 +242,7 @@ async function updateChat(user) {
     document.querySelectorAll(".posts, .timestamp").forEach(e => {e.remove();});
 
     const nameCache = {}; 
-
+    let timeList = [];
     for (const [b, e] of messagesArray.entries()) {
         const time = document.createElement("p");
         const box = document.createElement("div");
@@ -263,9 +263,9 @@ async function updateChat(user) {
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit',
-            hour12: false // Set to true if you want AM/PM
+            hour12: false
         });
-        time.innerText = `${datePart} at ${timePart}`;
+        let timeString = `${datePart} at ${timePart}`;
         if (e.user == user.uid) {
             box.classList.add('right');
             p.textContent = e.text;
@@ -290,6 +290,7 @@ async function updateChat(user) {
             const replyUser = document.createElement('p');
             const replyText = document.createElement('p');
             replyBox.className = 'replyBox';
+            replyBox.className += document.getElementById("darktest").classList.contains('darkmode')? ' darkmode':'';
             replyUser.textContent = e.replyToUser;
             const unsortedMessages = [...messagesArray].sort((a, b) => a.timestamp.localeCompare(b.timestamp));
             try {
@@ -325,8 +326,13 @@ async function updateChat(user) {
             };
         });
         box.append(p);
-        console.log(`Loading message with time ${date} and message ${e.text}`);
-        document.getElementById("messageBottom").before(box, time);
+        // console.log(`Loading message with time ${date} and message ${e.text}`);
+        document.getElementById("messageBottom").before(box);
+        if (!timeList.includes(timeString)) {
+            timeList.push(timeString);
+            time.innerText = timeString;
+            document.getElementById("messageBottom").before(time);
+        }
     };
 };
 async function getChatList(snapshot, user) {
@@ -343,9 +349,7 @@ async function getChatList(snapshot, user) {
         box.className = "chats";
         h2.textContent = data.title || doc.id;
         p.textContent = data.lastMessage || 'none';
-        if (document.getElementById("darktest").classList.contains('darkmode')) {
-            box.className += ' darkmode';
-        };
+        box.className += document.getElementById("darktest").classList.contains('darkmode')?' darkmode':'';
 
         box.addEventListener('click', (e) => {
             e.preventDefault();
@@ -465,12 +469,13 @@ async function renameChat(name) {
 async function editMessage(docId, indexToEdit, newText) {
     const docRef = doc(db, "chats", docId);
     const metaRef = doc(db, "chats", chatId);
+    let messages = [];
     
     try {
         await runTransaction(db, async (transaction) => {
             const sfDoc = await transaction.get(docRef);
             if (!sfDoc.exists()) return;
-            let messages = sfDoc.data().messages || [];
+            messages = sfDoc.data().messages || [];
             if (messages[indexToEdit]) {
                 messages[indexToEdit].text = newText;
                 messages[indexToEdit].edited = true;
@@ -485,7 +490,7 @@ async function editMessage(docId, indexToEdit, newText) {
         alert(`Editing the message has failed because of error: ${e}`);
     };
     const metaSnap = await getDoc(metaRef);
-    if (metaSnap.data().totalMessages === messages.length - 1) {
+    if (metaSnap.data().totalMessages === indexToEdit + 1) {
         console.log('Changing lastMessage...');
         await setDoc(metaRef, {
             lastMessage: newText,
@@ -495,7 +500,7 @@ async function editMessage(docId, indexToEdit, newText) {
         await setDoc(metaRef, {
             updatedAt: new Date().toISOString()
         }, { merge: true });
-    }
+    };
 };
 onAuthStateChanged(auth, async (user) => {
     // Detect if user is logged in or not. If not, this leads them to the login page to be redirected back here.
@@ -505,7 +510,6 @@ onAuthStateChanged(auth, async (user) => {
     };
     // Below should be code to run after firebase firestore load
     const q = query(messageCollection, where('participants', 'array-contains', user.uid), orderBy('updatedAt', 'desc'));
-
     onSnapshot(q, async (snapshot) => {
         console.log("Database changed.");
         if (chatId !== '') {
@@ -517,184 +521,94 @@ onAuthStateChanged(auth, async (user) => {
         createChatMenu(user.uid);
     });
     {
-    document.getElementById('addUser').addEventListener('click', () => {
-        if (chatId && popupActive === false) {
-            popupActive = true;
-            const box = document.createElement('div');
-            const h2 = document.createElement('h2');
-            const form = document.createElement('form');
-            const input = document.createElement('input');
-            const submit = document.createElement('button');
-            const cancel = document.createElement('button');
-
-            h2.textContent = 'Add new user';
-            submit.textContent = 'Add';
-            input.placeholder = 'username or user id';
-            cancel.textContent = 'Cancel'
-            
-            form.id = 'addUserForm';
-            box.id = 'addUserBox';
-            h2.id = 'addUserTitle';
-            input.id = 'addUserInput';
-            submit.id = 'addUserSubmit';
-            cancel.id = 'addUserCancel';
-            submit.type = 'submit';
-
-            box.className += document.getElementById('darktest').classList.contains('darkmode')?' darkmode':'';
-
-            form.append(h2, input, submit, cancel);
-            box.append(form);
-            document.getElementById('main').after(box);
-
-            document.getElementById('addUserForm').addEventListener('submit', (e) => {
-                e.preventDefault();
-
-                if (document.getElementById('addUserInput').value.trim()) {
-                    addUser(document.getElementById('addUserInput').value.trim());
-                }
-
-                document.getElementById('addUserBox').remove();
-                popupActive = false;
-            });
-            document.getElementById('addUserCancel').addEventListener('click', () => {
-                document.getElementById('addUserBox').remove();
-                popupActive = false;
-            });
-        };
-    });
-    document.getElementById('removeUser').addEventListener('click', async () => {
-        if (chatId && popupActive === false) {
-            popupActive = true;
-            const box = document.createElement('div');
-            const h2 = document.createElement('h2');
-            const form = document.createElement('form');
-            const submit = document.createElement('button');
-            const cancel = document.createElement('button');
-
-            h2.textContent = 'Remove user';
-            submit.textContent = 'Remove';
-            cancel.textContent = 'Cancel'
-            
-            form.id = 'removeUserForm';
-            box.id = 'removeUserBox';
-            h2.id = 'removeUserTitle';
-            submit.id = 'removeUserSubmit';
-            cancel.id = 'removeUserCancel';
-            submit.type = 'submit';
-            
-            box.className += document.getElementById('darktest').classList.contains('darkmode')?' darkmode':'';
-
-            const listRef = doc(db, 'chats', chatId);
-            const list = await getDoc(listRef);
-            const participants = list.data().participants;
-            let input = [];
-
-            for (const e of participants) {
-                const checkbox = document.createElement('input');
-                const label = document.createElement('label');
-                const br = document.createElement('br');
-                checkbox.type = 'checkbox';
-                checkbox.value = e;
-                checkbox.name = 'removeUser';
-                let text = e;
-                const usersRef = doc(db, 'users', e);
-                const usersSnap = await getDoc(usersRef);
-                if (user.uid == e) {
-                    text = 'Yourself';
-                } else if (usersSnap.exists()) {
-                    text = usersSnap.data().username;
-                }
-                label.append(checkbox, text, br);
-
-                input.push(label);
-            };
-
-            form.append(h2, ...input, submit, cancel);
-            box.append(form);
-            document.getElementById('main').after(box);
-
-            document.getElementById('removeUserForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-
-                const checkedBoxes = document.querySelectorAll('input[name="removeUser"]:checked');
-                const removeList = Array.from(checkedBoxes).map(cb => cb.value);
-
-                const removeChatId = chatId;
-
-                await removeList.forEach(async (b) => {
-                    await removeUser(b, removeChatId);
-                });
-                if (removeList.includes(user.uid)) {
-                    chatId = '';
-                };
-                updateChat(user);
-                document.getElementById('removeUserBox').remove();
-                popupActive = false;
-            });
-
-            document.getElementById('removeUserCancel').addEventListener('click', () => {
-                document.getElementById('removeUserBox').remove();
-                popupActive = false;
-            });
-        };
-    });
-    }
-    {
     document.getElementById('settingsIconButton').addEventListener('click', async () => {
-        if (popupActive === false) {
+        if (chatId && popupActive === false) {
             popupActive = true;
             const box = document.createElement('div');
             const h2 = document.createElement('h2');
             const x = document.createElement('h2');
             const topBox = document.createElement('div');
-            const profile = document.createElement('a');
+            const profile = document.createElement('p');
+            const profileLink = document.createElement('a');
             const form = document.createElement('form');
             const chatTitle = document.createElement('input');
             const participantsList = document.createElement('p');
             const save = document.createElement('button');
+            const addUserTitle = document.createElement('p');
+            const addUserForm = document.createElement('form');
+            const addUserInput = document.createElement('input');
+            const addUserSubmit = document.createElement('button');
+            const removeUserForm = document.createElement('form');
+            const removeUserSubmit = document.createElement('button');
+
+            addUserTitle.textContent = 'Add User:';
+            addUserSubmit.textContent = 'Add';
+            addUserInput.placeholder = 'username or user id';
+            removeUserSubmit.textContent = 'Remove';
+            removeUserSubmit.style.display = 'none';
+            
+            addUserForm.id = 'addUserForm';
+            addUserTitle.id = 'addUserTitle';
+            addUserInput.id = 'addUserInput';
+            addUserSubmit.id = 'addUserSubmit';
+            addUserSubmit.type = 'submit';
+            removeUserForm.id = 'removeUserForm';
+            removeUserSubmit.id = 'removeUserSubmit';
+            removeUserSubmit.type = 'submit';
 
             const listRef = doc(db, 'chats', chatId);
             const list = await getDoc(listRef);
             const title = list.data().title;
             let participants = list.data().participants;
 
-            box.className += document.getElementById('darktest').classList.contains('darkmode')?' darkmode':'';
-            profile.className += document.getElementById('darktest').classList.contains('darkmode')?' darkmode':'';
+            const darkmodeElements = [box, profile, x];
+            darkmodeElements.forEach((element) => {element.className += document.getElementById('darktest').classList.contains('darkmode')?' darkmode':'';})
 
             box.id = 'settingsBox';
-            h2.textContent = 'Chat  Settings';
+            h2.textContent = 'Chat Settings';
             h2.id = 'settingsTitle';
             x.id = 'settingsCancel';
             x.textContent = 'X';
             topBox.id = 'settingsTopBox'
-            profile.textContent = 'Profile settings';
-            profile.href = '/login.html';
+            profile.textContent = 'Profile Settings: ';
+            profileLink.href = '/login.html';
+            profileLink.textContent = 'link';
+            profile.style.margin = '0px';
             form.id = 'settingsForm';
             chatTitle.value = title;
             chatTitle.id = 'settingsInput';
             participantsList.append('Chat Members: ', document.createElement('br'));
+
             for (const uid of participants) {
                 const docSnap = await getDoc(doc(db, 'users', uid));
-                if (docSnap.exists()) {
-                    participantsList.append(docSnap.data().username, document.createElement('br'));
-                } else {
-                    console.log('Username not yet given');
-                    participantsList.append(uid, document.createElement('br'));
-                };
+                const checkbox = document.createElement('input');
+                const label = document.createElement('label');
+                const br = document.createElement('br');
+                const text = docSnap.exists()?docSnap.data().username:uid;
+                checkbox.type = 'checkbox';
+                checkbox.name = 'removeUser';
+                checkbox.addEventListener('change', () => {
+                    document.getElementById('removeUserSubmit').style.display = Array.from(document.getElementById('removeUserForm').querySelectorAll('input')).some(checkbox => checkbox.checked)?'':'none';
+                });
+                label.append(checkbox, text, br);
+                participantsList.append(label);
             };
+            participantsList.append(removeUserSubmit)
             save.id = 'settingsSave';
             save.textContent = 'Save';
 
+            profile.append(profileLink);
+            removeUserForm.append(participantsList);
             form.append(chatTitle, save);
+            addUserForm.append(addUserTitle, addUserInput, addUserSubmit);
             topBox.append(h2, x);
-            box.append(topBox, profile, document.createElement('br'), 'Chat Title: ', document.createElement('br'),form, participantsList);
+            box.append(topBox, profile, 'Chat Title: ', form, removeUserForm, addUserForm);
             document.getElementById('main').after(box);
 
             document.getElementById('settingsCancel').addEventListener('click', () => {
                 document.getElementById('settingsBox').remove();
                 popupActive = false;
             });
-
             document.getElementById('settingsForm').addEventListener('submit', (e) => {
                 e.preventDefault();
 
@@ -703,6 +617,32 @@ onAuthStateChanged(auth, async (user) => {
                 if (newTitle) {
                     renameChat(newTitle);
                 };
+                document.getElementById('settingsBox').remove();
+                popupActive = false;
+            });
+            document.getElementById('addUserForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                if (document.getElementById('addUserInput').value.trim()) {
+                    addUser(document.getElementById('addUserInput').value.trim());
+                };
+                document.getElementById('settingsBox').remove();
+                popupActive = false;
+            });
+            document.getElementById('removeUserForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const checkedBoxes = document.querySelectorAll('input[name="removeUser"]:checked');
+                const removeList = Array.from(checkedBoxes).map(cb => cb.value);
+                const currentChatId = chatId
+
+                await removeList.forEach(async (b) => {
+                    await removeUser(b, currentChatId);
+                });
+                if (removeList.includes(user.uid)) {
+                    chatId = '';
+                };
+                updateChat(user);
                 document.getElementById('settingsBox').remove();
                 popupActive = false;
             });

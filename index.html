@@ -35,12 +35,13 @@
         <p id="until2"></p>
         <p id="until3"></p>
         <p id="until4"></p>
+        <p id="until5"></p>
         <h2>Javascript Test (runs on page load)</h2>
         <p id="jstest">Javascript test failed. Please click the button below to try again.</p>
         <button onclick="jstest();">Click here to redo the test.</button>
     </div>
     <footer>
-        <p id="darktest" class="footer">Updated: 12/31/2025 - jazhdo</p>
+        <p id="darktest" class="footer">Updated: 1/4/2026 - jazhdo</p>
         <a class="footer" href="/privacy.html">Privacy</a>
         <a class="footer" href="/terms.html">Terms</a>
         <button onclick="lightmode()" id="lightmode" class="footer"></button>
@@ -58,8 +59,12 @@
             };
             function refreshDate(elementId, year, month, day, subject) {
                 const now = new Date();
-                const goal = new Date(year, month - 1, day);
+                let goal = new Date(year, month - 1, day);
                 let until = (goal - now)/1000/60/60/24;
+                for (let index = year; until < 0; index++) {
+                    goal = new Date(index, month - 1, day);
+                    until = (goal - now)/1000/60/60/24;
+                }
                 let seconds = Math.floor((goal - now)/1000%60);
                 let minutes = Math.floor((goal - now)/1000/60%60);
                 let hours = Math.floor((goal - now)/1000/60/60%24);
@@ -98,7 +103,7 @@
                     alert(`There has been an error with getting how long it is until a date. Please report this error at the contact page`);
                 };
                 // Make this more modular (add weeks if more than 0, add days if more than 0, etc... also add hours and minutes and seconds (live countdown for new yearss))
-                document.getElementById(elementId).innerText = subject + " (" + month + "/" + day + "/" + year + "): " + message;
+                document.getElementById(elementId).innerText = subject + " (" + month + "/" + day + "): " + message;
             };
             jstest();
             setInterval(() => {
@@ -107,6 +112,7 @@
                 refreshDate('until2', 2026, 2, 14, 'Valentines Day');
                 refreshDate('until3', 2026, 2, 16, 'Presidents Day');
                 refreshDate('until4', 2026, 2, 17, 'Chinese New Years');
+                refreshDate('until5', 2021, 5, 28, 'Last Day of School');
             }, 1000);
         </script>
     </footer>

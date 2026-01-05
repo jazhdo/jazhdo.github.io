@@ -1,4 +1,4 @@
-// Version 12/31/2025
+// Version 1/4/2026
 
 // Firebase stuff
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -44,7 +44,7 @@ if (document.getElementById("contactForm") !== null) {
             // Prevent blank submissions
             if (!email || !message) {
                 window.showAlert("Please fill in both the email and message fields before submitting.");
-                return; // Stop the submission
+                return;
             }
             
             document.getElementById("contactForm").style.display = "none";
@@ -167,19 +167,17 @@ async function profileLoad(user) {
     const input2 = document.createElement('input');
     const submit = document.createElement('button');
     const userRef = doc(db, 'users', user.uid);
-    const usersSnap = await getDoc(userRef);
+    let usersSnap = await getDoc(userRef);
 
-    if (usersSnap.data() !== undefined) {
-        input.value = usersSnap.data().username;
-        input2.value = usersSnap.data().displayName;
-    } else {
+    if (usersSnap.data() == undefined) {
         await setDoc(userRef, {
             username: user.uid,
             displayName: user.uid
         }, { merge: true });
-        input.value = user.uid;
-        input2.value = user.uid;
+        usersSnap = await getDoc(userRef);
     };
+    input.value = usersSnap.data().username;
+    input2.value = usersSnap.data().displayName;
     username.textContent = 'Username: ';
     displayName.textContent = 'Display name: ';
     submit.textContent = 'save';
@@ -188,6 +186,7 @@ async function profileLoad(user) {
     input2.id = 'displayName';
     form.id = 'profileForm';
     submit.id = 'profileSubmit';
+    submit.classList += document.getElementById("darktest").classList.contains('darkmode') ? ' darkmode' : '';
     
     username.append(input);
     displayName.append(input2);
@@ -209,7 +208,7 @@ async function profileLoad(user) {
             return;
         }
         if (newUsername.length == 28) {
-            alert("Username has a possibility of being a user id. Please choose another.");
+            alert("Username has a possibility of being a user id because of it's 28 digits long. Please choose another.");
             return;
         }
         await setDoc(userRef, {
@@ -229,9 +228,9 @@ async function profileLoad(user) {
     });
 };
 
-let loginOption = true;
-let loginError = false;
 if (document.getElementById("loginForm") !== null) {
+    let loginOption = true;
+    let loginError = false;
     // After user clicks login instead or sign up instead
     document.getElementById("otherInstead").addEventListener("click", () => {
         if (loginOption === true) {
@@ -253,9 +252,7 @@ if (document.getElementById("loginForm") !== null) {
         if (user) {
             try {
                 const urlData = new URLSearchParams(window.location.search);
-                if (urlData.get('redirect') !== null) {
-                    window.location.href = urlData.get('redirect');
-                };
+                if (urlData.get('redirect')) {window.location.href = urlData.get('redirect');};
             } catch (error) {
                 window.showAlert(`Url redirect detection broken. Error: ${error}.`)
             }
@@ -269,12 +266,8 @@ if (document.getElementById("loginForm") !== null) {
 
             // Check if user is admin
             const adminSnap = await getDoc(doc(db, "admins", user.uid));
-            if (adminSnap.exists()) {
-                if (document.getElementById("message-bottom") !== null) {
-                    showAdminContent(user);
-                } else if (document.getElementById("adminLink") !== null) {
-                    document.getElementById("adminLink").innerHTML = "Admin page link: <a href='admin.html'>link</a>";
-                };
+            if (adminSnap.exists() && document.getElementById("adminLink") !== null) {
+                document.getElementById("adminLink").innerHTML = "Admin page link: <a href='admin.html'>link</a>";
             };
         } else {
             document.getElementById("adminLink").innerHTML = "<p id='adminLink'></p>";
@@ -351,7 +344,7 @@ if (document.getElementById("loginForm") !== null) {
                     default:
                         message = `Account creation error: ${error}. Please report this error with code ${error.code} to the developers.`;
                         break;
-                }
+                };
                 window.showAlert(message);
             };
             if (loginError === false) {
@@ -361,8 +354,8 @@ if (document.getElementById("loginForm") !== null) {
                     window.showAlert(`You have successfully logged in with your email address: ${user.email}.`);
                 } catch (error) {
                     window.showAlert(`Automatic sign in after sign up error: ${error}. Please report this error with code ${error.code} to the developers`);
-                }
-            }
+                };
+            };
         } else {
             window.showAlert(`Variable loginOption has not returned true or false. Please report the status "${loginOption}" of loginOption to the developers.`);
         }
@@ -387,10 +380,4 @@ if (document.getElementById("loginForm") !== null) {
         };
     });
 };
-onAuthStateChanged(auth, async (user) => {
-    if (user !== null) {
-        document.getElementById("login-link").innerText = "Profile";
-    } else {
-        document.getElementById("login-link").innerText = "Login/Sign up";
-    };
-});
+onAuthStateChanged(auth, async (user) => {document.getElementById("login-link").innerText = (user !== null)?"Profile":"Login/Sign up";});

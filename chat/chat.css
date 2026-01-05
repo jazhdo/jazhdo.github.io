@@ -1,4 +1,4 @@
-/* Version 12/31/2025 */
+/* Version 1/4/2026 */
 
 /* 
 @media options:
@@ -86,7 +86,7 @@ body {
     border: none;
     cursor: pointer;
     
-    display: flex;
+    display: inline-flex;
     justify-content: flex-end;
     align-items: center;
     border-radius: 50%;
@@ -176,15 +176,15 @@ body {
 #chatTitle {
     font-size: 3vw;
 }
-#addUser, #removeUser {
-    cursor: pointer;
-    font-size: 3vw;
-}
 #chatBar {
     background-color: rgb(200, 200, 200);
     color: black;
     font-size: 2vw;
     padding: 0.5vw;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
 }
 #messages {
     flex: 1;
@@ -300,10 +300,13 @@ button#lightmode {
     font-family: 'Times New Roman', Times, serif;
     background-color: lightgreen;
 }
-h2#addUserTitle, h2#createChatTitle, h2#removeUserTitle, h2#settingsTitle, h2#contextMenuTitle {
+h2#settingsTitle, h2#contextMenuTitle {
     margin: 1vw 0px;
 }
-#createChatBox, #addUserBox, #removeUserBox, #settingsBox{
+h2#createChatTitle {
+    margin: 0px 0px 1vw 0px;
+}
+#createChatBox, #settingsBox{
     position: absolute;
     background-color: lightgreen;
     top: 50%;
@@ -339,7 +342,7 @@ h2#settingsTitle {
     margin: 0px;
 }
 #settingsCancel, #contextMenuClose {
-    color: red;
+    color: black;
     display: inline;
     margin: 0px;
 }
@@ -350,6 +353,9 @@ h2#settingsTitle {
     display: flex;
     justify-content: space-between;
 }
+#addUserTitle {
+    margin: 0px;
+}
 /* Darkmode settings */
 body.darkmode {
     color: #f2f2f2;
@@ -357,11 +363,11 @@ body.darkmode {
 header.darkmode {
     background-color: darkgreen;
 }
-#menuIconButton.darkmode, #settingsIconButton.darkmode {
+#menuIconButton.darkmode {
     background-color: darkgreen;
 }
 #settingsIconButton.darkmode:hover {
-    background-color: green;
+    background-color: #626262;
 }
 #toptitle.darkmode {
     color: #f2f2f2;
@@ -378,7 +384,7 @@ div#chatCreate.darkmode, div.chats.darkmode {
 div#chatCreate.darkmode:hover, div.chats.darkmode:hover {
     background-color: #323232;
 }
-div#resizer.darkmode {
+div#resizer.darkmode, #settingsIconButton.darkmode {
     background-color: #525252;
 }
 div#resizer.darkmode:hover {
@@ -396,6 +402,9 @@ div.posts.right.darkmode {
 }
 div.posts.left.darkmode {
     background-color: #323240;
+}
+div.posts.darkmode div.replyBox.darkmode {
+    background-color: #424250;
 }
 div#typeBar.darkmode {
     background-color: #323232;
@@ -421,7 +430,7 @@ footer.darkmode, .footer.darkmode, button#lightmode.darkmode {
     background-color: green;
     border-color: #727272;
 }
-#contextMenuCopy.darkmode, #contextMenuReply.darkmode, #contextMenuEdit.darkmode, #contextMenuBox.darkmode, #settingsBox.darkmode, #addUserBox.darkmode, #removeUserBox.darkmode {
+#contextMenuCopy.darkmode, #contextMenuReply.darkmode, #contextMenuEdit.darkmode, #contextMenuBox.darkmode, #settingsBox.darkmode, #createChatBox.darkmode {
     background-color: darkgreen;
 }
 #contextMenuCopy.darkmode:hover, #contextMenuReply.darkmode:hover, #contextMenuEdit.darkmode:hover {
@@ -430,6 +439,9 @@ footer.darkmode, .footer.darkmode, button#lightmode.darkmode {
 #settingsBox a.darkmode {
     color: #f2f2f2;
     text-decoration: none;
+}
+#settingsCancel.darkmode, #contextMenuClose.darkmode {
+    color: #f2f2f2;
 }
 @media (max-width: 600px) {
     #main {
@@ -483,7 +495,7 @@ footer.darkmode, .footer.darkmode, button#lightmode.darkmode {
     #toptitle {
         font-size: 5vw;
     }
-    #chatTitle, #addUser, #removeUser {
+    #chatTitle{
         font-size: 4vw;
     }
     #chatsTitle {
@@ -504,7 +516,7 @@ footer.darkmode, .footer.darkmode, button#lightmode.darkmode {
     #chatsTitle {
         font-size: 1.5vw;
     }
-    #chatTitle, #addUser, #removeUser {
+    #chatTitle{
         font-size: 2vw;
     }
     #menuIconButton {
@@ -524,13 +536,12 @@ footer.darkmode, .footer.darkmode, button#lightmode.darkmode {
 }
 @media (min-width: 1401px) {
     #toptitle {
-        font-size: max(calc(100px - 3vw), 10px);
-        
+        font-size: max(calc(60px - 1vw), 10px);
     }
     #chatsTitle {
         font-size: max(calc(35px - 1vw), 10px);
     }
-    #chatTitle, #addUser, #removeUser{
+    #chatTitle{
         font-size: max(calc(50px - 1vw), 10px);
     }
     .posts, footer, button#lightmode {
