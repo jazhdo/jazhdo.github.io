@@ -2,35 +2,26 @@
 
 //Check and update mode (Not set dark mode)
 function darkmode() {
-    if (localStorage.getItem('lightmode') === 'dark') {
-        document.querySelectorAll('*').forEach(Element => {Element.className += " darkmode"});
-        console.log('Darkmode Enabled.');
-    } else if (localStorage.getItem('lightmode') === 'light') {
-        document.querySelectorAll('*').forEach(element => {element.classList.remove('darkmode')});
-        console.log('Lightmode Enabled.');
-    }
-}
+    let mode = localStorage.getItem('lightmode');
+    document.querySelectorAll('*').forEach(element => element.classList(mode == 'dark')? += " darkmode":(mode == 'light')?.remove('darkmode'));
+};
 //Response to the light mode/dark mode button being clicked (Not set light mode)
 function lightmode() {
     if (localStorage.getItem('lightmode') === 'dark') {
         localStorage.setItem('lightmode', 'auto')
         if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
             if (document.getElementById('darktest').className == 'footer') {
-                document.querySelectorAll('*').forEach(Element => {Element.className += " darkmode"});
+                document.querySelectorAll('*').forEach(element => element.classList += " darkmode");
             }
         } else if (window.matchMedia("(prefers-color-scheme: light)").matches) {
             if (document.getElementById('darktest').className == 'footer darkmode') {
-                document.querySelectorAll('*').forEach(element => {
-                element.classList.remove('darkmode');
-                });
-            }
-        }
-        console.log("Auto Change Enabled")
-    } else if (localStorage.getItem('lightmode') === 'auto') {
-        localStorage.setItem('lightmode', 'light')
-    } else if (localStorage.getItem('lightmode') === 'light') {
-        localStorage.setItem('lightmode', 'dark')
-    }
+                document.querySelectorAll('*').forEach(element => element.classList.remove('darkmode'));
+            };
+        };
+        console.log("Auto Change Enabled");
+    } else {
+        localStorage.setItem('lightmode', localStorage.getItem('lightmode') === 'auto'?'light':localStorage.getItem('lightmode') === 'light'?'dark':'')
+    };
     darkmode();
     document.getElementById('lightmode').innerHTML = 'Current Mode: ' + localStorage.getItem('lightmode');
 }
