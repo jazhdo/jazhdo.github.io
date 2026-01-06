@@ -1,4 +1,4 @@
-// Version 1/4/2026
+// Version 1/5/2026
 
 //Check and update mode (Not set dark mode)
 function darkmode() {
@@ -33,6 +33,7 @@ function showAlert(message) {
     box.id = "customAlert";
     content.id = "alertMessage";
     button.id = "alertClose";
+    if (document.getElementById('darktest').className == 'footer darkmode') [box, content, button].forEach((e) => e.className += " darkmode");
 
     content.innerText = message;
     button.innerText = "OK";
@@ -46,10 +47,10 @@ function showAlert(message) {
 };
 window.showAlert = showAlert;
 function manageCookies(status) {
-    if (status === true) {
+    if (status) {
         console.log("Cookies Accepted.");
         localStorage.setItem("Cookies", true);
-    } else if (status === false) {
+    } else if (!status) {
         console.log("Cookies Declined.")
         localStorage.setItem("Cookies", false)
     } else {
@@ -58,7 +59,7 @@ function manageCookies(status) {
     if (document.getElementById("cookies") !== null) {
         document.getElementById("cookies").remove();
     };
-}
+};
 function addCookiesBar() {
     const textContent = `
         Your perference will be stored until you clear your browser's cache. 
@@ -84,48 +85,30 @@ function addCookiesBar() {
     heading.className = 'cookieheading';
     acceptButton.className = 'cookiebutton';
     declineButton.className = 'cookiebutton';
+    if (document.getElementById('darktest').className == 'footer darkmode') [box, text, heading, acceptButton, declineButton].forEach((e) => e.className += " darkmode");
 
     text.append(privacyLink, '.', document.createElement("br"), acceptButton, declineButton);
     box.append(heading, text);
     document.getElementById("main").after(box);
 };
 // Initial check (All pages)
-if (localStorage.getItem('lightmode') === 'auto' || localStorage.getItem('lightmode') === null) {
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) { 
-        if (document.getElementById('darktest').className == 'footer') {
-            document.querySelectorAll('*').forEach(Element => {Element.className += " darkmode"});
-            console.log('Darkmode Enabled.');
-        }
-    } 
-    else if (document.getElementById('darktest').className == 'footer darkmode'){
-        document.querySelectorAll('*').forEach(element => {
-        element.classList.remove('darkmode');
-        console.log('Lightmode Enabled.');
-        });
-    }
+
+// Lightmode Detection
+if (localStorage.getItem('lightmode') === 'auto' || !localStorage.getItem('lightmode')) {
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches || document.getElementById('darktest').className == 'footer') {document.querySelectorAll('*').forEach(e => e.className += " darkmode"); console.log('Darkmode Enabled.')}
+    else if (document.getElementById('darktest').className == 'footer darkmode') document.querySelectorAll('*').forEach(e => { e.classList.remove('darkmode'); console.log('Lightmode Enabled.')});
     localStorage.setItem('lightmode', 'auto');
-} else {
-    darkmode();
-    console.log(localStorage.getItem('lightmode'))
-}
-if (document.getElementById('lightmode') !== null) {
-    document.getElementById('lightmode').innerHTML = 'Current Mode: ' + localStorage.getItem('lightmode');
-};
-if (localStorage.getItem('Cookies') == null) {
-    addCookiesBar();
-};
-
+} else darkmode(); console.log(localStorage.getItem('lightmode'));
+if (document.getElementById('lightmode')) document.getElementById('lightmode').innerHTML = 'Current Mode: ' + localStorage.getItem('lightmode');
+if (!localStorage.getItem('Cookies')) addCookiesBar();
 console.log('Cookies Status: ' + localStorage.getItem('Cookies'))
-
-if (localStorage.getItem("Counter") === null) {
-    localStorage.setItem("Counter", 0);
-}
+if (!localStorage.getItem("Counter")) localStorage.setItem("Counter", 0);
 let counter = 0
-if (document.getElementById("counterDisplay") !== null) {
+if (document.getElementById("counterDisplay")) {
     document.getElementById("counterDisplay").innerText = localStorage.getItem("Counter");
     counter = Number(localStorage.getItem("Counter"));
     console.log("Counter status:", counter)
-}
+};
 let commaCounterStatus = false
 
 // Listen for changes if auto

@@ -29,20 +29,20 @@
             This is my personal website where I post stuff. 
         </p>
         <h2>Branches</h2>
-        <p>
-            <a href="/chat/">Chat Site</a>
-            <a href="/games/">Game Site</a>
-            <a href="/blog/">Blog Site</a>
-        </p>
+        <ul>
+            <li><a href="/chat/">Chat Site</a></li>
+            <li><a href="/games/">Game Site</a></li>
+            <li><a href="/blog/">Blog Site</a></li>
+        </ul>
         <h2>Comments/Bugs</h2>
         <p><a href="/contact.html">Contact me</a> to tell me about bugs so I can improve this website.</p>
-        <h2 id="until"></h2>
+        <h2 id="until0"></h2>
         <h2>Javascript Test (runs on page load)</h2>
         <p id="jstest">Javascript test failed. Please click the button below to try again.</p>
-        <button onclick="jstest();" id="jstestButton">Click here to redo the test.</button>
+        <button onclick='jstest;' id="jstestButton">Click here to redo the test.</button>
     </div>
     <footer>
-        <p id="darktest" class="footer">Updated: 1/4/2026 - jazhdo</p>
+        <p id="darktest" class="footer">Updated: 1/5/2026 - jazhdo</p>
         <a class="footer" href="/privacy.html">Privacy</a>
         <a class="footer" href="/terms.html">Terms</a>
         <button onclick="lightmode()" id="lightmode" class="footer"></button>
@@ -58,7 +58,6 @@
                 return (time)?(Math.abs(time) > 1)?`${time} ${measure}s`:`${time} ${measure}`:'';
             };
             function refreshDate(elementId, year, month, day, subject) {
-                document.getElementById(elementId).remvove();
                 const now = new Date();
                 let goal = new Date(year, month - 1, day);
                 let until = (goal - now)/1000/60/60/24;
@@ -106,17 +105,23 @@
                 let element = document.createElement('p');
                 element.id = elementId;
                 element.innerText = subject + " (" + month + "/" + day + "): " + message;
-                document.getElementById('until').after(element);
+                document.getElementById(elementId)?.remove();
+                document.getElementById(`until${[...elementId][5]-1}`).after(element);
             };
-            jstest();
-            setInterval(() => {
-                document.getElementById('until').innerText = 'Upcoming Holidays:';
+            (function refreshDates() {
+                document.getElementById('until0').innerText = 'Upcoming* Important Dates:';
                 refreshDate('until1', 2026, 1, 19, 'Martin Luther King Jr. Day');
                 refreshDate('until2', 2026, 2, 14, 'Valentines Day');
                 refreshDate('until3', 2026, 2, 16, 'Presidents Day');
                 refreshDate('until4', 2026, 2, 17, 'Chinese New Years');
                 refreshDate('until5', 2026, 5, 28, 'Last Day of School');
-            }, 1000);
+            })();
+            const sideNote = document.createElement('h6');
+            sideNote.innerText = '*Dates may not all be coming soon.';
+            sideNote.style.margin = '0px';
+            document.getElementById('until5').after(sideNote);
+            jstest();
+            setInterval(refreshDates, 1000);
         </script>
     </footer>
 </body>

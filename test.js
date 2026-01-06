@@ -1,4 +1,4 @@
-// Version 1/4/2026
+// Version 1/5/2026
 function hide(list) {
     for (let a = 0; a < list.length; a++) {
         document.querySelectorAll(list[a]).forEach(element => {

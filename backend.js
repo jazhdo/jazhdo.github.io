@@ -1,4 +1,4 @@
-// Version 1/4/2026
+// Version 1/5/2026
 
 // Firebase stuff
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -29,7 +29,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Check if the form is submitted
+// Contact page form
 if (document.getElementById("contactForm") !== null) {
     let currentlyWorking = false;
     document.getElementById("contactForm").addEventListener("submit", async (e) => {
@@ -37,22 +37,22 @@ if (document.getElementById("contactForm") !== null) {
         if (currentlyWorking === false) {
             currentlyWorking = true;
             // Get trimmed values (Whitespace in front & back removed)
-            const email = document.getElementById("contactEmail").value.trim();
+            const email = document.getElementById("contactMethod").value.trim();
             const message = document.getElementById("contactMessage").value.trim();
             const sentDate = new Date()
 
             // Prevent blank submissions
             if (!email || !message) {
-                window.showAlert("Please fill in both the email and message fields before submitting.");
+                window.showAlert("Please fill in both the contact method and message fields before submitting.");
                 return;
-            }
+            };
             
             document.getElementById("contactForm").style.display = "none";
             document.getElementById("contactFormStatus").style.display = "";
 
             try {
                 const record = await addDoc(collection(db, "messages"), {
-                    email: email,
+                    contactMethod: email,
                     message: message,
                     createdAt: sentDate
                 });
@@ -67,9 +67,9 @@ if (document.getElementById("contactForm") !== null) {
             document.getElementById("contactForm").style.display = "";
             document.getElementById("contactFormStatus").style.display = "none";
             currentlyWorking = false;
-        }
+        };
     });
-}
+};
 function timestampToDate(ts) {
     if (!ts) {
         console.error("Nothing was provided when timestampToDate was called.");
@@ -103,7 +103,9 @@ async function loadContacts() {
             minute: "2-digit",
             second: "2-digit"
         });
-        email.textContent = "Email: " + doc.data().email;
+
+        email.textContent = "Contact Method: " + doc.data()?.contactMethod;
+        if (email.textContent === 'Contact Method: undefined') { email.textContent = "Email: " + doc.data().email; }
         message.textContent = doc.data().message;
 
         box.className = "posts";
@@ -139,7 +141,7 @@ function showAdminContent(user) {
                 document.getElementById("showMessages").innerText = "Show messages";
             });
             showMessages = false;
-        }
+        };
     };
     message.textContent = `Welcome.`;
     document.getElementById("message-bottom").before(message, showButton);
