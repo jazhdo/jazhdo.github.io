@@ -593,7 +593,7 @@ onAuthStateChanged(auth, async (user) => {
                 label.append(checkbox, text, br);
                 participantsList.append(label);
             };
-            participantsList.append(removeUserSubmit)
+            participantsList.append(removeUserSubmit);
             save.id = 'settingsSave';
             save.textContent = 'Save';
 
@@ -614,18 +614,14 @@ onAuthStateChanged(auth, async (user) => {
 
                 const newTitle = document.getElementById('settingsInput').value.trim();
 
-                if (newTitle) {
-                    renameChat(newTitle);
-                };
+                if (newTitle) renameChat(newTitle);
                 document.getElementById('settingsBox').remove();
                 popupActive = false;
             });
             document.getElementById('addUserForm').addEventListener('submit', (e) => {
                 e.preventDefault();
 
-                if (document.getElementById('addUserInput').value.trim()) {
-                    addUser(document.getElementById('addUserInput').value.trim());
-                };
+                if (document.getElementById('addUserInput').value.trim()) addUser(document.getElementById('addUserInput').value.trim());
                 document.getElementById('settingsBox').remove();
                 popupActive = false;
             });
@@ -634,14 +630,10 @@ onAuthStateChanged(auth, async (user) => {
 
                 const checkedBoxes = document.querySelectorAll('input[name="removeUser"]:checked');
                 const removeList = Array.from(checkedBoxes).map(cb => cb.value);
-                const currentChatId = chatId
+                const currentChatId = chatId;
 
-                await removeList.forEach(async (b) => {
-                    await removeUser(b, currentChatId);
-                });
-                if (removeList.includes(user.uid)) {
-                    chatId = '';
-                };
+                await removeList.forEach(async (b) => await removeUser(b, currentChatId));
+                if (removeList.includes(user.uid)) chatId = '';
                 updateChat(user);
                 document.getElementById('settingsBox').remove();
                 popupActive = false;

@@ -91,6 +91,31 @@ function addCookiesBar() {
     box.append(heading, text);
     document.getElementById("main").after(box);
 };
+// RPi 5 backend server
+const piBackend = 'http://192.168.68.106:3000';
+async function sendDataToPi(myData) {
+    try {
+        const response = await fetch(`${piBackend}/receive`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(myData)
+        });
+        const result = await response.json();
+        console.log("Pi says:", result.message);
+    } catch (err) {
+        console.error("Failed to send:", err);
+    }
+}
+async function getDataFromPi() {
+    try {
+        const response = await fetch(`${piBackend}/send`);
+        const data = await response.json();
+        console.log("Stats from Pi:", data);
+        return data;
+    } catch (err) {
+        console.error("Failed to receive:", err);
+    }
+}
 // Initial check (All pages)
 
 // Lightmode Detection
@@ -129,4 +154,15 @@ window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (ev
         }
     }
 })
+const footerElements = [...document.getElementsByClassName("footer")];
+const termsLink = footerElements[footerElements.length - 1];
+const lightmodeButton = document.createElement('button');
+
+lightmodeButton.id = 'lightmode';
+lightmodeButton.className = 'footer';
+lightmodeButton.textContent = 'Current Mode: ' + localStorage.getItem('lightmode');
+lightmodeButton.classList += document.getElementById('darktest').className == 'footer darkmode'?' darkmode':'';
+
+termsLink.after(lightmodeButton);
+document.getElementById('lightmode').addEventListener('click', lightmode);
 console.log("Initial Code Completed.");

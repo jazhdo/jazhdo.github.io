@@ -45,7 +45,6 @@
         <p id="darktest" class="footer">Updated: 1/5/2026 - jazhdo</p>
         <a class="footer" href="/privacy.html">Privacy</a>
         <a class="footer" href="/terms.html">Terms</a>
-        <button onclick="lightmode()" id="lightmode" class="footer"></button>
         <script type="module" src="/backend.js"></script>
         <script src="/script.js"></script>
         <script>
@@ -108,19 +107,21 @@
                 document.getElementById(elementId)?.remove();
                 document.getElementById(`until${[...elementId][5]-1}`).after(element);
             };
-            (function refreshDates() {
-                document.getElementById('until0').innerText = 'Upcoming* Important Dates:';
+            function refreshDates() {
                 refreshDate('until1', 2026, 1, 19, 'Martin Luther King Jr. Day');
                 refreshDate('until2', 2026, 2, 14, 'Valentines Day');
                 refreshDate('until3', 2026, 2, 16, 'Presidents Day');
                 refreshDate('until4', 2026, 2, 17, 'Chinese New Years');
                 refreshDate('until5', 2026, 5, 28, 'Last Day of School');
-            })();
+            };
+            document.getElementById('until0').innerText = 'Upcoming* Important Dates:';
+            refreshDates()
             const sideNote = document.createElement('h6');
             sideNote.innerText = '*Dates may not all be coming soon.';
             sideNote.style.margin = '0px';
             document.getElementById('until5').after(sideNote);
             jstest();
+            for (let a = new Date(); a.getMilliseconds() !== 0; a = new Date());
             setInterval(refreshDates, 1000);
         </script>
     </footer>
