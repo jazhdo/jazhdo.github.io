@@ -1,2 +1,2 @@
 # main-website
-My main website that is updated to https://jazhdo.free.nf/ once in a while when the release is stable.
+My main website that is automatically uploaded to https://jazhdo.github.io and https://jazhdo.vercel.app (vercel.app one isn't maintained.)

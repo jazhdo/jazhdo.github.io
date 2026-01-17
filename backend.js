@@ -1,4 +1,4 @@
-// Version 1/5/2026
+// Version 1/16/2026
 
 // Firebase stuff
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -29,47 +29,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Contact page form
-if (document.getElementById("contactForm") !== null) {
-    let currentlyWorking = false;
-    document.getElementById("contactForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        if (currentlyWorking === false) {
-            currentlyWorking = true;
-            // Get trimmed values (Whitespace in front & back removed)
-            const email = document.getElementById("contactMethod").value.trim();
-            const message = document.getElementById("contactMessage").value.trim();
-            const sentDate = new Date()
-
-            // Prevent blank submissions
-            if (!email || !message) {
-                window.showAlert("Please fill in both the contact method and message fields before submitting.");
-                return;
-            };
-            
-            document.getElementById("contactForm").style.display = "none";
-            document.getElementById("contactFormStatus").style.display = "";
-
-            try {
-                const record = await addDoc(collection(db, "messages"), {
-                    contactMethod: email,
-                    message: message,
-                    createdAt: sentDate
-                });
-                window.showAlert("Thank you! Your message was successfully sent. \
-                    Here's your message ID for future inquiries: " + record.id);
-                document.getElementById("contactForm").reset();
-            } catch (error) {
-                window.showAlert("There was an error sending the message: ", error, ". \
-                    Please try again later or on a different device.");
-                window.showAlert("Oops! Something went wrong.");
-            };
-            document.getElementById("contactForm").style.display = "";
-            document.getElementById("contactFormStatus").style.display = "none";
-            currentlyWorking = false;
-        };
-    });
-};
 function timestampToDate(ts) {
     if (!ts) {
         console.error("Nothing was provided when timestampToDate was called.");
@@ -146,13 +105,11 @@ function showAdminContent(user) {
     message.textContent = `Welcome.`;
     document.getElementById("message-bottom").before(message, showButton);
     loadContacts();
-    document.querySelectorAll(".posts").forEach(e => {
-        e.style.display = "";
-    });
+    document.querySelectorAll(".posts").forEach(e => e.style.display = "");
     document.getElementById("adminTitle").style.display = "";
     document.getElementById("goBack").style.display = "";
     document.getElementById("message-bottom").innerText = "";
-};
+}
 async function profileLoad(user) {
     document.getElementById("profileUID").innerText = `User UID: ${user.uid}`
     document.getElementById("profileEmail").innerText = `User Email: ${user.email}`
@@ -209,10 +166,7 @@ async function profileLoad(user) {
             document.getElementById('username').value = usersSnap.data().username;
             return;
         }
-        if (newUsername.length == 28) {
-            alert("Username has a possibility of being a user id because of it's 28 digits long. Please choose another.");
-            return;
-        }
+        if (newUsername.length == 28) { alert("Username has a possibility of being a user id because of it's 28 digits long. Please choose another."); return}
         await setDoc(userRef, {
             username: newUsername, 
             displayName: newDisplayName
@@ -224,12 +178,11 @@ async function profileLoad(user) {
         try {
             await navigator.clipboard.writeText(user.uid);
             console.log(`Copied message: '${user.uid}'`);
-        } catch (err) {
-            console.error("Failed to copy: ", err);
-        };
+        } catch (err) { console.error("Failed to copy: ", err); };
     });
 };
 
+// Login page
 if (document.getElementById("loginForm") !== null) {
     let loginOption = true;
     let loginError = false;
@@ -255,9 +208,7 @@ if (document.getElementById("loginForm") !== null) {
             try {
                 const urlData = new URLSearchParams(window.location.search);
                 if (urlData.get('redirect')) {window.location.href = urlData.get('redirect');};
-            } catch (error) {
-                window.showAlert(`Url redirect detection broken. Error: ${error}.`)
-            }
+            } catch (error) { window.showAlert(`Url redirect detection broken. Error: ${error}.`); }
             console.log(`User Email: ${user.email}`);
             console.log(`User UID: ${user.uid}`);
             
@@ -268,20 +219,14 @@ if (document.getElementById("loginForm") !== null) {
 
             // Check if user is admin
             const adminSnap = await getDoc(doc(db, "admins", user.uid));
-            if (adminSnap.exists() && document.getElementById("adminLink") !== null) {
-                document.getElementById("adminLink").innerHTML = "Admin page link: <a href='admin.html'>link</a>";
-            };
-        } else {
-            document.getElementById("adminLink").innerHTML = "<p id='adminLink'></p>";
-        }
+            if (adminSnap.exists() && document.getElementById("adminLink") !== null) { document.getElementById("adminLink").innerHTML = "Admin page link: <a href='admin.html'>link</a>"; };
+        } else { document.getElementById("adminLink").innerHTML = "<p id='adminLink'></p>"; }
     });
     document.getElementById("signOut").addEventListener("click", async () => {
         try {
             await signOut(auth);
             window.location.reload();
-        } catch (err) {
-            window.showAlert("Logout failed because of error:", err);
-        };
+        } catch (err) { window.showAlert("Logout failed because of error:", err); };
     });
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -328,9 +273,8 @@ if (document.getElementById("loginForm") !== null) {
                 window.showAlert(message);
             };
         } else if (loginOption === false) {
-            try {
-                await createUserWithEmailAndPassword(auth, email, password);
-            } catch (error) {
+            try { await createUserWithEmailAndPassword(auth, email, password); }
+            catch (error) {
                 loginError = true;
                 let message = '';
                 switch (error.code) {
@@ -354,15 +298,13 @@ if (document.getElementById("loginForm") !== null) {
                     const userCredential = await signInWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
                     window.showAlert(`You have successfully logged in with your email address: ${user.email}.`);
-                } catch (error) {
-                    window.showAlert(`Automatic sign in after sign up error: ${error}. Please report this error with code ${error.code} to the developers`);
-                };
+                } catch (error) { window.showAlert(`Automatic sign in after sign up error: ${error}. Please report this error with code ${error.code} to the developers`); };
             };
-        } else {
-            window.showAlert(`Variable loginOption has not returned true or false. Please report the status "${loginOption}" of loginOption to the developers.`);
-        }
+        } else { window.showAlert(`Variable loginOption has not returned true or false. Please report the status "${loginOption}" of loginOption to the developers.`); }
     });
-} else if (document.getElementById("message-bottom") !== null) {
+}
+// Admin page
+else if (document.getElementById("message-bottom") !== null) {
     onAuthStateChanged(auth, async (user) => {
         if (user !== null) {
             try {
@@ -379,6 +321,48 @@ if (document.getElementById("loginForm") !== null) {
         } else {
             alert("Please sign in before continuing.");
             redirectToHome();
+        };
+    });
+};
+// Contact page
+if (document.getElementById("contactForm") !== null) {
+    document.getElementById('contactFormDiv').style.display = '';
+    let currentlyWorking = false;
+    document.getElementById("contactForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (currentlyWorking === false) {
+            currentlyWorking = true;
+            // Get trimmed values (Whitespace in front & back removed)
+            const email = document.getElementById("contactMethod").value.trim();
+            const message = document.getElementById("contactMessage").value.trim();
+            const sentDate = new Date()
+
+            // Prevent blank submissions
+            if (!email || !message) {
+                window.showAlert("Please fill in both the contact method and message fields before submitting.");
+                return;
+            };
+            
+            document.getElementById("contactForm").style.display = "none";
+            document.getElementById("contactFormStatus").style.display = "";
+
+            try {
+                const record = await addDoc(collection(db, "messages"), {
+                    contactMethod: email,
+                    message: message,
+                    createdAt: sentDate
+                });
+                window.showAlert("Thank you! Your message was successfully sent. \
+                    Here's your message ID for future inquiries: " + record.id);
+                document.getElementById("contactForm").reset();
+            } catch (error) {
+                window.showAlert("There was an error sending the message: ", error, ". \
+                    Please try again later or on a different device.");
+                window.showAlert("Oops! Something went wrong.");
+            };
+            document.getElementById("contactForm").style.display = "";
+            document.getElementById("contactFormStatus").style.display = "none";
+            currentlyWorking = false;
         };
     });
 };

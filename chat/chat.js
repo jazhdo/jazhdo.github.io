@@ -44,14 +44,12 @@ let replyMessageStatus = {
 
 // Functions
 async function sendMessage(messageData, user) {
-    if (!messageData.text.trim() || !chatId) {
-        return;
-    } else if (editMessageStatus.status === true) {
+    if (!messageData.text.trim() || !chatId) { return; }
+    else if (editMessageStatus.status === true) {
         await editMessage(editMessageStatus.docId, editMessageStatus.index, messageData.text);
         editMessageStatus.status = false;
-        // updateChat(user);
-        return;
-    };
+        return
+    }
     // metaRef is main data doc, metaSnap is a snapshot of that main data doc
     const metaRef = doc(db, "chats", chatId);
     const metaSnap = await getDoc(metaRef);
@@ -123,9 +121,7 @@ function openContextMenu(a, e, user, option, b, metaSnap, messagesArray) {
         edit.id = 'contextMenuEdit';
         edit.className += document.getElementById("darktest").classList.contains('darkmode')? ' darkmode' : '';
         menu.append(copy, edit, reply);
-    } else {
-        menu.append(copy, reply);
-    };
+    } else { menu.append(copy, reply); };
     document.getElementById('main').after(menu, back);
 
     const menuBoxElement = document.getElementById('contextMenuBox');
@@ -137,17 +133,11 @@ function openContextMenu(a, e, user, option, b, metaSnap, messagesArray) {
 
         // 2. Calculate Horizontal Position (Left/Right)
         let left = a.pageX;
-        if (a.clientX + menuWidth > windowWidth) {
-            // If it goes off the right edge, move it to the left of the cursor
-            left = a.pageX - menuWidth;
-        }
+        if (a.clientX + menuWidth > windowWidth) { left = a.pageX - menuWidth; }
 
         // 3. Calculate Vertical Position (Top/Bottom)
         let top = a.pageY;
-        if (a.clientY + menuHeight > windowHeight) {
-            // If it goes off the bottom edge, move it above the cursor
-            top = a.pageY - menuHeight;
-        }
+        if (a.clientY + menuHeight > windowHeight) { top = a.pageY - menuHeight; }
 
         // 4. Apply the safe coordinates
         menuBoxElement.style.left = left + 'px';
@@ -162,9 +152,7 @@ function openContextMenu(a, e, user, option, b, metaSnap, messagesArray) {
         m.borderRadius =  '3vw';
         m.padding = '2vw';
         m.zIndex = '1000';
-    } else {
-        console.log('Option has not returned true or false.');
-    };
+    } else { console.log('Option has not returned true or false.'); };
     
     const close = () => {
         document.getElementById('contextMenuBox').remove();
@@ -191,7 +179,8 @@ function openContextMenu(a, e, user, option, b, metaSnap, messagesArray) {
         document.getElementById('contextMenuEdit').addEventListener('click', async () => {
             document.getElementById('typeInput').focus();
             document.getElementById('typeInput').value = e.text;
-
+            const typeFormElement = document.getElementById('typeForm');
+            typeFormElement.getElementsByTagName('button')[0].textContent = 'Edit';
             editMessageStatus.status = true;
             editMessageStatus.docId = `${chatId}_${metaSnap.data().currentBucket}`;
             editMessageStatus.index = (messagesArray.length - 1) - b;
@@ -202,9 +191,7 @@ function openContextMenu(a, e, user, option, b, metaSnap, messagesArray) {
         try {
             await navigator.clipboard.writeText(e.text);
             console.log(`Copied message: '${e.text}'`);
-        } catch (error) {
-            console.error("Failed to copy: ", error);
-        };
+        } catch (error) { console.error("Failed to copy: ", error); }
         close();
     });
     document.getElementById('contextMenuClose').addEventListener('click', close)
@@ -215,19 +202,13 @@ async function updateChat(user) {
         document.getElementById('chatTitle').innerText = '';
         document.getElementById('chatBar').style.display = 'none';
         document.getElementById('typeBar').style.display = 'none';
-        document.querySelectorAll('.posts, .timestamp').forEach((e) => {
-            e.remove();
-        });
+        document.querySelectorAll('.posts, .timestamp').forEach((e) => e.remove());
         document.getElementById('typeInput').value = '';
-        return;
-    };
+        return
+    }
     const metaRef = doc(db, "chats", chatId);
     const metaSnap = await getDoc(metaRef);
-    if (metaSnap.data() !== null) {
-        if (metaSnap.data().title !== null) {
-        document.getElementById("chatTitle").innerText = metaSnap.data().title.trim();
-        };
-    };
+    if (metaSnap.data() !== null && metaSnap.data().title !== null) { document.getElementById("chatTitle").innerText = metaSnap.data().title.trim(); };
     const bucketRef = doc(db, "chats", `${chatId}_${metaSnap.data().currentBucket}`);
     const bucketSnap = await getDoc(bucketRef);
 
@@ -235,10 +216,8 @@ async function updateChat(user) {
 
     if (bucketSnap.exists()) {
         messagesArray = bucketSnap.data().messages || [];
-
         messagesArray.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
     }
-
     document.querySelectorAll(".posts, .timestamp").forEach(e => {e.remove();});
 
     const nameCache = {}; 
@@ -247,6 +226,7 @@ async function updateChat(user) {
         const time = document.createElement("p");
         const box = document.createElement("div");
         const p = document.createElement("p");
+        const userName = document.createElement("p");
 
         box.className = 'posts';
         box.className += document.getElementById("darktest").classList.contains('darkmode')? ' darkmode' : '';
@@ -273,18 +253,20 @@ async function updateChat(user) {
             box.classList.add('left');
 
             if (nameCache[e.user]) {
-                p.textContent = `${nameCache[e.user]}: ${e.text}`;
+                p.textContent = e.text;
+                userName.textContent = nameCache[e.user];
             } else {
                 const usersSnap = await getDoc(doc(db, 'users', e.user));
                 const name = usersSnap.exists() ? usersSnap.data().displayName : e.user;
                 
                 nameCache[e.user] = name;
-                p.textContent = `${name}: ${e.text}`;
+                
+                p.textContent = e.text;
+                userName.textContent = name;
             };
         };
-        if (e.edited) {
-            p.textContent = p.textContent + ' (edited)';
-        };
+        if (e.edited) { p.textContent = p.textContent + ' (edited)'; };
+        box.append(userName)
         if (e.replyToText && e.replyToUser) {
             const replyBox = document.createElement('div');
             const replyUser = document.createElement('p');
@@ -336,9 +318,7 @@ async function updateChat(user) {
     };
 };
 async function getChatList(snapshot, user) {
-    document.querySelectorAll('.chats').forEach(e => {
-        e.remove();
-    })
+    document.querySelectorAll('.chats').forEach(e => e.remove());
     snapshot.docs.map(doc => {
         // doc is each document that was found that the user was in
         const data = doc.data();
@@ -366,7 +346,7 @@ async function getChatList(snapshot, user) {
         box.append(h2, p);
         document.getElementById("chatBottom").before(box);
     });
-};
+}
 async function createChatMenu(userUID) {
     const h2 = document.createElement('h2');
     const box = document.createElement("div");
@@ -408,7 +388,7 @@ async function createChatMenu(userUID) {
         createChat(chatTitle, userUID);
         document.getElementById("createChatBox").remove();
     });
-};
+}
 async function createChat(chatTitle, userUID) {
     const newChat = addDoc(messageCollection, {
         participants: [userUID],
@@ -420,7 +400,7 @@ async function createChat(chatTitle, userUID) {
         updatedAt: new Date()
     });
     chatId = newChat.id;
-};
+}
 async function addUser(userUID) {
     const metaRef = doc(db, "chats", chatId);
     const q = query(
@@ -444,7 +424,7 @@ async function addUser(userUID) {
     } else {
         console.log(`The entered user id or username has not been found to match any in the database.`);
     }
-};
+}
 async function removeUser(userUID, removeChatId) {
     const metaRef = doc(db, "chats", removeChatId);
     await setDoc(metaRef, {
@@ -453,19 +433,17 @@ async function removeUser(userUID, removeChatId) {
     }, { merge: true });
     const metaSnap = await getDoc(metaRef);
     if (metaSnap.data().participants.length === 0) {
-        for (let i = metaSnap.data().currentBucket; i >= 0; i--) {
-            await deleteDoc(doc(db, 'chats', `${removeChatId}_${i}`));
-        }
+        for (let i = metaSnap.data().currentBucket; i >= 0; i--) { await deleteDoc(doc(db, 'chats', `${removeChatId}_${i}`)); }
         await deleteDoc(metaRef);
-    };
-};
+    }
+}
 async function renameChat(name) {
     const metaRef = doc(db, "chats", chatId);
     await setDoc(metaRef, {
         title: name,
         updatedAt: new Date()
     }, { merge: true });
-};
+}
 async function editMessage(docId, indexToEdit, newText) {
     const docRef = doc(db, "chats", docId);
     const metaRef = doc(db, "chats", chatId);
@@ -481,14 +459,10 @@ async function editMessage(docId, indexToEdit, newText) {
                 messages[indexToEdit].edited = true;
 
                 transaction.update(docRef, { messages: messages });
-            } else {
-                alert("Index not found in array");
-            }
+            } else { alert("Index not found in array"); }
         });
         console.log(`Message #${indexToEdit + 1} has been edited to'${newText}'`);
-    } catch (e) {
-        alert(`Editing the message has failed because of error: ${e}`);
-    };
+    } catch (e) { alert(`Editing the message has failed because of error: ${e}`); };
     const metaSnap = await getDoc(metaRef);
     if (metaSnap.data().totalMessages === indexToEdit + 1) {
         console.log('Changing lastMessage...');
@@ -496,12 +470,8 @@ async function editMessage(docId, indexToEdit, newText) {
             lastMessage: newText,
             updatedAt: new Date().toISOString()
         }, { merge: true });
-    } else {
-        await setDoc(metaRef, {
-            updatedAt: new Date().toISOString()
-        }, { merge: true });
-    };
-};
+    } else { await setDoc(metaRef, { updatedAt: new Date().toISOString() }, { merge: true });  };
+}
 onAuthStateChanged(auth, async (user) => {
     // Detect if user is logged in or not. If not, this leads them to the login page to be redirected back here.
     if (!user) {
@@ -520,6 +490,7 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById("chatCreate").addEventListener('click', () => {
         createChatMenu(user.uid);
     });
+    // Settings Menu
     {
     document.getElementById('settingsIconButton').addEventListener('click', async () => {
         if (chatId && popupActive === false) {
@@ -632,7 +603,7 @@ onAuthStateChanged(auth, async (user) => {
                 const removeList = Array.from(checkedBoxes).map(cb => cb.value);
                 const currentChatId = chatId;
 
-                await removeList.forEach(async (b) => await removeUser(b, currentChatId));
+                removeList.forEach(async  (b) => await removeUser(b, currentChatId));
                 if (removeList.includes(user.uid)) chatId = '';
                 updateChat(user);
                 document.getElementById('settingsBox').remove();
@@ -641,6 +612,7 @@ onAuthStateChanged(auth, async (user) => {
         };
     });
     }
+    // Type input height control
     {
     const tx = document.getElementById('typeInput');
 
@@ -648,7 +620,7 @@ onAuthStateChanged(auth, async (user) => {
     tx.style.height = "auto";
     tx.style.height = (tx.scrollTop + tx.scrollHeight) + "px";
 
-    tx.addEventListener("input", function() {
+    tx.addEventListener("input", () => {
         // Reset height to calculate correctly
         this.style.height = "auto";
         // Set height based on scroll height
@@ -680,7 +652,7 @@ onAuthStateChanged(auth, async (user) => {
     });
     }
 });
-
+// Chat width : Chats list width changer
 {
 const resizer = document.getElementById('resizer');
 const leftSide = document.getElementById('chatsBox');
@@ -709,9 +681,7 @@ function handleMove(clientX) {
 }
 
 // Mouse Move Handler
-function onMouseMove(e) {
-    handleMove(e.clientX);
-}
+function onMouseMove(e) {handleMove(e.clientX);}
 
 // Touch Move Handler
 function onTouchMove(e) {
@@ -750,6 +720,7 @@ resizer.addEventListener('touchstart', (e) => {
     document.addEventListener('touchend', stopResizing);
 });
 }
+// Chats Bar open/close
 {
 const mainContainer = document.body;
 const menuBtn = document.getElementById('menuIconButton');
@@ -758,21 +729,15 @@ const allChats = document.querySelectorAll('.chats');
 // 1. When clicking the Menu Button on mobile, go BACK to the list
 menuBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    if (window.innerWidth <= 600) {
-        mainContainer.classList.remove('chat-open'); // Slide messages away
-    } else {
-        // Desktop toggle logic
-        chatsBox.classList.toggle('hidden-sidebar');
-    }
+    if (window.innerWidth <= 600) { mainContainer.classList.remove('chat-open'); }
+    else { chatsBox.classList.toggle('hidden-sidebar'); }
 });
 
 // 2. When clicking a chat in the list, OPEN the messages
 allChats.forEach(chat => {
     chat.addEventListener('click', (e) => {
         e.preventDefault();
-        if (window.innerWidth <= 600) {
-            mainContainer.classList.add('chat-open'); // Slide messages in
-        }
+        if (window.innerWidth <= 600) { mainContainer.classList.add('chat-open'); }
     });
 });
 }

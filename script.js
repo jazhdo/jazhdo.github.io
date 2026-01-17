@@ -1,7 +1,7 @@
-// Version 1/5/2026
+// Version 1/16/2026
 
 //Check and update mode (Not set dark mode)
-function darkmode() {
+function updateMode() {
     let mode = localStorage.getItem('lightmode');
     document.querySelectorAll('*').forEach(element => (mode == 'dark')?element.classList += " darkmode":(mode == 'light')?element.classList.remove('darkmode'):null);
 };
@@ -9,20 +9,11 @@ function darkmode() {
 function lightmode() {
     if (localStorage.getItem('lightmode') === 'dark') {
         localStorage.setItem('lightmode', 'auto')
-        if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-            if (document.getElementById('darktest').className == 'footer') {
-                document.querySelectorAll('*').forEach(element => element.classList += " darkmode");
-            }
-        } else if (window.matchMedia("(prefers-color-scheme: light)").matches) {
-            if (document.getElementById('darktest').className == 'footer darkmode') {
-                document.querySelectorAll('*').forEach(element => element.classList.remove('darkmode'));
-            };
-        };
+        if (window.matchMedia("(prefers-color-scheme: dark)").matches && document.getElementById('darktest').className == 'footer') document.querySelectorAll('*').forEach(element => element.classList += " darkmode")
+        else if (window.matchMedia("(prefers-color-scheme: light)").matches && document.getElementById('darktest').className == 'footer darkmode') { document.querySelectorAll('*').forEach(e => e.classList.remove('darkmode')); };
         console.log("Auto Change Enabled");
-    } else {
-        localStorage.setItem('lightmode', localStorage.getItem('lightmode') === 'auto'?'light':localStorage.getItem('lightmode') === 'light'?'dark':'')
-    };
-    darkmode();
+    } else localStorage.setItem('lightmode', localStorage.getItem('lightmode') === 'auto' ? 'light' : localStorage.getItem('lightmode') === 'light' ? 'dark' : '');
+    updateMode();
     document.getElementById('lightmode').innerHTML = 'Current Mode: ' + localStorage.getItem('lightmode');
 }
 function showAlert(message) {
@@ -33,32 +24,22 @@ function showAlert(message) {
     box.id = "customAlert";
     content.id = "alertMessage";
     button.id = "alertClose";
-    if (document.getElementById('darktest').className == 'footer darkmode') [box, content, button].forEach((e) => e.className += " darkmode");
+    [box, content, button].forEach((e) => e.className += document.getElementById('darktest').className == 'footer darkmode' ? " darkmode" : '');
 
     content.innerText = message;
     button.innerText = "OK";
 
-    button.onclick = () => {
-        document.getElementById("customAlert").remove();
-    };
+    button.onclick = () => document.getElementById("customAlert").remove();
 
     box.append(content, button);
     document.getElementById("main").after(box);
 };
 window.showAlert = showAlert;
 function manageCookies(status) {
-    if (status) {
-        console.log("Cookies Accepted.");
-        localStorage.setItem("Cookies", true);
-    } else if (!status) {
-        console.log("Cookies Declined.")
-        localStorage.setItem("Cookies", false)
-    } else {
-        console.log(`When calling function manageCookies in script.js, status gave the value: ${status} instead of true or false.`)
-    };
-    if (document.getElementById("cookies") !== null) {
-        document.getElementById("cookies").remove();
-    };
+    if (status) console.log("Cookies Accepted."), localStorage.setItem("Cookies", true);
+    else if (status === false) console.log("Cookies Declined."), localStorage.setItem("Cookies", false);
+    else { console.log(`When calling function manageCookies in script.js, status gave the value: ${status} instead of true or false.`); };
+    if (document.getElementById("cookies")) document.getElementById("cookies").remove();
 };
 function addCookiesBar() {
     const textContent = `
@@ -91,67 +72,55 @@ function addCookiesBar() {
     box.append(heading, text);
     document.getElementById("main").after(box);
 };
-// RPi 5 backend server
-const piBackend = 'http://192.168.68.106:3000';
-async function sendDataToPi(myData) {
-    try {
-        const response = await fetch(`${piBackend}/receive`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(myData)
-        });
-        const result = await response.json();
-        console.log("Pi says:", result.message);
-    } catch (err) {
-        console.error("Failed to send:", err);
-    }
-}
-async function getDataFromPi() {
-    try {
-        const response = await fetch(`${piBackend}/send`);
-        const data = await response.json();
-        console.log("Stats from Pi:", data);
-        return data;
-    } catch (err) {
-        console.error("Failed to receive:", err);
-    }
-}
+// RPi 5 backend server (Not working yet) (Future project)
+// const piBackend = 'http://192.168.68.106:3000';
+// async function sendDataToPi(myData) {
+//     try {
+//         const response = await fetch(`${piBackend}/receive`, {
+//             method: 'POST',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify(myData)
+//         });
+//         const result = await response.json();
+//         console.log("Pi says:", result.message);
+//     } catch (err) { console.error("Failed to send:", err); }
+// }
+// async function getDataFromPi() {
+//     try {
+//         const response = await fetch(`${piBackend}/send`);
+//         const data = await response.json();
+//         console.log("Stats from Pi:", data);
+//         return data
+//     } catch (err) { console.error("Failed to receive:", err); }
+// }
 // Initial check (All pages)
 
-// Lightmode Detection
-if (localStorage.getItem('lightmode') === 'auto' || !localStorage.getItem('lightmode')) {
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches || document.getElementById('darktest').className == 'footer') {document.querySelectorAll('*').forEach(e => e.className += " darkmode"); console.log('Darkmode Enabled.')}
-    else if (document.getElementById('darktest').className == 'footer darkmode') document.querySelectorAll('*').forEach(e => { e.classList.remove('darkmode'); console.log('Lightmode Enabled.')});
-    localStorage.setItem('lightmode', 'auto');
-} else darkmode(); console.log(localStorage.getItem('lightmode'));
+// Lightmode
+if (!localStorage.getItem('lightmode')) localStorage.setItem('lightmode', 'auto');
+if (localStorage.getItem('lightmode') === 'auto') {
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {document.querySelectorAll('*').forEach(e => e.className += " darkmode"); console.log('Darkmode Enabled.')}
+    else if (window.matchMedia("(prefers-color-scheme: light)").matches) {document.querySelectorAll('*').forEach(e => e.classList.remove('darkmode')); console.log('Lightmode Enabled.')};
+} else updateMode();
+console.log('Current Mode:', localStorage.getItem('lightmode'));
 if (document.getElementById('lightmode')) document.getElementById('lightmode').innerHTML = 'Current Mode: ' + localStorage.getItem('lightmode');
+// Cookies
 if (!localStorage.getItem('Cookies')) addCookiesBar();
-console.log('Cookies Status: ' + localStorage.getItem('Cookies'))
+console.log('Cookies Status: ' + localStorage.getItem('Cookies'));
+// Counter (test page)
 if (!localStorage.getItem("Counter")) localStorage.setItem("Counter", 0);
-let counter = 0
+let counter = 0;
 if (document.getElementById("counterDisplay")) {
     document.getElementById("counterDisplay").innerText = localStorage.getItem("Counter");
-    counter = Number(localStorage.getItem("Counter"));
-    console.log("Counter status:", counter)
+    counter = localStorage.getItem("Counter");
+    console.log("Counter status:", counter);
 };
-let commaCounterStatus = false
+let commaCounterStatus = false;
 
 // Listen for changes if auto
 window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
     if (localStorage.getItem('lightmode') == 'auto') {
-        if (event.matches) {
-            if (document.getElementById('darktest').className == 'footer') {
-                document.querySelectorAll('*').forEach(Element => {Element.className += " darkmode"});
-                console.log('Darkmode Enabled.');
-            }
-        } else {
-        if (document.getElementById('darktest').className == 'footer darkmode') {
-            document.querySelectorAll('*').forEach(element => {
-            element.classList.remove('darkmode');
-            console.log('Lightmode Enabled.')
-            });
-        }
-        }
+        if (event.matches && document.getElementById('darktest').className == 'footer') document.querySelectorAll('*').forEach(Element => {Element.className += " darkmode"}), console.log('Darkmode Enabled.');
+        else if (document.getElementById('darktest').className == 'footer darkmode') document.querySelectorAll('*').forEach(element => element.classList.remove('darkmode'), console.log('Lightmode Enabled.'));
     }
 })
 const footerElements = [...document.getElementsByClassName("footer")];
