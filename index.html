@@ -32,7 +32,10 @@
             <li><a href="/blog/">Blog Site</a></li>
         </ul>
         <h2>Comments/Bugs</h2>
-        <p><a href="/contact.html">Contact me</a> to tell me about bugs so I can improve this website.</p>
+        <p>
+            <a href="/contact.html">Contact me</a> to tell me about bugs so I can improve this website. </br>
+            Also if you ever get stuck anywhere, press the title "jazhdo" to take you back here.
+        </p>
         <h2 id="until0"></h2>
         <h2 id="jstestTitle">Javascript Test Results:</h2>
         <p id="jstest">
@@ -52,9 +55,33 @@
         <script>
             function jstest() { ['jstestTitle', 'jstest', 'jstestButton'].forEach((e) => document.getElementById(e).remove()) };
             // Mod is '%'
+            async function detectHoliday(day, month, subject) {
+                const now = new Date();
+                if (now.getDate() === day && now.getMonth() + 1 === month && holidayDetection) {
+                    console.log('Showing holiday special.')
+                    fetch('./holiday-info.json')
+                        .then(info => info.json())
+                        .then(info => info[subject])
+                        .then(info => {
+                            let message = document.createElement('p');
+                            message.textContent = `Today is ${subject}. Here is some basic info on the day:`;
+                            let index = 1;
+                            info.forEach((e) => {
+                                let element = document.createElement('a');
+                                element.href = e;
+                                element.textContent = ` Source ${index}`;
+                                message.append(element);
+                                index++;
+                            });
+                            window.showAlert(message);
+                        })
+                    holidayDetection = false;
+                }
+            }
             function timeS(time, measure) { return (time)?(Math.abs(time) > 1)?`${time} ${measure}s`:`${time} ${measure}`:'' };
             function refreshDate(elementId, year, month, day, subject) {
                 const now = new Date();
+                detectHoliday(day, month, subject);
                 let goal = new Date(year, month - 1, day);
                 let until = (goal - now)/1000/60/60/24;
                 for (let index = year; until < 0; index++) goal = new Date(index, month - 1, day), until = (goal - now)/1000/60/60/24;
@@ -90,12 +117,13 @@
                 document.getElementById(`until${[...elementId][5]-1}`).after(element);
             }
             function refreshDates() {
-                refreshDate('until1', 2026, 1, 19, 'Martin Luther King Jr. Day');
+                refreshDate('until1', 2026, 1, 18, 'Martin Luther King Jr. Day');
                 refreshDate('until2', 2026, 2, 14, 'Valentines Day');
                 refreshDate('until3', 2026, 2, 16, 'Presidents Day');
                 refreshDate('until4', 2026, 2, 17, 'Chinese New Years');
                 refreshDate('until5', 2026, 5, 28, 'Last Day of School');
             }
+            let holidayDetection = true;
             const gameLinkLi = document.createElement('li');
             const gameLinkA = document.createElement('a');
             gameLinkA.href = '/games/';

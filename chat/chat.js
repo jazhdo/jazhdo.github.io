@@ -275,11 +275,8 @@ async function updateChat(user) {
             replyBox.className += document.getElementById("darktest").classList.contains('darkmode')? ' darkmode':'';
             replyUser.textContent = e.replyToUser;
             const unsortedMessages = [...messagesArray].sort((a, b) => a.timestamp.localeCompare(b.timestamp));
-            try {
-                replyText.textContent = unsortedMessages[e.replyToText].text;
-            } catch {
-                replyText.textContent = e.replyToText;
-            };
+            try { replyText.textContent = unsortedMessages[e.replyToText].text; }
+            catch { replyText.textContent = e.replyToText; };
             replyBox.append(replyUser, replyText);
             box.append(replyBox);
         };
@@ -287,15 +284,12 @@ async function updateChat(user) {
         let pressTimer;
         box.addEventListener("pointerdown", (a) => {
             a.preventDefault();
-            // body.classList.
             pressTimer = setTimeout(() => {
                 clearTimeout(pressTimer);
                 openContextMenu(a, e, user, 'mobile', b, metaSnap, messagesArray);
             }, 500);
         });
-        function cancel() {
-            clearTimeout(pressTimer);
-        };
+        function cancel() {clearTimeout(pressTimer)};
         box.addEventListener("pointerup", cancel);
         box.addEventListener("pointerleave", cancel);
         box.addEventListener("pointercancel", cancel);
@@ -338,9 +332,7 @@ async function getChatList(snapshot, user) {
             document.getElementById('chatBar').style.display = '';
             document.getElementById('typeBar').style.display = '';
 
-            if (window.innerWidth <= 600) {
-                document.body.classList.add('chat-open');
-            };
+            if (window.innerWidth <= 600) document.body.classList.add('chat-open');
         });
 
         box.append(h2, p);
@@ -368,9 +360,7 @@ async function createChatMenu(userUID) {
     cancel.id = 'createChatCancel';
     submit.type = 'submit';
     
-    if (document.getElementById("darktest").classList.contains('darkmode')) {
-        box.className += ' darkmode';
-    };
+    box.className += document.getElementById("darktest").classList.contains('darkmode') ? ' darkmode' : '';
 
     form.append(h2, title, submit, cancel);
     box.append(form);
@@ -421,9 +411,7 @@ async function addUser(userUID) {
             participants: arrayUnion(userSnap.docs[0].id),
             updatedAt: new Date()
         }, { merge: true });
-    } else {
-        console.log(`The entered user id or username has not been found to match any in the database.`);
-    }
+    } else console.log(`The entered user id or username has not been found to match any in the database.`);
 }
 async function removeUser(userUID, removeChatId) {
     const metaRef = doc(db, "chats", removeChatId);
@@ -482,14 +470,10 @@ onAuthStateChanged(auth, async (user) => {
     const q = query(messageCollection, where('participants', 'array-contains', user.uid), orderBy('updatedAt', 'desc'));
     onSnapshot(q, async (snapshot) => {
         console.log("Database changed.");
-        if (chatId !== '') {
-            updateChat(user);
-        };
+        if (chatId !== '') updateChat(user);
         getChatList(snapshot, user);
     });
-    document.getElementById("chatCreate").addEventListener('click', () => {
-        createChatMenu(user.uid);
-    });
+    document.getElementById("chatCreate").addEventListener('click', () => { createChatMenu(user.uid) });
     // Settings Menu
     {
     document.getElementById('settingsIconButton').addEventListener('click', async () => {
@@ -532,8 +516,7 @@ onAuthStateChanged(auth, async (user) => {
             const title = list.data().title;
             let participants = list.data().participants;
 
-            const darkmodeElements = [box, profile, x];
-            darkmodeElements.forEach((element) => {element.className += document.getElementById('darktest').classList.contains('darkmode')?' darkmode':'';})
+            [box, profile, x].forEach((e) => {e.className += document.getElementById('darktest').classList.contains('darkmode')?' darkmode':'';})
 
             box.id = 'settingsBox';
             h2.textContent = 'Chat Settings';
@@ -626,7 +609,7 @@ onAuthStateChanged(auth, async (user) => {
         // Set height based on scroll height
         this.style.height = (this.scrollTop + this.scrollHeight) + "px";
     });
-    tx.addEventListener("keydown", function(e) {
+    tx.addEventListener("keydown", (e) => {
         if (e.key === "Enter" && !e.shiftKey && window.innerWidth >= 601) {
             e.preventDefault();
             const message = {
@@ -652,14 +635,17 @@ onAuthStateChanged(auth, async (user) => {
     });
     }
 });
+// Loading content (future loading screen)
+{
+document.getElementById('main').style.display = '';
+document.getElementsByTagName('footer')[0].style.display = '';
+}
 // Chat width : Chats list width changer
 {
 const resizer = document.getElementById('resizer');
 const leftSide = document.getElementById('chatsBox');
 
 let isResizing = false;
-
-// --- RESIZING LOGIC (MOUSE & TOUCH) ---
 
 function handleMove(clientX) {
     if (!isResizing) return;

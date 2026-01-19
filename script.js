@@ -26,7 +26,7 @@ function showAlert(message) {
     button.id = "alertClose";
     [box, content, button].forEach((e) => e.className += document.getElementById('darktest').className == 'footer darkmode' ? " darkmode" : '');
 
-    content.innerText = message;
+    content.append(message);
     button.innerText = "OK";
 
     button.onclick = () => document.getElementById("customAlert").remove();

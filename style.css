@@ -274,6 +274,15 @@ div#header-top {
     width: 100%;
     margin-bottom: 1vw;
 }
+#login {
+    text-align: center;
+}
+#copyUID:hover {
+    cursor: pointer;
+}
+#content {
+    font-size: 0px;
+}
 /* The modifications of the webpage for different screen sizes (Increase in size for smaller screen widthes) */
 @media (max-width: 450px) {
     nav{

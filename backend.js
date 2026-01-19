@@ -29,17 +29,31 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+function networkTest() {
+    try {
+        let test = fetch('https://google.com');s
+        if (test.ok || test.status === 404) return true
+    } catch {
+        console.log('Fetch failed.');
+        return false
+    }
+    return false
+}
+async function copy(text) {
+    try {
+        await navigator.clipboard.writeText(text);
+        console.log(`Copied message: '${text}'`);
+    } catch (e) { console.log("Failed to copy: ", e) };
+}
 function timestampToDate(ts) {
     if (!ts) {
         console.error("Nothing was provided when timestampToDate was called.");
         return null;
     }
     if (ts.toDate) return ts.toDate();
-    if (ts.seconds) {
-        return new Date(ts.seconds * 1000 + (ts.nanoseconds || 0) / 1_000_000);
-    }
+    if (ts.seconds) return new Date(ts.seconds * 1000 + (ts.nanoseconds || 0) / 1_000_000);
     return null;
-};
+}
 async function loadContacts() {
     const snapshot = await getDocs(query(collection(db, "messages"), orderBy("createdAt", "desc")));
     snapshot.forEach(doc => {
@@ -69,20 +83,15 @@ async function loadContacts() {
 
         box.className = "posts";
         box.style.display = "none";
-        if (document.getElementById("darktest").classList.contains('darkmode')) {
-            box.className += ' darkmode';
-            console.log("Darkmode added to posts")
-        }
+        box.className += document.getElementById("darktest").classList.contains('darkmode') ? ' darkmode' : '';
         box.append(id, time, email, message);
         document.getElementById("message-bottom").before(box);
     });
-};
-function redirectToHome() {
-    window.location.href = "/login.html";
-};
+}
+function redirectToHome() { window.location.href = "/login.html"; }
 // Show after logged in on admin page
 let showMessages = false;
-function showAdminContent(user) {
+function showAdminContent() {
     const message = document.createElement("p");
     const showButton = document.createElement("button");
     showButton.textContent = "Show messages";
@@ -111,76 +120,80 @@ function showAdminContent(user) {
     document.getElementById("message-bottom").innerText = "";
 }
 async function profileLoad(user) {
-    document.getElementById("profileUID").innerText = `User UID: ${user.uid}`
-    document.getElementById("profileEmail").innerText = `User Email: ${user.email}`
+    const copyUID = document.createElement('a');
+    copyUID.id = 'copyUID';
+    copyUID.textContent = 'Copy UID';
+    copyUID.style.color = 'darkgray';
+    document.getElementById("profileUID").innerText = `User UID: ${user.uid} `;
+    document.getElementById("profileUID").append(copyUID)
+    document.getElementById("profileEmail").innerText = `User Email: ${user.email}`;
     const chatLink = document.createElement('a');
     chatLink.href = '/chat/';
     chatLink.textContent = 'link';
     document.getElementById('chatLink').innerText = 'Chat link: ';
     document.getElementById('chatLink').append(chatLink);
 
-    const form = document.createElement('form');
-    const username = document.createElement('p');
-    const input = document.createElement('input');
-    const displayName = document.createElement('p');
-    const input2 = document.createElement('input');
-    const submit = document.createElement('button');
-    const userRef = doc(db, 'users', user.uid);
-    let usersSnap = await getDoc(userRef);
+    document.getElementById('profileForm')?.remove();
+    if (networkTest()) {
+        const form = document.createElement('form');
+        const username = document.createElement('p');
+        const input = document.createElement('input');
+        const displayName = document.createElement('p');
+        const input2 = document.createElement('input');
+        const submit = document.createElement('button');
+        const userRef = doc(db, 'users', user.uid);
+        let usersSnap = await getDoc(userRef);
 
-    if (usersSnap.data() == undefined) {
-        await setDoc(userRef, {
-            username: user.uid,
-            displayName: user.uid
-        }, { merge: true });
-        usersSnap = await getDoc(userRef);
-    };
-    input.value = usersSnap.data().username;
-    input2.value = usersSnap.data().displayName;
-    username.textContent = 'Username: ';
-    displayName.textContent = 'Display name: ';
-    submit.textContent = 'save';
-
-    input.id = 'username';
-    input2.id = 'displayName';
-    form.id = 'profileForm';
-    submit.id = 'profileSubmit';
-    submit.classList += document.getElementById("darktest").classList.contains('darkmode') ? ' darkmode' : '';
-    
-    username.append(input);
-    displayName.append(input2);
-    form.append(username, displayName, submit);
-
-    document.getElementById('profileEmail').before(form);
-
-    document.getElementById('profileForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const newUsername = document.getElementById('username').value.trim();
-        const newDisplayName = document.getElementById('displayName').value.trim();
-
-        const q = query(collection(db, "users"), where("username", "==", newUsername));
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty && querySnapshot.docs[0].id !== user.uid) {
-            alert("Username is already taken! Please choose another.");
-            document.getElementById('username').value = usersSnap.data().username;
-            return;
+        if (usersSnap.data() == undefined) {
+            await setDoc(userRef, {
+                username: user.uid,
+                displayName: user.uid
+            }, { merge: true });
+            usersSnap = await getDoc(userRef);
         }
-        if (newUsername.length == 28) { alert("Username has a possibility of being a user id because of it's 28 digits long. Please choose another."); return}
-        await setDoc(userRef, {
-            username: newUsername, 
-            displayName: newDisplayName
-        }, { merge: true });
-        console.log(`Username changed to '${newUsername}'.`)
-        console.log(`Display name changed to '${newDisplayName}'.`)
-    });
+        input.value = usersSnap?.data().username || 'No network';
+        input2.value = usersSnap?.data().displayName || 'No network';
+        username.textContent = 'Username: ';
+        displayName.textContent = 'Display name: ';
+        submit.textContent = 'save';
+
+        input.id = 'username';
+        input2.id = 'displayName';
+        form.id = 'profileForm';
+        submit.id = 'profileSubmit';
+        submit.classList += document.getElementById("darktest").classList.contains('darkmode') ? ' darkmode' : '';
+        
+        username.append(input);
+        displayName.append(input2);
+        form.append(username, displayName, submit);
+
+        document.getElementById('profileEmail').before(form);
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newUsername = document.getElementById('username').value.trim();
+            const newDisplayName = document.getElementById('displayName').value.trim();
+
+            const q = query(collection(db, "users"), where("username", "==", newUsername));
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty && querySnapshot.docs[0].id !== user.uid) {
+                alert("Username is already taken! Please choose another.");
+                document.getElementById('username').value = usersSnap.data().username;
+                return;
+            }
+            if (newUsername.length == 28) { alert("Username has a possibility of being a user id because of it's 28 digits long. Please choose another."); return}
+            await setDoc(userRef, {
+                username: newUsername, 
+                displayName: newDisplayName
+            }, { merge: true });
+            console.log(`Username changed to '${newUsername}'.`)
+            console.log(`Display name changed to '${newDisplayName}'.`)
+        });
+    }
     document.getElementById('copyUID').addEventListener('click', async () => {
-        try {
-            await navigator.clipboard.writeText(user.uid);
-            console.log(`Copied message: '${user.uid}'`);
-        } catch (err) { console.error("Failed to copy: ", err); };
+        copy(user.uid)
     });
-};
+}
 
 // Login page
 if (document.getElementById("loginForm") !== null) {
@@ -217,15 +230,26 @@ if (document.getElementById("loginForm") !== null) {
             
             profileLoad(user);
 
-            // Check if user is admin
-            const adminSnap = await getDoc(doc(db, "admins", user.uid));
-            if (adminSnap.exists() && document.getElementById("adminLink") !== null) { document.getElementById("adminLink").innerHTML = "Admin page link: <a href='admin.html'>link</a>"; };
-        } else { document.getElementById("adminLink").innerHTML = "<p id='adminLink'></p>"; }
+            if (networkTest()) {
+                // Check if user is admin
+                const adminSnap = await getDoc(doc(db, "admins", user.uid));
+                if (adminSnap.exists() && document.getElementById("adminLink") !== null) {
+                    const adminLink = document.createElement('a');
+                    adminLink.href = '/admin.html';
+                    adminLink.textContent = 'link';
+                    document.getElementById('chatLink').after(adminLink);
+                };
+            }
+        } else {
+            document.getElementById("adminLink")?.remove();
+            document.getElementById('login').style.display = '';
+            document.getElementById('content').style.display = 'none';
+            console.log('Login page loaded.')
+        }
     });
     document.getElementById("signOut").addEventListener("click", async () => {
         try {
             await signOut(auth);
-            window.location.reload();
         } catch (err) { window.showAlert("Logout failed because of error:", err); };
     });
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
@@ -310,7 +334,7 @@ else if (document.getElementById("message-bottom") !== null) {
             try {
                 const adminSnap = await getDoc(doc(db, "admins", user.uid));
                 if (adminSnap.exists()) {
-                    showAdminContent(user);
+                    showAdminContent();
                 } else {
                     alert("Access denied: You are not an admin. (If you actually are, ask to be added to the admins file)");
                     redirectToHome();
@@ -366,4 +390,4 @@ if (document.getElementById("contactForm") !== null) {
         };
     });
 };
-onAuthStateChanged(auth, async (user) => {document.getElementById("login-link").innerText = (user !== null)?"Profile":"Login/Sign up";});
+onAuthStateChanged(auth, async (user) => {document.getElementById("login-link").innerText = user?"Profile":"Login/Sign up";});
