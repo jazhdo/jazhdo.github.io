@@ -63,12 +63,12 @@ onAuthStateChanged(auth, async (user) => {
     
 });
 
-// Get the initial set of cameras connected
-const videoCameras = getInputs('videoinput');
-updateCameraList(videoCameras);
+// // Get the initial set of cameras connected
+// const videoCameras = getInputs('videoinput');
+// updateCameraList(videoCameras);
 
-// Listen for changes to media devices and update the list accordingly
-navigator.mediaDevices.addEventListener('devicechange', event => {
-    const newCameraList = getInputs('video');
-    updateCameraList(newCameraList);
-});
+// // Listen for changes to media devices and update the list accordingly
+// navigator.mediaDevices.addEventListener('devicechange', event => {
+//     const newCameraList = getInputs('video');
+//     updateCameraList(newCameraList);
+// });

@@ -29,14 +29,10 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-function networkTest() {
-    try {
-        let test = fetch('https://google.com');s
-        if (test.ok || test.status === 404) return true
-    } catch {
-        console.log('Fetch failed.');
-        return false
-    }
+async function networkTest() {
+    let test = await fetch('https://google.com');
+    console.log(`Fetch details: ok - ${test.ok}, status - ${test.status}`);
+    if (test.ok || test.status === 404) return true
     return false
 }
 async function copy(text) {

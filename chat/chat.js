@@ -44,7 +44,7 @@ let replyMessageStatus = {
 
 // Functions
 async function sendMessage(messageData, user) {
-    if (!messageData.text.trim() || !chatId) { return; }
+    if (!messageData.text.trim() || !chatId) return
     else if (editMessageStatus.status === true) {
         await editMessage(editMessageStatus.docId, editMessageStatus.index, messageData.text);
         editMessageStatus.status = false;
@@ -634,12 +634,13 @@ onAuthStateChanged(auth, async (user) => {
         tx.style.height = (tx.scrollTop + tx.scrollHeight) + "px";
     });
     }
+    // Loading content (future loading screen)
+    {
+    document.getElementById('main').style.display = '';
+    document.getElementsByTagName('footer')[0].style.display = '';
+    document.getElementById('loadingScreen')?.remove();
+    }
 });
-// Loading content (future loading screen)
-{
-document.getElementById('main').style.display = '';
-document.getElementsByTagName('footer')[0].style.display = '';
-}
 // Chat width : Chats list width changer
 {
 const resizer = document.getElementById('resizer');
