@@ -30,11 +30,11 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 async function networkTest() {
-    let test = await fetch('https://google.com');
-    console.log(`Fetch details: ok - ${test.ok}, status - ${test.status}`);
-    if (test.ok || test.status === 404) return true
+    const response = await fetch('https://api.github.com');
+    if (response.ok) return true
     return false
 }
+window.networkTest = networkTest;
 async function copy(text) {
     try {
         await navigator.clipboard.writeText(text);
@@ -130,7 +130,7 @@ async function profileLoad(user) {
     document.getElementById('chatLink').append(chatLink);
 
     document.getElementById('profileForm')?.remove();
-    if (networkTest()) {
+    if (await networkTest()) {
         const form = document.createElement('form');
         const username = document.createElement('p');
         const input = document.createElement('input');
@@ -186,9 +186,7 @@ async function profileLoad(user) {
             console.log(`Display name changed to '${newDisplayName}'.`)
         });
     }
-    document.getElementById('copyUID').addEventListener('click', async () => {
-        copy(user.uid)
-    });
+    document.getElementById('copyUID').addEventListener('click', async () => { copy(user.uid); });
 }
 
 // Login page
@@ -223,17 +221,21 @@ if (document.getElementById("loginForm") !== null) {
             
             document.getElementById("login").style.display = "none";
             document.getElementById("content").style.display = "";
-            
             profileLoad(user);
 
-            if (networkTest()) {
+            if (await networkTest()) {
+                console.log(`Checking admin status of ${user.uid}`);
                 // Check if user is admin
                 const adminSnap = await getDoc(doc(db, "admins", user.uid));
-                if (adminSnap.exists() && document.getElementById("adminLink") !== null) {
+                if (adminSnap.exists()) {
+                    console.log('Admin true')
+                    const adminLinkOut = document.createElement('p');
                     const adminLink = document.createElement('a');
+                    adminLinkOut.id = 'adminLink';
                     adminLink.href = '/admin.html';
-                    adminLink.textContent = 'link';
-                    document.getElementById('chatLink').after(adminLink);
+                    adminLink.textContent = 'Admin page link';
+                    adminLinkOut.append(adminLink);
+                    document.getElementById('chatLink').after(adminLinkOut);
                 };
             }
         } else {
@@ -378,7 +380,6 @@ if (document.getElementById("contactForm") !== null) {
             } catch (error) {
                 window.showAlert("There was an error sending the message: ", error, ". \
                     Please try again later or on a different device.");
-                window.showAlert("Oops! Something went wrong.");
             };
             document.getElementById("contactForm").style.display = "";
             document.getElementById("contactFormStatus").style.display = "none";
@@ -386,4 +387,4 @@ if (document.getElementById("contactForm") !== null) {
         };
     });
 };
-onAuthStateChanged(auth, async (user) => {document.getElementById("login-link").innerText = user?"Profile":"Login/Sign up";});
+onAuthStateChanged(auth, async user => {document.getElementById("login-link").innerText = user?"Profile":"Login/Sign up";});

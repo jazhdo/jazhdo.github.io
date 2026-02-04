@@ -24,8 +24,8 @@
     <div id="main">
         <h1>Test Page</h1>
         <p>This is a test page for testing purposes.</p>
-        <h2 id="demo"></h2>
-        <h1 class="counter">Counter</h1>
+
+        <h2 class="counter">Counter</h2>
         <button id="disableCounter" onclick="disableCounterPreset()">Click to disable counter settings</button>
         <form id="counterForm">
             <label for="number">Type the number to start with if you want here.</label>
@@ -39,7 +39,8 @@
             <button class="counter" onclick="minusCounter()">Minus 1</button>
             <button class="counter" onclick="resetCounter()">Reset</button>
         </div>
-        <button onclick="document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen()">Toggle fullscreen</button>
+        <img id="imgElement">
+        <button onclick="const element = document.getElementById('imgElement'); element.fullscreenElement ? element.exitFullscreen() : element.requestFullscreen()">Toggle fullscreen</button>
     </div>
     <footer>
         <h2 style="display: none;">Footer:</h2>
@@ -49,6 +50,7 @@
         <script type="module" src="/backend.js"></script>
         <script src="/script.js"></script>
         <script src="/test.js"></script>
+        <script src="/rpi-cam.js"></script>
     </footer>
 </body>
 </html>

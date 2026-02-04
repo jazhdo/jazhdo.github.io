@@ -1,11 +1,28 @@
 // Version 1/16/2026
 
-//Check and update mode (Not set dark mode)
+// Load a script after page loads
+function loadScript(url, callback = () => {}) {
+    console.log('Loading script ' + url + '...')
+    let script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = url;
+
+    script.onload = () => { callback(); };
+    script.onerror = (e) => { console.log('Loading script ' + url + ' encountered error: ' + e) };
+    document.head.appendChild(script);
+}
+// Stuff to run after cookies have been accepted
+async function afterCookies() {
+    const parser = new UAParser();
+    const userAgent = parser.getResult();
+    console.log(userAgent)
+}
+// Check and update mode (Not set dark mode)
 function updateMode() {
     let mode = localStorage.getItem('lightmode');
     document.querySelectorAll('*').forEach(element => (mode == 'dark')?element.classList += " darkmode":(mode == 'light')?element.classList.remove('darkmode'):null);
-};
-//Response to the light mode/dark mode button being clicked (Not set light mode)
+}
+// Response to the light mode/dark mode button being clicked (Not set light mode)
 function lightmode() {
     if (localStorage.getItem('lightmode') === 'dark') {
         localStorage.setItem('lightmode', 'auto')
@@ -36,10 +53,13 @@ function showAlert(message) {
 };
 window.showAlert = showAlert;
 function manageCookies(status) {
-    if (status) console.log("Cookies Accepted."), localStorage.setItem("Cookies", true);
-    else if (status === false) console.log("Cookies Declined."), localStorage.setItem("Cookies", false);
+    if (status) {
+        console.log("Cookies Accepted.");
+        loadScript('https://cdn.jsdelivr.net/npm/ua-parser-js/dist/ua-parser.min.js', afterCookies);
+        localStorage.setItem("cookies", JSON.stringify({ value: true, time: Date.now() }))
+    } else if (status === false) console.log("Cookies Declined."), localStorage.setItem("cookies", JSON.stringify({ value: false, time: Date.now() }));
     else { console.log(`When calling function manageCookies in script.js, status gave the value: ${status} instead of true or false.`); };
-    if (document.getElementById("cookies")) document.getElementById("cookies").remove();
+    document.getElementById("cookies")?.remove();
 };
 function addCookiesBar() {
     const textContent = `
@@ -72,27 +92,9 @@ function addCookiesBar() {
     box.append(heading, text);
     document.getElementById("main").after(box);
 };
-// RPi 5 backend server (Not working yet) (Future project)
-// const piBackend = 'http://192.168.68.106:3000';
-// async function sendDataToPi(myData) {
-//     try {
-//         const response = await fetch(`${piBackend}/receive`, {
-//             method: 'POST',
-//             headers: { 'Content-Type': 'application/json' },
-//             body: JSON.stringify(myData)
-//         });
-//         const result = await response.json();
-//         console.log("Pi says:", result.message);
-//     } catch (err) { console.error("Failed to send:", err); }
-// }
-// async function getDataFromPi() {
-//     try {
-//         const response = await fetch(`${piBackend}/send`);
-//         const data = await response.json();
-//         console.log("Stats from Pi:", data);
-//         return data
-//     } catch (err) { console.error("Failed to receive:", err); }
-// }
+
+const cookiesUpdated = 1769904000000;
+
 // Initial check (All pages)
 
 // Lightmode
@@ -103,26 +105,7 @@ if (localStorage.getItem('lightmode') === 'auto') {
 } else updateMode();
 console.log('Current Mode:', localStorage.getItem('lightmode'));
 if (document.getElementById('lightmode')) document.getElementById('lightmode').innerHTML = 'Current Mode: ' + localStorage.getItem('lightmode');
-// Cookies
-if (!localStorage.getItem('Cookies')) addCookiesBar();
-console.log('Cookies Status: ' + localStorage.getItem('Cookies'));
-// Counter (test page)
-if (!localStorage.getItem("Counter")) localStorage.setItem("Counter", 0);
-let counter = 0;
-if (document.getElementById("counterDisplay")) {
-    document.getElementById("counterDisplay").innerText = localStorage.getItem("Counter");
-    counter = localStorage.getItem("Counter");
-    console.log("Counter status:", counter);
-};
-let commaCounterStatus = false;
-
-// Listen for changes if auto
-window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
-    if (localStorage.getItem('lightmode') == 'auto') {
-        if (event.matches && document.getElementById('darktest').className == 'footer') document.querySelectorAll('*').forEach(Element => {Element.className += " darkmode"}), console.log('Darkmode Enabled.');
-        else if (document.getElementById('darktest').className == 'footer darkmode') document.querySelectorAll('*').forEach(element => element.classList.remove('darkmode'), console.log('Lightmode Enabled.'));
-    }
-})
+// Add lightmode button
 const footerElements = [...document.getElementsByClassName("footer")];
 const termsLink = footerElements[footerElements.length - 1];
 const lightmodeButton = document.createElement('button');
@@ -134,4 +117,30 @@ lightmodeButton.classList += document.getElementById('darktest').className == 'f
 
 termsLink.after(lightmodeButton);
 document.getElementById('lightmode').addEventListener('click', lightmode);
+// Listen for changes if auto
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
+    if (localStorage.getItem('lightmode') == 'auto') {
+        if (event.matches && document.getElementById('darktest').className == 'footer') document.querySelectorAll('*').forEach(Element => {Element.className += " darkmode"}), console.log('Darkmode Enabled.');
+        else if (document.getElementById('darktest').className == 'footer darkmode') document.querySelectorAll('*').forEach(element => element.classList.remove('darkmode'), console.log('Lightmode Enabled.'));
+    }
+})
+// Cookies
+let cookies;
+if (!localStorage.getItem('cookies')) addCookiesBar()
+else {
+    cookies = JSON.parse(localStorage.getItem('cookies'));
+    if (cookies.time < cookiesUpdated) addCookiesBar();
+    if (cookies.value === true) loadScript('https://cdn.jsdelivr.net/npm/ua-parser-js/dist/ua-parser.min.js', afterCookies);
+}
+console.log(`Cookies Status: ${cookies ? cookies.value : undefined}`);
+// Counter (test page)
+if (!localStorage.getItem("Counter")) localStorage.setItem("Counter", 0);
+let counter = 0;
+if (document.getElementById("counterDisplay")) {
+    document.getElementById("counterDisplay").innerText = localStorage.getItem("Counter");
+    counter = localStorage.getItem("Counter");
+    console.log("Counter status:", counter);
+};
+let commaCounterStatus = false;
+
 console.log("Initial Code Completed.");
