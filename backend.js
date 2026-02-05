@@ -387,4 +387,29 @@ if (document.getElementById("contactForm") !== null) {
         };
     });
 };
-onAuthStateChanged(auth, async user => {document.getElementById("login-link").innerText = user?"Profile":"Login/Sign up";});
+onAuthStateChanged(auth, async user => {
+    const loginLink = document.createElement('a');
+    const div = document.createElement('div');
+    const p = document.createElement('p');
+    const crossSize = 'clamp(40px, 2vw, 100px)';
+    loginLink.href = '/login.html';
+    loginLink.id = 'login-link';
+    // Profile circle has letter 'G' for 'Guest' (if no user logged in feature to be added later)
+    p.textContent = 'G';
+    p.style.fontSize = 'clamp(16px, 1.5vw, 32px)';
+    [
+        ['border', 'clamp(1px, 0.2vw, 2px) black solid'],
+        ['borderRadius', '100%'],
+        ['width', crossSize],
+        ['height', crossSize],
+        ['display', 'flex'],
+        ['alignItems', 'center'],
+        ['justifyContent', 'center'],
+        ['fontSize', '1.5vw'],
+        ['color', 'white'],
+        ['backgroundColor', 'gray']
+    ].forEach(style => { div.style[style[0]] = style[1]; });
+    div.append(p);
+    loginLink.append(div);
+    document.getElementsByClassName('toptitle')[0].after(loginLink);
+});

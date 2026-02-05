@@ -11,6 +11,18 @@ function loadScript(url, callback = () => {}) {
     script.onerror = (e) => { console.log('Loading script ' + url + ' encountered error: ' + e) };
     document.head.appendChild(script);
 }
+async function getJSON(url) {
+    let response = await fetch(url);
+    let data = await response.text();
+    return JSON.parse(data);
+}
+async function getLastUpdated() {
+    const info = await fetch("https://api.github.com/repos/jazhdo/jazhdo.github.io/commits?per_page=1");
+    info = await info.text();
+    info = JSON.parse(info);
+    const lastUpdated = info.commit.author.date;
+    localStorage.setItem("lastUpdated", JSON.stringify([lastUpdated, Date.now()]));
+}
 // Stuff to run after cookies have been accepted
 async function afterCookies() {
     const parser = new UAParser();
@@ -142,5 +154,7 @@ if (document.getElementById("counterDisplay")) {
     console.log("Counter status:", counter);
 };
 let commaCounterStatus = false;
+// Dynamic get last updated
+if (!localStorage.getItem("lastUpdated") || JSON.parse(localStorage.getItem('lastUpdated'))[1] >= 604800000) getLastUpdated();
 
 console.log("Initial Code Completed.");
