@@ -29,7 +29,7 @@ async function networkTest() {
 }
 async function getLastUpdated() {
     const info = await fetch("https://api.github.com/repos/jazhdo/jazhdo.github.io/commits?per_page=1");
-    info = await info.text();
+    info = info.text();
     info = JSON.parse(info);
     const lastUpdated = info.commit.author.date;
     localStorage.setItem("lastUpdated", JSON.stringify([lastUpdated, Date.now()]));

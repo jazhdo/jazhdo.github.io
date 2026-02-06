@@ -401,5 +401,20 @@ if (document.getElementById("contactForm") !== null) {
         };
     });
 };
-onAuthStateChanged(auth, async user => { if (user) updateProfilePic(); });
+onAuthStateChanged(auth, async user => {
+    if (user) {
+        const usersSnap = await getDoc(doc(db, 'users', user.uid));
+        let letter;
+        if (usersSnap.data()) {
+            letter = usersSnap.data().displayName?.charAt(0).toUpperCase();
+        } else {
+            await setDoc(userRef, {
+                username: user.uid,
+                displayName: user.uid
+            }, { merge: true });
+            letter = user.uid.charAt(0).toUpperCase();
+        }
+        updateProfilePic(letter);
+    }
+});
 updateProfilePic();
