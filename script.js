@@ -2,12 +2,12 @@
 
 // Load a script after page loads
 function loadScript(url, callback = () => {}) {
-    console.log('Loading script ' + url + '...')
+    console.log('Loading script ' + url);
     let script = document.createElement('script');
     script.type = 'text/javascript';
     script.src = url;
 
-    script.onload = () => { callback(); };
+    script.onload = callback;
     script.onerror = (e) => { console.log('Loading script ' + url + ' encountered error: ' + e) };
     document.head.appendChild(script);
 }
@@ -15,6 +15,17 @@ async function getJSON(url) {
     let response = await fetch(url);
     let data = await response.text();
     return JSON.parse(data);
+}
+async function copy(text) {
+    try {
+        await navigator.clipboard.writeText(text);
+        console.log(`Copied message: '${text}'`);
+    } catch (e) { console.log("Failed to copy: ", e) };
+}
+async function networkTest() {
+    const response = await fetch('https://api.github.com');
+    if (response.ok) return true
+    return false
 }
 async function getLastUpdated() {
     const info = await fetch("https://api.github.com/repos/jazhdo/jazhdo.github.io/commits?per_page=1");
@@ -29,7 +40,7 @@ async function afterCookies() {
     const userAgent = parser.getResult();
     console.log(userAgent)
 }
-// Check and update mode (Not set dark mode)
+// Check and update mode
 function updateMode() {
     let mode = localStorage.getItem('lightmode');
     document.querySelectorAll('*').forEach(element => (mode == 'dark')?element.classList += " darkmode":(mode == 'light')?element.classList.remove('darkmode'):null);
@@ -76,7 +87,7 @@ function manageCookies(status) {
 function addCookiesBar() {
     const textContent = `
         Your perference will be stored until you clear your browser's cache. 
-        By clicking accept, you also accept to the `
+        By clicking accept, you also accept to the `;
     const box = document.createElement("div");
     const heading = document.createElement("h2");
     const text = document.createElement("p");
@@ -118,8 +129,6 @@ if (localStorage.getItem('lightmode') === 'auto') {
 console.log('Current Mode:', localStorage.getItem('lightmode'));
 if (document.getElementById('lightmode')) document.getElementById('lightmode').innerHTML = 'Current Mode: ' + localStorage.getItem('lightmode');
 // Add lightmode button
-const footerElements = [...document.getElementsByClassName("footer")];
-const termsLink = footerElements[footerElements.length - 1];
 const lightmodeButton = document.createElement('button');
 
 lightmodeButton.id = 'lightmode';
@@ -127,7 +136,7 @@ lightmodeButton.className = 'footer';
 lightmodeButton.textContent = 'Current Mode: ' + localStorage.getItem('lightmode');
 lightmodeButton.classList += document.getElementById('darktest').className == 'footer darkmode'?' darkmode':'';
 
-termsLink.after(lightmodeButton);
+document.querySelectorAll('a[href="/terms.html"]')[0].after(lightmodeButton);
 document.getElementById('lightmode').addEventListener('click', lightmode);
 // Listen for changes if auto
 window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
@@ -154,7 +163,7 @@ if (document.getElementById("counterDisplay")) {
     console.log("Counter status:", counter);
 };
 let commaCounterStatus = false;
-// Dynamic get last updated
+// Get last updated
 if (!localStorage.getItem("lastUpdated") || JSON.parse(localStorage.getItem('lastUpdated'))[1] >= 604800000) getLastUpdated();
 
 console.log("Initial Code Completed.");

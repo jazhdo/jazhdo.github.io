@@ -29,17 +29,31 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-async function networkTest() {
-    const response = await fetch('https://api.github.com');
-    if (response.ok) return true
-    return false
-}
-window.networkTest = networkTest;
-async function copy(text) {
-    try {
-        await navigator.clipboard.writeText(text);
-        console.log(`Copied message: '${text}'`);
-    } catch (e) { console.log("Failed to copy: ", e) };
+function updateProfilePic(letter = 'G', bgcolor = 'gray', borderColor = 'black', color = 'white') {
+    document.getElementById('login-link')?.remove();
+    const loginLink = document.createElement('a');
+    const div = document.createElement('div');
+    const p = document.createElement('p');
+    const crossSize = 'clamp(40px, 2vw, 100px)';
+    loginLink.href = '/login.html';
+    loginLink.id = 'login-link';
+    p.textContent = String(letter);
+    p.style.fontSize = 'clamp(16px, 1.5vw, 32px)';
+    [
+        ['border', `clamp(1px, 0.2vw, 2px) ${borderColor} solid`],
+        ['borderRadius', '100%'],
+        ['width', crossSize],
+        ['height', crossSize],
+        ['display', 'flex'],
+        ['alignItems', 'center'],
+        ['justifyContent', 'center'],
+        ['fontSize', '1.5vw'],
+        ['color', String(color)],
+        ['backgroundColor', String(bgcolor)]
+    ].forEach(style => { div.style[style[0]] = style[1]; });
+    div.append(p);
+    loginLink.append(div);
+    document.getElementsByClassName('toptitle')[0].after(loginLink);
 }
 function timestampToDate(ts) {
     if (!ts) {
@@ -387,29 +401,5 @@ if (document.getElementById("contactForm") !== null) {
         };
     });
 };
-onAuthStateChanged(auth, async user => {
-    const loginLink = document.createElement('a');
-    const div = document.createElement('div');
-    const p = document.createElement('p');
-    const crossSize = 'clamp(40px, 2vw, 100px)';
-    loginLink.href = '/login.html';
-    loginLink.id = 'login-link';
-    // Profile circle has letter 'G' for 'Guest' (if no user logged in feature to be added later)
-    p.textContent = 'G';
-    p.style.fontSize = 'clamp(16px, 1.5vw, 32px)';
-    [
-        ['border', 'clamp(1px, 0.2vw, 2px) black solid'],
-        ['borderRadius', '100%'],
-        ['width', crossSize],
-        ['height', crossSize],
-        ['display', 'flex'],
-        ['alignItems', 'center'],
-        ['justifyContent', 'center'],
-        ['fontSize', '1.5vw'],
-        ['color', 'white'],
-        ['backgroundColor', 'gray']
-    ].forEach(style => { div.style[style[0]] = style[1]; });
-    div.append(p);
-    loginLink.append(div);
-    document.getElementsByClassName('toptitle')[0].after(loginLink);
-});
+onAuthStateChanged(auth, async user => { if (user) updateProfilePic(); });
+updateProfilePic();
