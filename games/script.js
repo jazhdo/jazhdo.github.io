@@ -11,7 +11,20 @@ async function loadGames(sort) {
         const img = document.createElement('img');
         const span = document.createElement('span');
         const info = gamesList[key];
-        a.href = '/games/' + info.url;
+        a.addEventListener('click', () => {
+            const background = document.createElement('div');
+            const view = document.createElement('iframe');
+            [
+                ['height', '100vh'],
+                ['width', '100vw'],
+                ['backgroundColor', document.getElementById("darktest").classList.contains('darkmode')? 'gray' : 'white'],
+                ['position', 'fixed']
+            ].forEach([e, v] => { background.style[e] = v });
+            view.src = '/games/' + info.url;
+            view.style.position = 'fixed';
+            background.append(view);
+            document.getElementById('main').after(background);
+        });
         a.className = 'game-icon';
         img.src = info.img;
         if (window.matchMedia("(any-pointer: coarse)").matches) span.style.opacity = 1;
