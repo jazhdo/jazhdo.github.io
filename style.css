@@ -1,4 +1,4 @@
-/* Version 1/16/2026 */
+/* v0.1.0 */
 a.navbutton{
     border: 0px;
     padding: 0.5vw 1vw;
@@ -272,7 +272,6 @@ a#login-link {
 div#header-top {
     display: flex;
     width: 100%;
-    margin-bottom: 1vw;
 }
 #login {
     text-align: center;

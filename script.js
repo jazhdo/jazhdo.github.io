@@ -1,4 +1,4 @@
-// Version 1/16/2026
+// v0.1.0
 
 // Load a script after page loads
 function loadScript(url, callback = () => {}) {
@@ -11,34 +11,46 @@ function loadScript(url, callback = () => {}) {
     script.onerror = (e) => { console.log('Loading script ' + url + ' encountered error: ' + e) };
     document.head.appendChild(script);
 }
+// Fetch JSON data
 async function getJSON(url) {
     let response = await fetch(url);
     let data = await response.text();
     return JSON.parse(data);
 }
+// Copy text to clipboard
 async function copy(text) {
     try {
         await navigator.clipboard.writeText(text);
         console.log(`Copied message: '${text}'`);
     } catch (e) { console.log("Failed to copy: ", e) };
 }
+// Test network status (if website was downloaded offline)
 async function networkTest() {
     const response = await fetch('https://api.github.com');
     if (response.ok) return true
     return false
 }
-async function getLastUpdated() {
-    const info = await fetch("https://api.github.com/repos/jazhdo/jazhdo.github.io/commits?per_page=1");
-    info = info.text();
+// Check if there are updates
+async function checkLastUpdated() {
+    const currentVersion = document.getElementById('darktest').textContent.match(/v(\d+).(\d+).(\d+)/).slice(1, 4);
+    localStorage.setItem("lastUpdated", new Date(currentVersion));
+    let info = await fetch("https://api.github.com/repos/jazhdo/jazhdo.github.io/commits?per_page=1");
+    info = await info.text();
     info = JSON.parse(info);
-    const lastUpdated = info.commit.author.date;
-    localStorage.setItem("lastUpdated", JSON.stringify([lastUpdated, Date.now()]));
+    const latestVersion = info[0].commit.message.match(/v(\d+).(\d+).(\d+)/).slice(1, 4);
+    if (currentVersion[0] < latestVersion[0]) {
+        console.log('Version outdated.');
+        alert('Please hard refresh the page to get the latest content (Latest: v' + latestVersion.join('.') + ', Current: v' + currentVersion.join('.') + ').');
+    } else {
+        console.log('Version up to date (v' + latestVersion.join('.') + ')');
+    }
 }
 // Stuff to run after cookies have been accepted
 async function afterCookies() {
+    // Analytics
     const parser = new UAParser();
     const userAgent = parser.getResult();
-    console.log(userAgent)
+    console.log(userAgent);
 }
 // Check and update mode
 function updateMode() {
@@ -163,7 +175,8 @@ if (document.getElementById("counterDisplay")) {
     console.log("Counter status:", counter);
 };
 let commaCounterStatus = false;
-// Get last updated
-if (!localStorage.getItem("lastUpdated") || JSON.parse(localStorage.getItem('lastUpdated'))[1] >= 604800000) getLastUpdated();
-
+// Check last updated
+try {
+checkLastUpdated();
+} catch (e) { console.log('Error: ' + e) }
 console.log("Initial Code Completed.");

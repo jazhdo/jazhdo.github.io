@@ -1,4 +1,4 @@
-// Version 1/16/2026
+// v0.1.0
 
 // Firebase stuff
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -63,6 +63,12 @@ function timestampToDate(ts) {
     if (ts.toDate) return ts.toDate();
     if (ts.seconds) return new Date(ts.seconds * 1000 + (ts.nanoseconds || 0) / 1_000_000);
     return null;
+}
+// Test network status (if website was downloaded offline)
+async function networkTest() {
+    const response = await fetch('https://api.github.com');
+    if (response.ok) return true
+    return false
 }
 async function loadContacts() {
     const snapshot = await getDocs(query(collection(db, "messages"), orderBy("createdAt", "desc")));

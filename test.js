@@ -1,4 +1,4 @@
-// Version 1/16/2026
+// v0.1.0
 function hide(list) { for (let a = 0; a < list.length; a++) { document.querySelectorAll(list[a]).forEach(element => { element.style.display = "none"; }); }; };
 function updateCounter(newCounter) {
     localStorage.setItem("Counter", newCounter);

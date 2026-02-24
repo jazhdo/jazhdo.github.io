@@ -1,4 +1,4 @@
-// Version 1/16/2026
+// v0.1.0
 
 // Firebase stuff
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";

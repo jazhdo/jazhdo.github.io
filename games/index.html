@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <title>Games - jazhdo</title>
     <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="/darkmode.css">
@@ -26,7 +27,7 @@
             display: block;
             object-fit: cover;
             object-position: center;
-            --cross-size: clamp(120px, 8vw, 300px);
+            --cross-size: clamp(150px, 8vw, 300px);
             width: var(--cross-size);
             height: var(--cross-size);
         }
@@ -39,14 +40,20 @@
             right: 0;
             background-color: rgba(0, 0, 0, 0.7);
             color: white;
-            padding: 0.5vw 1vw;
-            font-size: clamp(13px, 2.5vw, 16px);
+            padding: clamp(5px, 0.5vw, 10px) clamp(10px, 1vw, 20px);
+            font-size: clamp(13px, 2.5vw, 20px);
             line-height: normal;
             text-align: center;
         }
         a.game-icon:hover span.game-name {
             opacity: 1;
         } 
+        /* In case device is touch and there is no hover */
+        @media  (hover: none) {
+            span.game-name {
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -68,7 +75,7 @@
     </div>
     <footer>
         <h2 style="display: none;">Footer:</h2>
-        <p id="darktest" class="footer">Updated: 1/16/2026 - jazhdo</p>
+        <p id="darktest" class="footer">v0.1.0 - jazhdo</p>
         <a class="footer" href="/privacy.html">Privacy</a>
         <a class="footer" href="/terms.html">Terms</a>
         <script type="module" src="/backend.js"></script>
