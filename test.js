@@ -1,6 +1,7 @@
-// Version 1/16/2026
+// v0.1.0
 function hide(list) { for (let a = 0; a < list.length; a++) { document.querySelectorAll(list[a]).forEach(element => { element.style.display = "none"; }); }; };
 function updateCounter(newCounter) {
+    localStorage.setItem("Counter", newCounter);
     showCounter = newCounter;
     if (commaCounterStatus) { showCounter = commaNumber(showCounter) };
     document.getElementById("counterDisplay").innerText = showCounter;
@@ -8,17 +9,14 @@ function updateCounter(newCounter) {
 function addCounter() {
     counter = Number(counter);
     counter += 1;
-    localStorage.setItem("Counter", counter);
     updateCounter(counter);
 }
 function minusCounter() {
     counter -= 1;
-    localStorage.setItem("Counter", counter);
     updateCounter(counter);
 }
 function resetCounter() {
     counter = 0;
-    localStorage.setItem("Counter", 0);
     updateCounter(counter);
 }
 function commaCounter() {

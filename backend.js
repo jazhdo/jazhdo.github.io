@@ -1,4 +1,4 @@
-// Version 1/16/2026
+// v0.1.0
 
 // Firebase stuff
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -29,17 +29,31 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-async function networkTest() {
-    let test = await fetch('https://google.com');
-    console.log(`Fetch details: ok - ${test.ok}, status - ${test.status}`);
-    if (test.ok || test.status === 404) return true
-    return false
-}
-async function copy(text) {
-    try {
-        await navigator.clipboard.writeText(text);
-        console.log(`Copied message: '${text}'`);
-    } catch (e) { console.log("Failed to copy: ", e) };
+function updateProfilePic(letter = 'G', bgcolor = 'gray', borderColor = 'black', color = 'white') {
+    document.getElementById('login-link')?.remove();
+    const loginLink = document.createElement('a');
+    const div = document.createElement('div');
+    const p = document.createElement('p');
+    const crossSize = 'clamp(40px, 2vw, 100px)';
+    loginLink.href = '/login.html';
+    loginLink.id = 'login-link';
+    p.textContent = String(letter);
+    p.style.fontSize = 'clamp(16px, 1.5vw, 32px)';
+    [
+        ['border', `clamp(1px, 0.2vw, 2px) ${borderColor} solid`],
+        ['borderRadius', '100%'],
+        ['width', crossSize],
+        ['height', crossSize],
+        ['display', 'flex'],
+        ['alignItems', 'center'],
+        ['justifyContent', 'center'],
+        ['fontSize', '1.5vw'],
+        ['color', String(color)],
+        ['backgroundColor', String(bgcolor)]
+    ].forEach(style => { div.style[style[0]] = style[1]; });
+    div.append(p);
+    loginLink.append(div);
+    document.getElementsByClassName('toptitle')[0].after(loginLink);
 }
 function timestampToDate(ts) {
     if (!ts) {
@@ -49,6 +63,12 @@ function timestampToDate(ts) {
     if (ts.toDate) return ts.toDate();
     if (ts.seconds) return new Date(ts.seconds * 1000 + (ts.nanoseconds || 0) / 1_000_000);
     return null;
+}
+// Test network status (if website was downloaded offline)
+async function networkTest() {
+    const response = await fetch('https://api.github.com');
+    if (response.ok) return true
+    return false
 }
 async function loadContacts() {
     const snapshot = await getDocs(query(collection(db, "messages"), orderBy("createdAt", "desc")));
@@ -130,7 +150,7 @@ async function profileLoad(user) {
     document.getElementById('chatLink').append(chatLink);
 
     document.getElementById('profileForm')?.remove();
-    if (networkTest()) {
+    if (await networkTest()) {
         const form = document.createElement('form');
         const username = document.createElement('p');
         const input = document.createElement('input');
@@ -186,9 +206,7 @@ async function profileLoad(user) {
             console.log(`Display name changed to '${newDisplayName}'.`)
         });
     }
-    document.getElementById('copyUID').addEventListener('click', async () => {
-        copy(user.uid)
-    });
+    document.getElementById('copyUID').addEventListener('click', async () => { copy(user.uid); });
 }
 
 // Login page
@@ -223,17 +241,21 @@ if (document.getElementById("loginForm") !== null) {
             
             document.getElementById("login").style.display = "none";
             document.getElementById("content").style.display = "";
-            
             profileLoad(user);
 
-            if (networkTest()) {
+            if (await networkTest()) {
+                console.log(`Checking admin status of ${user.uid}`);
                 // Check if user is admin
                 const adminSnap = await getDoc(doc(db, "admins", user.uid));
-                if (adminSnap.exists() && document.getElementById("adminLink") !== null) {
+                if (adminSnap.exists()) {
+                    console.log('Admin true')
+                    const adminLinkOut = document.createElement('p');
                     const adminLink = document.createElement('a');
+                    adminLinkOut.id = 'adminLink';
                     adminLink.href = '/admin.html';
-                    adminLink.textContent = 'link';
-                    document.getElementById('chatLink').after(adminLink);
+                    adminLink.textContent = 'Admin page link';
+                    adminLinkOut.append(adminLink);
+                    document.getElementById('chatLink').after(adminLinkOut);
                 };
             }
         } else {
@@ -378,7 +400,6 @@ if (document.getElementById("contactForm") !== null) {
             } catch (error) {
                 window.showAlert("There was an error sending the message: ", error, ". \
                     Please try again later or on a different device.");
-                window.showAlert("Oops! Something went wrong.");
             };
             document.getElementById("contactForm").style.display = "";
             document.getElementById("contactFormStatus").style.display = "none";
@@ -386,4 +407,20 @@ if (document.getElementById("contactForm") !== null) {
         };
     });
 };
-onAuthStateChanged(auth, async (user) => {document.getElementById("login-link").innerText = user?"Profile":"Login/Sign up";});
+onAuthStateChanged(auth, async user => {
+    if (user) {
+        const usersSnap = await getDoc(doc(db, 'users', user.uid));
+        let letter;
+        if (usersSnap.data()) {
+            letter = usersSnap.data().displayName?.charAt(0).toUpperCase();
+        } else {
+            await setDoc(userRef, {
+                username: user.uid,
+                displayName: user.uid
+            }, { merge: true });
+            letter = user.uid.charAt(0).toUpperCase();
+        }
+        updateProfilePic(letter);
+    }
+});
+updateProfilePic();

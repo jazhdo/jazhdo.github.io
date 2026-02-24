@@ -3,16 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <title>Games - jazhdo</title>
     <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="/darkmode.css">
     <link rel="icon" href="/icon.png">
+    <style>
+        #games {
+            display: flex;
+            gap: 20px;
+            font-size: 0px;
+            justify-content: center;
+        }
+        .game-icon {
+            padding: 0px;
+            border: 0.25vw rgba(0, 0, 0, 0.7) solid;
+            border-radius: clamp(40px, 2vw, 100px);
+            display: inline-block;
+            overflow: hidden;
+            position: relative;
+        }
+        a.game-icon img {
+            display: block;
+            object-fit: cover;
+            object-position: center;
+            --cross-size: clamp(150px, 8vw, 300px);
+            width: var(--cross-size);
+            height: var(--cross-size);
+        }
+        span.game-name {
+            opacity: 0;
+            transition: opacity 0.3s;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: clamp(5px, 0.5vw, 10px) clamp(10px, 1vw, 20px);
+            font-size: clamp(13px, 2.5vw, 20px);
+            line-height: normal;
+            text-align: center;
+        }
+        a.game-icon:hover span.game-name {
+            opacity: 1;
+        } 
+        /* In case device is touch and there is no hover */
+        @media  (hover: none) {
+            span.game-name {
+                opacity: 1;
+            }
+        }
+    </style>
 </head>
 <body>
     <header>
         <div id="header-top">
             <a href="/" draggable="false" class="toptitle">jazhdo</a>
-            <a href="/login.html" id="login-link"></a>
         </div>
         <nav>
             <a href="/" draggable="false" class="navbutton">Home</a>
@@ -22,21 +69,21 @@
         </nav>
     </header>
     <div id="main">
-        <h1>Games</h1>
-        <p>List of games currently avaliable to play on the website:</p>
-        <ul>
-            <li><a href="/games/cloudmoon.html">Cloud Moon App Games (Not mine)</a></li>
-            <li><a href="/games/Eaglercraft_1.12.2_WASM_Offline_Download.html">Eaglercraft (Also not mine)</a></li>
-            <!-- <li><a href="/games/phaser.html">My games</a></li> -->
-        </ul>
+        <h1 style="text-align: center;">Games</h1>
+        <div id="games">
+        </div> 
     </div>
     <footer>
         <h2 style="display: none;">Footer:</h2>
-        <p id="darktest" class="footer">Updated: 1/16/2026 - jazhdo</p>
+        <p id="darktest" class="footer">v0.1.0 - jazhdo</p>
         <a class="footer" href="/privacy.html">Privacy</a>
         <a class="footer" href="/terms.html">Terms</a>
         <script type="module" src="/backend.js"></script>
         <script src="/script.js"></script>
+        <script src="/games/script.js"></script>
+        <script>
+            loadGames();
+        </script>
     </footer>
 </body>
 </html>
