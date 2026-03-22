@@ -1,4 +1,4 @@
-// v0.2.0
+// v0.2.1
 
 // Firebase stuff
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
