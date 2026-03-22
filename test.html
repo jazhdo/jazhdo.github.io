@@ -22,8 +22,9 @@
         </nav>
     </header>
     <div id="main">
-        <h1>Test Page</h1>
-        <p>This is a test page for testing purposes.</p>
+        <h1>Test Page (H1 Element)</h1>
+        <h2>H2 Element</h2>
+        <p>This is a test page for testing purposes. (P Element)</p>
 
         <h2 class="counter">Counter</h2>
         <button id="disableCounter" onclick="disableCounterPreset()">Click to disable counter settings</button>
@@ -40,11 +41,11 @@
             <button class="counter" onclick="resetCounter()">Reset</button>
         </div>
         <img id="imgElement">
-        <button onclick="const element = document.getElementById('imgElement'); element.fullscreenElement ? element.exitFullscreen() : element.requestFullscreen()">Toggle fullscreen</button>
+        <button onclick="fullScreen(document.getElementById('imgElement'))">Toggle fullscreen</button>
     </div>
     <footer>
         <h2 style="display: none;">Footer:</h2>
-        <p id="darktest" class="footer">v0.1.0 - jazhdo</p>
+        <p id="darktest" class="footer">v0.2.0 - jazhdo</p>
         <a class="footer" href="/privacy.html">Privacy</a>
         <a class="footer" href="/terms.html">Terms</a>
         <script type="module" src="/backend.js"></script>

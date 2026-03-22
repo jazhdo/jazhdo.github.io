@@ -9,12 +9,15 @@
     <link rel="stylesheet" href="/darkmode.css">
     <link rel="icon" href="/icon.png">
     <style>
+        /* Game Icons' container */
         #games {
             display: flex;
             gap: 20px;
             font-size: 0px;
             justify-content: center;
+            flex-wrap: wrap;
         }
+        /* Game Icons */
         .game-icon {
             padding: 0px;
             border: 0.25vw rgba(0, 0, 0, 0.7) solid;
@@ -22,6 +25,9 @@
             display: inline-block;
             overflow: hidden;
             position: relative;
+        }
+        .game-icon.darkmode {
+            border-color: lightgray;
         }
         a.game-icon img {
             display: block;
@@ -45,11 +51,41 @@
             line-height: normal;
             text-align: center;
         }
+        a.game-icon:hover {
+            cursor: grab;
+        }
         a.game-icon:hover span.game-name {
             opacity: 1;
-        } 
+        }
+        /* Game Display */
+        #exit {
+            position: fixed;
+            top: 0px;
+            left: 0px;
+            font-size: 20px;
+            margin: 0px;
+            padding: 0px 5px;
+            z-index: 1000000000;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        #background {
+            height: 100vw;
+            width: 100vw;
+            display: flex;
+            align-items: center;
+            position: fixed;
+        }
+        #game-view {
+            position: fixed;
+            height: 100vh;
+            width: 100vw;
+            top: 0px;
+            left: 0px;
+            z-index: 1000000;
+            border: none;
+        }
         /* In case device is touch and there is no hover */
-        @media  (hover: none) {
+        @media  (any-hover: none) {
             span.game-name {
                 opacity: 1;
             }
@@ -70,18 +106,79 @@
     </header>
     <div id="main">
         <h1 style="text-align: center;">Games</h1>
+        <noscript>Please enable javascript to play games.</noscript>
         <div id="games">
         </div> 
     </div>
     <footer>
         <h2 style="display: none;">Footer:</h2>
-        <p id="darktest" class="footer">v0.1.0 - jazhdo</p>
+        <p id="darktest" class="footer">v0.2.0 - jazhdo</p>
         <a class="footer" href="/privacy.html">Privacy</a>
         <a class="footer" href="/terms.html">Terms</a>
         <script type="module" src="/backend.js"></script>
         <script src="/script.js"></script>
-        <script src="/games/script.js"></script>
         <script>
+            // Games list
+            const games = {
+                "EaglercraftX 1.8.8": {
+                    url: "./EaglercraftX_1.8.html",
+                    img: "./Eaglercraft.png"
+                },
+                "EaglercraftX 1.8.8 WASM": {
+                    url: "./EaglercraftX_1.8_WASM.html",
+                    img: "./Eaglercraft.png"
+                },
+                // Eaglercraft 1.12.2 is too laggy for even my macbook. Try again when they release a stable version. The current version has errors with the launch screen.
+                // "Eaglercraft 1.12.2": {
+                //     url: "./Eaglercraft_1.12.2.html",
+                //     img: "./Eaglercraft.png"
+                // },
+                "Eaglercraft 1.12.2 WASM": {
+                    url: "./Eaglercraft_1.12.2_WASM.html",
+                    img: "./Eaglercraft.png"
+                },
+                "Cloud Moon App": {
+                    url: "https://cloudmoonapp.pages.dev",
+                    img: "https://cloudmoonapp.pages.dev/images/logo.png"
+                }
+            };
+            // Load games
+            async function loadGames(sort) {
+                [...document.getElementsByClassName("game-icon")]?.forEach(e => e.remove());
+                if (sort === "az") gamesSort = Object.keys(games).sort();
+                else if (sort === "za") gamesSort = Object.keys(games).sort().reverse();
+                else if (sort === "reverse") gamesSort = Object.keys(games).reverse();
+                else gamesSort = Object.keys(games);
+                if (gamesSort != Object.keys(games)) console.log("Sorted " + gamesSort.join(', ') + " by " + sort + ".");
+                else console.log("Sorted " + gamesSort.join(', ') + " by no sorting.");
+                gamesSort.forEach(key => {
+                    const a = document.createElement("a");
+                    const img = document.createElement("img");
+                    const span = document.createElement("span");
+                    const info = games[key];
+                    a.addEventListener("click", () => {
+                        const background = document.createElement("div");
+                        const view = document.createElement("iframe");
+                        const exit = document.createElement("button");
+                        exit.textContent = "X";
+                        exit.id = "exit";
+                        exit.addEventListener("click", () => background.remove());
+                        background.style.backgroundColor = getLightmode() ? "white" : "gray";
+                        background.id = "background";
+                        view.src = (info.url.startsWith("http") ? "" : "/games/") + info.url;
+                        view.id = "game-view";
+                        background.append(exit, view);
+                        document.getElementById("main").after(background);
+                    });
+                    a.className = "game-icon";
+                    if (!getLightmode()) a.classList.add("darkmode");
+                    img.src = info.img;
+                    span.className = "game-name";
+                    span.textContent = key;
+                    a.append(img, span);
+                    document.getElementById("games").appendChild(a);
+                });
+            }
             loadGames();
         </script>
     </footer>

@@ -1,4 +1,4 @@
-// v0.1.0
+// v0.2.0
 
 // Firebase stuff
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -29,27 +29,19 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-function updateProfilePic(letter = 'G', bgcolor = 'gray', borderColor = 'black', color = 'white') {
+function updateProfilePic() {
     document.getElementById('login-link')?.remove();
     const loginLink = document.createElement('a');
     const div = document.createElement('div');
     const p = document.createElement('p');
-    const crossSize = 'clamp(40px, 2vw, 100px)';
-    loginLink.href = '/login.html';
+    loginLink.href = '/settings.html';
     loginLink.id = 'login-link';
-    p.textContent = String(letter);
-    p.style.fontSize = 'clamp(16px, 1.5vw, 32px)';
+    div.id = 'pfp';
+    p.textContent = String(localStorage.getItem('pfp-letter') || 'G');
     [
-        ['border', `clamp(1px, 0.2vw, 2px) ${borderColor} solid`],
-        ['borderRadius', '100%'],
-        ['width', crossSize],
-        ['height', crossSize],
-        ['display', 'flex'],
-        ['alignItems', 'center'],
-        ['justifyContent', 'center'],
-        ['fontSize', '1.5vw'],
-        ['color', String(color)],
-        ['backgroundColor', String(bgcolor)]
+        ['border', `clamp(1px, 0.2vw, 2px) ${localStorage.getItem('pfp-brcolor') || 'black'} solid`],
+        ['color', String(localStorage.getItem('pfp-text-color') || 'white')],
+        ['backgroundColor', String(localStorage.getItem('pfp-bgcolor') || 'gray')]
     ].forEach(style => { div.style[style[0]] = style[1]; });
     div.append(p);
     loginLink.append(div);
@@ -66,7 +58,7 @@ function timestampToDate(ts) {
 }
 // Test network status (if website was downloaded offline)
 async function networkTest() {
-    const response = await fetch('https://api.github.com');
+    const response = await fetch('https://jazhdo.pages.dev');
     if (response.ok) return true
     return false
 }
@@ -135,218 +127,9 @@ function showAdminContent() {
     document.getElementById("goBack").style.display = "";
     document.getElementById("message-bottom").innerText = "";
 }
-async function profileLoad(user) {
-    const copyUID = document.createElement('a');
-    copyUID.id = 'copyUID';
-    copyUID.textContent = 'Copy UID';
-    copyUID.style.color = 'darkgray';
-    document.getElementById("profileUID").innerText = `User UID: ${user.uid} `;
-    document.getElementById("profileUID").append(copyUID)
-    document.getElementById("profileEmail").innerText = `User Email: ${user.email}`;
-    const chatLink = document.createElement('a');
-    chatLink.href = '/chat/';
-    chatLink.textContent = 'link';
-    document.getElementById('chatLink').innerText = 'Chat link: ';
-    document.getElementById('chatLink').append(chatLink);
 
-    document.getElementById('profileForm')?.remove();
-    if (await networkTest()) {
-        const form = document.createElement('form');
-        const username = document.createElement('p');
-        const input = document.createElement('input');
-        const displayName = document.createElement('p');
-        const input2 = document.createElement('input');
-        const submit = document.createElement('button');
-        const userRef = doc(db, 'users', user.uid);
-        let usersSnap = await getDoc(userRef);
-
-        if (usersSnap.data() == undefined) {
-            await setDoc(userRef, {
-                username: user.uid,
-                displayName: user.uid
-            }, { merge: true });
-            usersSnap = await getDoc(userRef);
-        }
-        input.value = usersSnap?.data().username || 'No network';
-        input2.value = usersSnap?.data().displayName || 'No network';
-        username.textContent = 'Username: ';
-        displayName.textContent = 'Display name: ';
-        submit.textContent = 'save';
-
-        input.id = 'username';
-        input2.id = 'displayName';
-        form.id = 'profileForm';
-        submit.id = 'profileSubmit';
-        submit.classList += document.getElementById("darktest").classList.contains('darkmode') ? ' darkmode' : '';
-        
-        username.append(input);
-        displayName.append(input2);
-        form.append(username, displayName, submit);
-
-        document.getElementById('profileEmail').before(form);
-        document.getElementById('profileForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const newUsername = document.getElementById('username').value.trim();
-            const newDisplayName = document.getElementById('displayName').value.trim();
-
-            const q = query(collection(db, "users"), where("username", "==", newUsername));
-            const querySnapshot = await getDocs(q);
-
-            if (!querySnapshot.empty && querySnapshot.docs[0].id !== user.uid) {
-                alert("Username is already taken! Please choose another.");
-                document.getElementById('username').value = usersSnap.data().username;
-                return;
-            }
-            if (newUsername.length == 28) { alert("Username has a possibility of being a user id because of it's 28 digits long. Please choose another."); return}
-            await setDoc(userRef, {
-                username: newUsername, 
-                displayName: newDisplayName
-            }, { merge: true });
-            console.log(`Username changed to '${newUsername}'.`)
-            console.log(`Display name changed to '${newDisplayName}'.`)
-        });
-    }
-    document.getElementById('copyUID').addEventListener('click', async () => { copy(user.uid); });
-}
-
-// Login page
-if (document.getElementById("loginForm") !== null) {
-    let loginOption = true;
-    let loginError = false;
-    // After user clicks login instead or sign up instead
-    document.getElementById("otherInstead").addEventListener("click", () => {
-        if (loginOption === true) {
-            document.getElementById("loginTitle").innerText = "Sign Up";
-            document.getElementById("loginRules").innerText = "Requirements: Valid email address, 6+ characters password";
-            document.getElementById("loginSubmit").innerText = "Sign Up";
-            document.getElementById("otherInstead").innerText = "Login instead";
-            loginOption = false;
-        } else if (loginOption === false) {
-            document.getElementById("loginTitle").innerText = "Login";
-            document.getElementById("loginRules").innerText = "";
-            document.getElementById("loginSubmit").innerText = "Login";
-            document.getElementById("otherInstead").innerText = "Sign up instead";
-            loginOption = true;
-        };
-    });
-    // What to do after firebase loads or auth change detected
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            try {
-                const urlData = new URLSearchParams(window.location.search);
-                if (urlData.get('redirect')) {window.location.href = urlData.get('redirect');};
-            } catch (error) { window.showAlert(`Url redirect detection broken. Error: ${error}.`); }
-            console.log(`User Email: ${user.email}`);
-            console.log(`User UID: ${user.uid}`);
-            
-            document.getElementById("login").style.display = "none";
-            document.getElementById("content").style.display = "";
-            profileLoad(user);
-
-            if (await networkTest()) {
-                console.log(`Checking admin status of ${user.uid}`);
-                // Check if user is admin
-                const adminSnap = await getDoc(doc(db, "admins", user.uid));
-                if (adminSnap.exists()) {
-                    console.log('Admin true')
-                    const adminLinkOut = document.createElement('p');
-                    const adminLink = document.createElement('a');
-                    adminLinkOut.id = 'adminLink';
-                    adminLink.href = '/admin.html';
-                    adminLink.textContent = 'Admin page link';
-                    adminLinkOut.append(adminLink);
-                    document.getElementById('chatLink').after(adminLinkOut);
-                };
-            }
-        } else {
-            document.getElementById("adminLink")?.remove();
-            document.getElementById('login').style.display = '';
-            document.getElementById('content').style.display = 'none';
-            console.log('Login page loaded.')
-        }
-    });
-    document.getElementById("signOut").addEventListener("click", async () => {
-        try {
-            await signOut(auth);
-        } catch (err) { window.showAlert("Logout failed because of error:", err); };
-    });
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value.trim();
-
-        if (loginOption === true) {
-            console.log("Logging in...");
-            try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-
-                window.showAlert(`You have successfully logged in with email address ${user.email}.`);
-            } catch (error) {
-                const err = error.code;
-                let message = '';
-                switch (err) {
-                    case "auth/invalid-email":
-                        message = "That is a invalid email. Please enter a valid one.";
-                        break;
-                    case "auth/wrong-password":
-                        message = "You have entered the wrong password. Please try again.";
-                        break;
-                    case "auth/user-not-found":
-                        message = "You have not yet signed up. Please do so by clicking the text 'Sign up' below.";
-                        break;
-                    case "auth/user-disabled":
-                        message = "A admin of this site has disabled your account. Please go to the contact page and submit a message to learn more.";
-                        break;
-                    case "auth/too-many-requests":
-                        message = "Unusual activity has been detected from this source. Please wait a while and then try again.";
-                        break;
-                    case "auth/unauthorized-domain":
-                        message = "You cannot sign in with a email address ending in that domain. Please try another. (I do not make the rules, firebase does)";
-                        break;
-                    case "auth/invalid-credential":
-                        message = "You have either entered a email that is not valid or a password that is shorter than 6 characters."
-                        break;
-                    default:
-                        message = `Your login has failed because of error: ${error}. Please report this error with code ${err} to the developers.`;
-                        break;
-                };
-                window.showAlert(message);
-            };
-        } else if (loginOption === false) {
-            try { await createUserWithEmailAndPassword(auth, email, password); }
-            catch (error) {
-                loginError = true;
-                let message = '';
-                switch (error.code) {
-                    case "auth/weak-password":
-                        message = "Your password must be at least 6 characters long.";
-                        break;
-                    case "auth/email-already-in-use":
-                        message = "This email is already linked to a account. Please try another email.";
-                        break;
-                    case "auth/too-many-requests":
-                        message = "Unusual activity has been detected from this source. Please wait a while and then try again.";
-                        break;
-                    default:
-                        message = `Account creation error: ${error}. Please report this error with code ${error.code} to the developers.`;
-                        break;
-                };
-                window.showAlert(message);
-            };
-            if (loginError === false) {
-                try {
-                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                    const user = userCredential.user;
-                    window.showAlert(`You have successfully logged in with your email address: ${user.email}.`);
-                } catch (error) { window.showAlert(`Automatic sign in after sign up error: ${error}. Please report this error with code ${error.code} to the developers`); };
-            };
-        } else { window.showAlert(`Variable loginOption has not returned true or false. Please report the status "${loginOption}" of loginOption to the developers.`); }
-    });
-}
 // Admin page
-else if (document.getElementById("message-bottom") !== null) {
+if (document.getElementById("message-bottom") !== null) {
     onAuthStateChanged(auth, async (user) => {
         if (user !== null) {
             try {
@@ -368,19 +151,29 @@ else if (document.getElementById("message-bottom") !== null) {
 };
 // Contact page
 if (document.getElementById("contactForm") !== null) {
+    const method = document.getElementById("contactMethod");
+    const message = document.getElementById("contactMessage");
     document.getElementById('contactFormDiv').style.display = '';
+    method.value = localStorage.getItem("contactMethod") || "";
+    method.addEventListener('input', (e) => localStorage.setItem('contactMethod', e.target.value), console.log('Contact method changed.'));
+    message.value = localStorage.getItem("contactMessage") || "";
+    message.addEventListener('input', (e) => localStorage.setItem('contactMessage', e.target.value), console.log('Contact message changed.'));
     let currentlyWorking = false;
     document.getElementById("contactForm").addEventListener("submit", async (e) => {
         e.preventDefault();
         if (currentlyWorking === false) {
             currentlyWorking = true;
+            // Reset saved values
+            localStorage.setItem('contactMethod', '');
+            localStorage.setItem('contactMessage', '');
+
             // Get trimmed values (Whitespace in front & back removed)
-            const email = document.getElementById("contactMethod").value.trim();
-            const message = document.getElementById("contactMessage").value.trim();
-            const sentDate = new Date()
+            const email = method.value.trim();
+            const text = message.value.trim();
+            const sentDate = new Date();
 
             // Prevent blank submissions
-            if (!email || !message) {
+            if (!email || !text) {
                 window.showAlert("Please fill in both the contact method and message fields before submitting.");
                 return;
             };
@@ -391,7 +184,7 @@ if (document.getElementById("contactForm") !== null) {
             try {
                 const record = await addDoc(collection(db, "messages"), {
                     contactMethod: email,
-                    message: message,
+                    message: text,
                     createdAt: sentDate
                 });
                 window.showAlert("Thank you! Your message was successfully sent. \
@@ -409,18 +202,15 @@ if (document.getElementById("contactForm") !== null) {
 };
 onAuthStateChanged(auth, async user => {
     if (user) {
-        const usersSnap = await getDoc(doc(db, 'users', user.uid));
+        const userRef = doc(db, 'users', user.uid);
+        const usersSnap = await getDoc(userRef);
+        const data = usersSnap.data();
         let letter;
-        if (usersSnap.data()) {
-            letter = usersSnap.data().displayName?.charAt(0).toUpperCase();
-        } else {
-            await setDoc(userRef, {
-                username: user.uid,
-                displayName: user.uid
-            }, { merge: true });
-            letter = user.uid.charAt(0).toUpperCase();
-        }
-        updateProfilePic(letter);
+        if (data && data.pfp && data.pfp.letter) {
+            letter = data.pfp?.letter || usersSnap.data().displayName?.charAt(0).toUpperCase();
+        } else letter = user.uid.charAt(0).toUpperCase();
+        localStorage.setItem('pfp-letter', letter);
+        updateProfilePic();
     }
 });
 updateProfilePic();

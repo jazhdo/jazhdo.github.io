@@ -25,7 +25,7 @@ function filename2date(filename) { if (!filename) return 'Error: Missing input';
 function config(IMAGE_ELEMENT, FPS = 60, IP = 'http://192.168.68.100:3000') { fps = FPS; imgElement = IMAGE_ELEMENT; site = IP; }
 
 // Load stream into <img> element
-function stream() { imgElement?.src = `${site}/camera/stream?token=${getToken()}&fps=${fps || 60}` }
+function stream() { imgElement.src = `${site}/camera/stream?token=${getToken()}&fps=${fps || 60}` }
 
 // Camera info
 async function info() {

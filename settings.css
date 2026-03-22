@@ -1,0 +1,157 @@
+/* v0.2.0 */
+
+#main {
+    margin: 0px;
+    display: flex;
+    height: 100%;
+}
+footer {
+    margin: 0px;
+}
+
+/* Menu */
+#menu {
+    background-color: lightgray;
+    display: flex;
+    flex-direction: column;
+    width: clamp(100px, 20vw, 500px);
+    margin: 0px;
+    padding: 8px 0px;
+}
+#menu.darkmode {
+    background-color: gray;
+}
+#menu h1 {
+    padding: 0.5vw 0px;
+    margin: 0px 1vw;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    user-select: none;
+    font-size: clamp(15px, 4vw, 30px);
+}
+#menu h1:hover {
+    background-color: darkgray;
+}
+#menu hr {
+    width: 90%;
+    border: none;
+    background-color: gray;
+    height: 2px;
+}
+#menu.darkmode hr {
+    background-color: lightgray;
+}
+
+/* Content */
+#content {
+    display: flex;
+    flex-direction: column;
+    padding: 1vh 2vw;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: clamp(380px, 76vw, 1900px);
+}
+#content * {
+    user-select: none;
+}
+#content h1 {
+    margin: 0.25% 0px;
+}
+#content h2 {
+    margin: 0.5% 0px;
+}
+#content p {
+    margin: 0px;
+    overflow-wrap: break-word;
+}
+#content .copy {
+    margin-left: 1vw;
+    color: darkgray;
+}
+#content .copy:hover {
+    cursor: pointer;
+}
+#content form label {
+    display: block;
+    margin: 1vh 0px;
+}
+#content form input {
+    margin: 0px;
+}
+#content button {
+    margin: 0.25% 0px;
+    width: fit-content;
+}
+:root {
+    --toggle-size: 25px;
+}
+#content p.toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+#content label.toggle {
+    width: calc(var(--toggle-size) * 2);
+    height: var(--toggle-size);
+    border-radius: 100vw;
+    display: flex;
+    align-items: center;
+    background-color: red;
+    transition-duration: 0.4s;
+}
+#content label.toggle:has(input.toggle:checked) {
+    background-color: green;
+}
+#content span.toggle {
+    height: calc(var(--toggle-size) * 0.8);
+    width: calc(var(--toggle-size) * 0.8);
+    border-radius: 100vw;
+    display: inline-block;
+    background-color: #f2f2f2;
+    position: relative;
+    left: calc(var(--toggle-size) * 0.1);
+    transition-duration: 0.4s;
+}
+#content label.toggle input.toggle:checked + span.toggle {
+    left: calc(var(--toggle-size) + calc(var(--toggle-size) * 0.1));
+}
+#content input.toggle {
+    position: absolute;
+    left: -100vw;
+}
+#content p.select {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Login Screen */
+#login-sidebar {
+    position: fixed;
+}
+#login {
+    position: fixed;
+    background-color: darkgray;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+}
+#login h1 {
+    margin-top: 5vh;
+}
+#login form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#login-other {
+    margin: 10vw 0px;
+}
+#login button:hover {
+    background-color: green;
+}
+#login button {
+    width: clamp(10px, 50vw, 200px);
+    margin: 1vw 0px;
+}

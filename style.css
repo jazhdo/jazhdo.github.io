@@ -1,39 +1,15 @@
-/* v0.1.0 */
-a.navbutton{
-    border: 0px;
-    padding: 0.5vw 1vw;
-    margin: 0px 0.4vw;
-    font-size: 3vw;
-    background-color: rgb(164, 255, 164);
-    border-radius: 5vw;
-    color: black;
-    font-family: Arial;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    user-select: none;
-    display: inline;
-}
-a.navbutton:hover{
-    background-color: darkgreen;
-    cursor: pointer;
-}
-nav{
-    padding: 0vw 0px 0px 0px;
-    margin: 0px;
-    border: 0px;
-    text-align: center;
-    display: block;
-    margin-left: auto;
-    font-size: 0px;
-}
+/* v0.2.0 */
+
+/* Heading/Navigation */
 header{
     background-color: lightgreen;
     padding: 3vw 2vw 1vw 2vw;
     display: flex;
     flex-direction: column;
 }
-button{
-    margin: 1vw;
+div#header-top {
+    display: flex;
+    width: 100%;
 }
 .toptitle{
     padding: 0vw 0vw 0vw 3vw;
@@ -45,15 +21,69 @@ button{
     color: black;
     display: inline-flex;
 }
-a.blogbutton{
-    border: 0px;
-    padding: .5vw 1.5vw;
-    margin: 5px;
-    font-size: 2vw;
-    background-color: rgb(164, 255, 164);
-    border-radius: 100px;
+a#login-link {
     color: black;
-    font-family: Arial
+    font-size: 2.5vw;
+    margin: 0.5vw 2vw 0px 0px;
+    justify-content: right;
+    margin-left: auto;
+    display: flex;
+}
+#pfp {
+    --cross-size: clamp(40px, 2vw, 100px);
+    border-radius: 1000vw;
+    width: var(--cross-size);
+    height: var(--cross-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5vw;
+}
+#pfp p {
+    font-size: clamp(16px, 1.5vw, 32px);
+}
+a.navbutton{
+    border: 0px;
+    padding: 0.5vw 1vw;
+    margin: 0px 0.4vw;
+    font-size: 3vw;
+    background-color: #A4FFA4;
+    border-radius: 5vw;
+    color: black;
+    font-family: Arial;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    display: inline;
+}
+a.navbutton:hover{
+    background-color: #A4FFA4;
+    cursor: pointer;
+}
+nav{
+    padding: 0px;
+    padding-top: 1vw;
+    margin: 0px;
+    border: 0px;
+    text-align: center;
+    display: block;
+    margin-left: auto;
+    font-size: 0px;
+    height: fit-content;
+}
+
+/* Default for buttons (during testing before actual styles) */
+button:hover{
+    background-color: darkgreen;
+    cursor: pointer;
+    border-radius: 100px;
+}
+button{
+    border-radius: 100px;
+    background-color: rgb(164, 255, 164);
+    border-color: lightgreen;
+    margin: 1vw;
+    width: fit-content;
 }
 a{
     text-decoration: none;
@@ -64,19 +94,6 @@ a{
 #main{
     margin: 2% 5%;
     flex-grow: 1;
-}
-button:hover{
-    background-color: darkgreen;
-    cursor: pointer;
-    border-radius: 100px;
-}
-button{
-    border-radius: 100px;
-    background-color: rgb(164, 255, 164);
-    border-color: lightgreen;
-}
-button:active, .toptitle:active{
-    cursor: wait;
 }
 body{
     margin: 0px;
@@ -139,6 +156,8 @@ button.footer:hover{
     font-family: "Times New Roman", Times;
     background-color: lightgreen;
 }
+
+/* Cookies Banner */
 #cookies{
     background-color: lightgreen;
     position: fixed;
@@ -177,6 +196,8 @@ button.footer:hover{
 .cookiebutton:hover {
     background-color: darkgreen;
 }
+
+/* Counter on test page */
 button.counter {
     margin: 0px;
     border-radius: 0px;
@@ -195,6 +216,8 @@ button.counter:hover {
 div.counter {
     font-size: 0px;
 }
+
+/* Blog */
 .blogheader {
     text-align: center;
     background-color:lightgreen;
@@ -210,9 +233,9 @@ a.blogfind {
     padding-bottom: 0.5vw;
     margin: 0px;
     margin-top: 0.5vw;
-    border: 0.2vw solid black;
-    border-top-width: 0px;
-    border-bottom-width: 0px;
+    border-width: 0px 0.2vw;
+    border-style: solid;
+    border-color: black;
     background-color: rgb(164, 255, 164);
     display: inline;
     -webkit-user-select: none;
@@ -223,6 +246,18 @@ a.blogfind {
 a.blogfind:hover {
     background-color: darkgreen;
 }
+a.blogbutton{
+    border: 0px;
+    padding: .5vw 1.5vw;
+    margin: 5px;
+    font-size: 2vw;
+    background-color: rgb(164, 255, 164);
+    border-radius: 100px;
+    color: black;
+    font-family: Arial
+}
+
+/* Contact form */
 textarea {
     width: 50vw;
     height: 15vw;
@@ -230,6 +265,8 @@ textarea {
 button.form{
     margin: 0.5vw 1.5vw;
 }
+
+/* Custom Alert */
 #customAlert {
     position: fixed;
     top: 40vh;
@@ -252,37 +289,17 @@ button.form{
 #customAlert button:hover {
     background-color: darkgreen;
 }
+
+/* Posts (Admin page / chat) */
 div.posts {
     border-radius: 1vw;
     padding: 1vw;
     margin: 1vw 0px;
     background-color: lightgray;
 }
-a#login-link {
-    color: black;
-    font-size: 2.5vw;
-    margin: 0.5vw 2vw 0px 0px;
-    justify-content: right;
-    margin-left: auto;
-    display: flex;
-} 
-#profileSubmit, input#username, input#displayName {
-    margin: 0px 1vw;
-}
-div#header-top {
-    display: flex;
-    width: 100%;
-}
-#login {
-    text-align: center;
-}
-#copyUID:hover {
-    cursor: pointer;
-}
-#content {
-    font-size: 0px;
-}
+
 /* The modifications of the webpage for different screen sizes (Increase in size for smaller screen widthes) */
+/* To be turned into clamp sizes */
 @media (max-width: 450px) {
     nav{
         flex-direction: column;
