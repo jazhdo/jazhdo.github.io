@@ -1,4 +1,4 @@
-// v0.2.1
+// v0.2.2
 function hide(list) { for (let a = 0; a < list.length; a++) { document.querySelectorAll(list[a]).forEach(element => { element.style.display = "none"; }); }; };
 function updateCounter(newCounter) {
     localStorage.setItem("Counter", newCounter);

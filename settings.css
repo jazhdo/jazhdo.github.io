@@ -1,4 +1,4 @@
-/* v0.2.1 */
+/* v0.2.2 */
 
 #main {
     margin: 0px;
@@ -50,7 +50,7 @@ footer {
     padding: 1vh 2vw;
     overflow-y: auto;
     overflow-x: hidden;
-    width: clamp(380px, 76vw, 1900px);
+    flex: 1;
 }
 #content * {
     user-select: none;

@@ -60,8 +60,6 @@
         /* Game Display */
         #exit {
             position: fixed;
-            top: 0px;
-            left: 0px;
             font-size: 20px;
             margin: 0px;
             padding: 0px 5px;
@@ -112,7 +110,7 @@
     </div>
     <footer>
         <h2 style="display: none;">Footer:</h2>
-        <p id="darktest" class="footer">v0.2.1 - jazhdo</p>
+        <p id="darktest" class="footer">v0.2.2 - jazhdo</p>
         <a class="footer" href="/privacy.html">Privacy</a>
         <a class="footer" href="/terms.html">Terms</a>
         <script type="module" src="/backend.js"></script>
@@ -143,8 +141,9 @@
                 }
             };
             // Load games
-            async function loadGames(sort) {
+            async function loadGames() {
                 [...document.getElementsByClassName("game-icon")]?.forEach(e => e.remove());
+                const sort = JSON.parse(localStorage.getItem('game-settings')).sort;
                 if (sort === "az") gamesSort = Object.keys(games).sort();
                 else if (sort === "za") gamesSort = Object.keys(games).sort().reverse();
                 else if (sort === "reverse") gamesSort = Object.keys(games).reverse();
@@ -162,6 +161,11 @@
                         const exit = document.createElement("button");
                         exit.textContent = "X";
                         exit.id = "exit";
+                        const corners = JSON.parse(localStorage.getItem('game-settings')).exitCorner.split('-');
+                        if (corners[0] == "top") exit.style.top = '0px';
+                        else if (corners[0] == "bottom") exit.style.bottom = '0px';
+                        if (corners[1] == "left") exit.style.left = '0px';
+                        else if (corners[1] == "right") exit.style.right = '0px';
                         exit.addEventListener("click", () => background.remove());
                         background.style.backgroundColor = getLightmode() ? "white" : "gray";
                         background.id = "background";

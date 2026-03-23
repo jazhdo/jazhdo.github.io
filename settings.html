@@ -31,7 +31,7 @@
         </div>
         <footer>
             <h2 style="display: none">Footer:</h2>
-            <p id="darktest" class="footer">v0.2.1 - jazhdo</p>
+            <p id="darktest" class="footer">v0.2.2 - jazhdo</p>
             <a class="footer" href="/privacy.html">Privacy</a>
             <a class="footer" href="/terms.html">Terms</a>
             <script type="module" src="/backend.js"></script>
@@ -148,6 +148,31 @@
                                 updateMode();
                                 document.getElementById('lightmode').textContent = 'Current Mode: ' + localStorage.getItem('lightmode');
                             }
+                        },
+                        "Games": {
+                            type: "heading"
+                        },
+                        "Exit Button Corner": {
+                            type: "select",
+                            values: () => { return ['top-left', 'top-right', 'bottom-left', 'bottom-right'] },
+                            value: () => {
+                                return JSON.parse(localStorage.getItem('game-settings')).exitCorner
+                            },
+                            set: (value) => {
+                                const current = JSON.parse(localStorage.getItem('game-settings'));
+                                current.exitCorner = ['top-left', 'top-right', 'bottom-left', 'bottom-right'][value];
+                                localStorage.setItem('game-settings', JSON.stringify(current));
+                            }
+                        },
+                        "Game Sort": {
+                            type: "select",
+                            values: () => { return ['none', 'reverse', 'az', 'za'] },
+                            value: () => { return JSON.parse(localStorage.getItem('game-settings')).sort },
+                            set: (value) => {
+                                const current = JSON.parse(localStorage.getItem('game-settings'));
+                                current.sort = ['none', 'reverse', 'az', 'za'][value];
+                                localStorage.setItem('game-settings', JSON.stringify(current));
+                            }
                         }
                     },
                     Eaglercraft: {
@@ -178,6 +203,15 @@
                             set: (value) => {
                                 localStorage.setItem('_eaglercraft_1.12.g', btoa(atob(localStorage.getItem('_eaglercraft_1.12.g')).replace(/gamma:[^\n]+/, value?'gamma:100.0':'gamma:0.0')));
                             }
+                        }
+                    },
+                    Dev: {
+                        login: true,
+                        title: "Developer Settings & Tools",
+                        "Eruda": {
+                            type: "toggle",
+                            value: () => { return Boolean(Number(localStorage.getItem('eruda'))) },
+                            set: (value) => { localStorage.setItem('eruda', Number(value)) }
                         }
                     }
                 };
@@ -212,16 +246,7 @@
                         console.log(`[Copy]: Copied message: "${text}"`);
                     } catch (e) { console.log("[Copy Error]:", e) };
                 }
-                async function load(json) {
-                    if (json.login) {
-                        showLogin();
-                        await waitUntil(() => globalUser);
-                    };
-                    const content = document.getElementById('content');
-                    const title = document.createElement('h1');
-                    content.innerHTML = '';
-                    title.textContent = json.title;
-                    content.append(title);
+                async function types(content, json) {
                     for (const [key, value] of Object.entries(json)) {
                         if (key === "login" || key === "title") continue;
                         switch (value.type) {
@@ -317,6 +342,18 @@
                                 console.log('An error occurred when finding what type a element is (type: ' + value.type + ')');
                         };
                     };
+                }
+                async function load(json) {
+                    if (json.login) {
+                        showLogin();
+                        await waitUntil(() => globalUser);
+                    };
+                    const content = document.getElementById('content');
+                    const title = document.createElement('h1');
+                    content.innerHTML = '';
+                    title.textContent = json.title;
+                    content.append(title);
+                    types(content, json);
                 }
                 function waitUntil(condition, after = () => {}) {
                     return new Promise(resolve => {

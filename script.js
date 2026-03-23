@@ -1,4 +1,4 @@
-// v0.2.1
+// v0.2.2
 
 // Load a script after page loads
 function loadScript(url, callback = () => {}) {
@@ -176,6 +176,10 @@ else {
     if (cookies.value === true) loadScript('https://cdn.jsdelivr.net/npm/ua-parser-js/dist/ua-parser.min.js', afterCookies);
 }
 console.log('Cookies Status: ' + cookies?.value);
+// Game settings
+if (!localStorage.getItem('game-settings')) localStorage.setItem('game-settings', '{"exitCorner":"top-left","sort":"none"}');
+// Eruda
+if (Boolean(Number(localStorage.getItem('eruda')))) loadScript('https://cdn.jsdelivr.net/npm/eruda', () => eruda.init())
 // Check version
 checkLastUpdated();
 
