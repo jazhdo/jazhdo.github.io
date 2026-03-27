@@ -13,7 +13,7 @@
     <body>
         <header>
             <div id="header-top">
-                <a href="/" draggable="false" class="toptitle">jazhdo</a>
+                <a href="/" draggable="false" id="toptitle">jazhdo</a>
             </div>
             <nav>
                 <a href="/" draggable="false" class="navbutton">Home</a>
@@ -31,7 +31,7 @@
         </div>
         <footer>
             <h2 style="display: none">Footer:</h2>
-            <p id="darktest" class="footer">v0.2.2 - jazhdo</p>
+            <p id="darktest" class="footer">v0.2.3 - jazhdo</p>
             <a class="footer" href="/privacy.html">Privacy</a>
             <a class="footer" href="/terms.html">Terms</a>
             <script type="module" src="/backend.js"></script>
@@ -63,9 +63,6 @@
                 const db = getFirestore(app);
                 const auth = getAuth(app);
                 let globalUser;
-                // Inputs
-                // values are the placeholders
-                // sets are the code to run to set its new value.
                 const pages = {
                     Profile: {
                         login: true,
@@ -119,6 +116,56 @@
                                 }
                             }
                         },
+                        "Profile Pic": {
+                            type: "heading"
+                        },
+                        "Font Color": {
+                            type: "select",
+                            values: () => { return ['red', 'orange', 'yellow', 'blue', 'green', 'purple', 'brown', 'black', 'gray', 'white'] },
+                            value: () => { return JSON.parse(atob(localStorage.getItem('pfp'))).color },
+                            set: async (value) => {
+                                const old = JSON.parse(atob(localStorage.getItem('pfp')));
+                                old.color = ['red', 'orange', 'yellow', 'blue', 'green', 'purple', 'brown', 'black', 'gray', 'white'][value];
+                                localStorage.setItem('pfp', btoa(JSON.stringify(old)));
+                                window.updatePfp();
+                                await setDoc(doc(db, 'users', globalUser.uid), {pfp: old}, { merge: true });
+                            }
+                        },
+                        "Background Color": {
+                            type: "select",
+                            values: () => { return ['red', 'orange', 'yellow', 'blue', 'green', 'purple', 'brown', 'black', 'gray', 'white'] },
+                            value: () => { return JSON.parse(atob(localStorage.getItem('pfp'))).background },
+                            set: async (value) => {
+                                const old = JSON.parse(atob(localStorage.getItem('pfp')));
+                                old.background = ['red', 'orange', 'yellow', 'blue', 'green', 'purple', 'brown', 'black', 'gray', 'white'][value];
+                                localStorage.setItem('pfp', btoa(JSON.stringify(old)));
+                                window.updatePfp();
+                                await setDoc(doc(db, 'users', globalUser.uid), {pfp: old}, { merge: true });
+                            }
+                        },
+                        "Border Color": {
+                            type: "select",
+                            values: () => { return ['red', 'orange', 'yellow', 'blue', 'green', 'purple', 'brown', 'black', 'gray', 'white'] },
+                            value: () => { return JSON.parse(atob(localStorage.getItem('pfp'))).border },
+                            set: async (value) => {
+                                const old = JSON.parse(atob(localStorage.getItem('pfp')));
+                                old.border = ['red', 'orange', 'yellow', 'blue', 'green', 'purple', 'brown', 'black', 'gray', 'white'][value];
+                                localStorage.setItem('pfp', btoa(JSON.stringify(old)));
+                                window.updatePfp();
+                                await setDoc(doc(db, 'users', globalUser.uid), {pfp: old}, { merge: true });
+                            }
+                        },
+                        "Letter": {
+                            type: "input",
+                            value: () => { return JSON.parse(atob(localStorage.getItem('pfp'))).letter },
+                            set: async (value) => {
+                                const old = JSON.parse(atob(localStorage.getItem('pfp')));
+                                old.letter = value.split('', 2).join('');
+                                localStorage.setItem('pfp', btoa(JSON.stringify(old)));
+                                window.updatePfp();
+                                await setDoc(doc(db, 'users', globalUser.uid), {pfp: old}, { merge: true });
+                            }
+                        },
                         "Sign Out": {
                             type: "button",
                             set: async () => {
@@ -132,6 +179,10 @@
                                 if (!fail) {
                                     globalUser = undefined;
                                     showLogin();
+                                    await waitUntil(() => globalUser);
+                                    const content = document.getElementById('content');
+                                    content.innerHTML = '<h1>Profile</h1>';
+                                    types(content, pages.Profile);
                                 };
                             }
                         }
@@ -273,18 +324,27 @@
                                 selectP.append(select);
                                 content.append(selectP);
                                 break;
-                            case "toggle":
-                                const toggleP = document.createElement('p');
+                            case "input":
                                 const label = document.createElement('label');
                                 const input = document.createElement('input');
+                                label.textContent = key;
+                                input.value = await value.value();
+                                input.addEventListener('change', async (event) => { await value.set(event.target.value) });
+                                label.append(input);
+                                content.append(label);
+                                break;
+                            case "toggle":
+                                const toggleP = document.createElement('p');
+                                const toggleLabel = document.createElement('label');
+                                const toggleInput = document.createElement('input');
                                 const span = document.createElement('span');
                                 toggleP.textContent = key;
-                                [toggleP, label, input, span].forEach(e => e.className = 'toggle');
-                                input.type = 'checkbox';
-                                if (await value.value()) input.checked = true;
-                                input.addEventListener('change', async (event) => { await value.set(event.target.checked); });
-                                label.append(input, span);
-                                toggleP.append(label);
+                                [toggleP, toggleLabel, toggleInput, span].forEach(e => e.className = 'toggle');
+                                toggleInput.type = 'checkbox';
+                                if (await value.value()) toggleInput.checked = true;
+                                toggleInput.addEventListener('change', async (event) => { await value.set(event.target.checked); });
+                                toggleLabel.append(toggleInput, span);
+                                toggleP.append(toggleLabel);
                                 content.append(toggleP);
                                 break;
                             case "value":
@@ -331,7 +391,6 @@
                                 };
                                 form.addEventListener('submit', (e) => {
                                     e.preventDefault();
-                                    console.log('Form Submitted.');
                                     submitFuncs.forEach(async ([a, b, c], i) => {
                                         if (a.value !== b) await c(a.value), submitFuncs[i][1] = a.value;
                                     });

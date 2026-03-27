@@ -1,10 +1,10 @@
-/* v0.2.2 */
+/* v0.2.3 */
 
 /* Dark Mode Settings Only*/
 button.darkmode:hover, a.navbutton.darkmode:hover, a.blogfind.darkmode:hover, #alertClose.darkmode:hover{
     background-color:green;
 }
-.toptitle.darkmode, .footer.darkmode, a.blogbutton.darkmode, header.darkmode, 
+#toptitle.darkmode, .footer.darkmode, a.blogbutton.darkmode, header.darkmode, 
 footer.darkmode, button.darkmode, button.footer.darkmode:hover, a.navbutton.darkmode{
     background-color: darkgreen;
     color: #f2f2f2;

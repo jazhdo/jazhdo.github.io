@@ -12,7 +12,7 @@
 <body>
     <header>
         <div id="header-top">
-            <a href="/" draggable="false" class="toptitle">jazhdo</a>
+            <a href="/" draggable="false" id="toptitle">jazhdo</a>
         </div>
         <nav>
             <a href="/" draggable="false" class="navbutton">Home</a>
@@ -57,11 +57,83 @@
     </div>
     <footer>
         <h2 style="display: none;">Footer:</h2>
-        <p id="darktest" class="footer">v0.2.2 - jazhdo</p>
+        <p id="darktest" class="footer">v0.2.3 - jazhdo</p>
         <a class="footer" href="/privacy.html">Privacy</a>
         <a class="footer" href="/terms.html">Terms</a>
         <script type="module" src="/backend.js"></script>
         <script src="/script.js"></script>
+        <script type="module">
+            // Firebase stuff
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+            import { collection, addDoc, getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+            // Firebase references
+            // https://firebase.google.com/docs/reference/js/app.md
+            // https://firebase.google.com/docs/reference/js/firestore_.md
+
+            // Firebase configuration
+            const firebaseConfig = {
+                apiKey: "AIzaSyAHm5_zvReOaA6RpttJ1KlIhoONis99MKA",
+                authDomain: "jazhdo-backend.firebaseapp.com",
+                projectId: "jazhdo-backend",
+                storageBucket: "jazhdo-backend.firebasestorage.app",
+                messagingSenderId: "535780894340",
+                appId: "1:535780894340:web:ca78bc82bbe1ff0a8204d1"
+            };
+
+            // Variables
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+
+            // Contact Form
+            const method = document.getElementById("contactMethod");
+            const message = document.getElementById("contactMessage");
+            document.getElementById('contactFormDiv').style.display = '';
+            method.value = localStorage.getItem("contactMethod") || "";
+            method.addEventListener('input', (e) => localStorage.setItem('contactMethod', e.target.value), console.log('Contact method changed.'));
+            message.value = localStorage.getItem("contactMessage") || "";
+            message.addEventListener('input', (e) => localStorage.setItem('contactMessage', e.target.value), console.log('Contact message changed.'));
+            let currentlyWorking = false;
+            document.getElementById("contactForm").addEventListener("submit", async (e) => {
+                e.preventDefault();
+                if (!currentlyWorking) {
+                    currentlyWorking = true;
+
+                    // Get trimmed values (Whitespace in front & back removed)
+                    const email = method.value.trim();
+                    const text = message.value.trim();
+
+                    // Prevent blank submissions
+                    if (!text) {
+                        window.showAlert("Please fill in the message field before submitting.");
+                        return;
+                    };
+                    if (!email) email = "Anonymous";
+                    
+                    document.getElementById("contactForm").style.display = "none";
+                    document.getElementById("contactFormStatus").style.display = "";
+
+                    try {
+                        const record = await addDoc(collection(db, "messages"), {
+                            contactMethod: email,
+                            message: text,
+                            createdAt: new Date()
+                        });
+                        window.showAlert("Thank you! Your message was successfully sent. Here's your message ID for future inquiries: " + record.id);
+
+                        // Reset saved form values and current form input
+                        localStorage.setItem('contactMethod', '');
+                        localStorage.setItem('contactMessage', '');
+                        document.getElementById("contactForm").reset();
+                    } catch (error) {
+                        window.showAlert("There was an error sending the message: ", error, ". Please try again later or on a different device.");
+                    };
+                    document.getElementById("contactForm").style.display = "";
+                    document.getElementById("contactFormStatus").style.display = "none";
+                    currentlyWorking = false;
+                };
+            });
+        </script>
     </footer>
 </body>
 </html>

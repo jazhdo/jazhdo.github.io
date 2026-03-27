@@ -1,4 +1,4 @@
-// v0.2.2
+// v0.2.3
 
 // Load a script after page loads
 function loadScript(url, callback = () => {}) {
