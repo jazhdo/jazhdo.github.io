@@ -5,7 +5,7 @@ export async function onRequest(context) {
         return context.next();
     }
 
-    const target = "ws://jzd.ddns.net:3000";
+    const target = "wss://jzd.ddns.net:3000";
 
     const request = new Request(target, {
         headers: context.request.headers,
