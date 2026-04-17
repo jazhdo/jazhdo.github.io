@@ -1,34 +1,30 @@
 export async function onRequest(context) {
     const upgradeHeader = context.request.headers.get("Upgrade");
 
-    if (!upgradeHeader || upgradeHeader !== "websocket") {
+    if (!upgradeHeader || upgradeHeader.toLowerCase() !== "websocket") {
         return context.next();
     }
 
-    const request = new Request("https://jzd.ddns.net:3000", {
-        headers: {
-            Upgrade: "websocket"
-        }
-    });
+    const [client, server] = new WebSocketPair();
+    const backend = new WebSocket("wss://jzd.ddns.net:3000");
 
-    let reps;
-    try {
-        reps = await fetch(request);
-    } catch (err) {
-        return new Response(`Failed to connect to backend: ${err.message}`, {
-            status: 502
-        });
+    function close() {
+        server.close();
+        backend.close();
     }
 
-    const ws = reps.webSocket;
-    if (!ws) {
-        return new Response("Backend did not accept WebSocket", { status: 502 });
+    function pipe(a, b) {
+        a.addEventListener('message', ({ data }) => b.readyState === WebSocket.OPEN && b.send(data));
     }
 
-    ws.accept();
+    server.accept();
+    server.onerror = server.onclose = backend.onerror = backend.onclose = close;
+
+    pipe(server, backend);
+    pipe(backend, server);
 
     return new Response(null, {
         status: 101,
-        webSocket: ws
+        webSocket: client
     })
 }
