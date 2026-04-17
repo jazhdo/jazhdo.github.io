@@ -1,4 +1,4 @@
-// v0.2.3
+// v0.2.4
 
 // Load a script after page loads
 function loadScript(url, callback = () => {}) {
@@ -33,7 +33,6 @@ async function networkTest() {
 // Check if there are updates
 async function checkLastUpdated() {
     const currentVersion = document.getElementById('darktest').textContent.match(/v(\d+).(\d+).(\d+)/).slice(1, 4);
-    localStorage.setItem("lastUpdated", new Date(currentVersion));
     if (!await networkTest()) {
         console.log('[Version]: Network offline.');
         return
@@ -144,7 +143,7 @@ function addCookiesBar() {
     declineButton.className = 'cookiebutton';
     if (!getLightmode()) [box, text, heading, acceptButton, declineButton].forEach((e) => e.className.add("darkmode"));
 
-    text.append('Accept our ', privacyLink, ' and cookies. Declining will limit storage tools to only the necessary ones.', document.createElement("br"), acceptButton, declineButton);
+    text.append('Accept our ', privacyLink, ', storage tools, and analytics.', document.createElement("br"), acceptButton, declineButton);
     box.append(heading, text);
     document.getElementById("main").after(box);
 };
@@ -169,7 +168,7 @@ window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () 
 const privacyData = getJSON('/privacy.json');
 const cookiesUpdated = new Date(privacyData.newest);
 let cookies;
-if (!localStorage.getItem('cookies')) addCookiesBar()
+if (!localStorage.getItem('cookies')) addCookiesBar();
 else {
     cookies = JSON.parse(localStorage.getItem('cookies'));
     if (cookies.time < cookiesUpdated.getTime()) addCookiesBar();

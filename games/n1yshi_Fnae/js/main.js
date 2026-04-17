@@ -98,6 +98,8 @@ function disableBrowserDefaults() {
             return false;
         }
     }, { capture: true });
+    
+    // console.log('Browser defaults disabled for better game experience');
 }
 
 // 更新预加载进度
@@ -113,7 +115,9 @@ function updatePreloadProgress(progress) {
 
 // 预加载所有游戏资源
 async function preloadGameAssets() {
-    const basePath = window.location.pathname.includes('/FNAE-HTML5-1.2.2-fix/') ? '/FNAE-HTML5-1.2.2-fix/' : './';
+    const basePath = window.location.pathname.includes('/FNAE-HTML5-1.2.2-fix/') 
+        ? '/FNAE-HTML5-1.2.2-fix/' 
+        : './';
     
     // 定义所有需要预加载的资源
     const imagePaths = [
@@ -222,39 +226,68 @@ function hidePreloader() {
     }
 }
 
+// 页面加载完成后启动
 window.addEventListener('DOMContentLoaded', async () => {
+    // 禁用浏览器默认行为
     disableBrowserDefaults();
+    
+    // 先预加载所有资源
     await preloadGameAssets();
+    
+    // 预加载背景图片（用于恐怖脸效果）
     preloadBackgrounds();
+    
+    // 隐藏预加载动画
     hidePreloader();
+    
+    // 初始化游戏
     game = new Game();
     staticNoise = new StaticNoise();
+    
+    // 更新Continue按钮显示
     game.updateContinueButton();
+    
     const mainMenu = document.getElementById('main-menu');
+    
+    // 检查是否从外部页面启动（带autostart参数）
     const urlParams = new URLSearchParams(window.location.search);
     const autostart = urlParams.get('autostart');
+    
+    // 启动菜单音乐
     const menuMusic = document.getElementById('menu-music');
     if (menuMusic) {
         menuMusic.volume = 0.5;
+        
+        // 如果是autostart，立即尝试播放
         if (autostart === '1') {
+            // console.log('检测到autostart参数，尝试自动播放音乐...');
             menuMusic.play().then(() => {
+                // console.log('✅ 音乐自动播放成功！');
             }).catch(e => {
+                // console.log('❌ 自动播放失败，等待用户交互:', e);
+                // 失败则等待用户点击
                 setupManualPlayback();
             });
         } else {
+            // 正常流程：等待用户点击
             setupManualPlayback();
         }
+        
         function setupManualPlayback() {
-            function playMusic () {
-                if (mainMenu && !mainMenu.classList.contains('hidden')) menuMusic.play().catch(() => {});
+            const playMusic = () => {
+                if (mainMenu && !mainMenu.classList.contains('hidden')) {
+                    menuMusic.play().catch(e => {/* console.log('音乐播放需要用户交互') */});
+                }
                 document.removeEventListener('click', playMusic);
                 document.removeEventListener('keydown', playMusic);
             };
+            
             document.addEventListener('click', playMusic);
             document.addEventListener('keydown', playMusic);
         }
     }
     
+    // 监听主菜单显示/隐藏，控制雪花和鬼脸效果
     const observer = new MutationObserver(() => {
         if (mainMenu && !mainMenu.classList.contains('hidden')) {
             startScaryFaceFlicker();
@@ -278,10 +311,17 @@ window.addEventListener('DOMContentLoaded', async () => {
 // 监听来自父页面的消息（iframe 通信）
 window.addEventListener('message', (event) => {
     if (event.data.type === 'USER_CLICKED_PLAY') {
+        // console.log('收到父页面的用户点击事件');
         const menuMusic = document.getElementById('menu-music');
         if (menuMusic) {
+            // 立即尝试播放音乐
             menuMusic.volume = 0.5;
-            menuMusic.play().then(() => {}).catch(() => {});
+            menuMusic.play().then(() => {
+                // console.log('✅ 音乐自动播放成功！');
+            }).catch(e => {
+                // console.log('❌ 音乐播放失败:', e);
+                // 如果失败，等待用户在游戏内点击
+            });
         }
     }
 });

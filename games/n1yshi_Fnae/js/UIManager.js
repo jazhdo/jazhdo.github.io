@@ -17,8 +17,11 @@ class UIManager {
         this.timeValue.textContent = `${this.game.state.currentTime === 0 ? 12 : this.game.state.currentTime} AM`;
         
         // Custom Night 显示为 "7" 或 "CUSTOM"
-        if (this.game.state.customNight && this.game.state.currentNight === 7) this.nightValue.textContent = '7';
-        else this.nightValue.textContent = this.game.state.currentNight;
+        if (this.game.state.customNight && this.game.state.currentNight === 7) {
+            this.nightValue.textContent = '7';
+        } else {
+            this.nightValue.textContent = this.game.state.currentNight;
+        }
         
         // Only update scene image when camera is not open
         if (!this.game.state.cameraOpen) {
@@ -30,8 +33,11 @@ class UIManager {
         }
         
         // Flash warning when oxygen below 40%
-        if (this.game.state.oxygen <= 40 && this.game.state.ventsClosed) this.powerValue.classList.add('flicker');
-        else this.powerValue.classList.remove('flicker');
+        if (this.game.state.oxygen <= 40 && this.game.state.ventsClosed) {
+            this.powerValue.classList.add('flicker');
+        } else {
+            this.powerValue.classList.remove('flicker');
+        }
         
         // Update camera status
         this.updateCameraStatus();
@@ -46,6 +52,9 @@ class UIManager {
         
         // Create camera button (special style)
         this.createCameraButton();
+        
+        // Bind close camera button event
+        this.bindCloseCameraButton();
     }
 
     createControlPanelButton() {
@@ -154,18 +163,28 @@ class UIManager {
         const controlBtn = document.getElementById('vents-btn');
         if (!controlBtn) return;
         
-        const isOpen = document.getElementById('control-panel-popup') && !document.getElementById('control-panel-popup').classList.contains('hidden');
+        const arrows = controlBtn.querySelectorAll('.control-arrows div');
+        const isOpen = document.getElementById('control-panel-popup') && 
+                      !document.getElementById('control-panel-popup').classList.contains('hidden');
         
         // Before panel opens: arrows point up ▲
         // Before panel closes: arrows point down ▼
-        controlBtn.querySelectorAll('.control-arrows div').forEach((arrow) => { arrow.innerHTML = isOpen ? '▼' : '▲'; });
+        arrows.forEach((arrow) => {
+            arrow.innerHTML = isOpen ? '▼' : '▲';
+        });
     }
 
     toggleControlPanel() {
         const panel = document.getElementById('control-panel-popup');
         if (panel) {
             const wasHidden = panel.classList.contains('hidden');
-            if (!wasHidden && this.game.state.controlPanelBusy) return;
+            
+            // 如果要关闭面板，检查是否有操作正在进行
+            if (!wasHidden && this.game.state.controlPanelBusy) {
+                // console.log('Cannot close control panel: operation in progress');
+                return; // 阻止关闭，不显示任何消息
+            }
+            
             panel.classList.toggle('hidden');
             
             // Control view rotation
@@ -222,9 +241,14 @@ class UIManager {
         option1.style.padding = '1.5vh 0';
         option1.style.display = 'flex';
         option1.style.alignItems = 'center';
-        option1.style.direction = 'ltr';
-        option1.innerHTML = '<span class="option-arrow" style="color: #0f0; margin-right: 1.5vw; width: 2vw;">&gt;</span><span>' + (this.game.state.ventsClosed ? 'Open' : 'Close') + ' Air Vents</span><span id="vents-dots" style="margin-left: 1vw; direction: ltr; font-family: \'Courier New\', monospace;"></span>';
-        option1.addEventListener('click', () => this.game.toggleVents);
+        option1.style.direction = 'ltr'; // 强制从左到右
+        option1.innerHTML = this.game.state.ventsClosed ? 
+            '<span class="option-arrow" style="color: #0f0; margin-right: 1.5vw; width: 2vw;">&gt;</span><span>Open Air Vents</span><span id="vents-dots" style="margin-left: 1vw; direction: ltr; font-family: \'Courier New\', monospace;"></span>' :
+            '<span class="option-arrow" style="color: #0f0; margin-right: 1.5vw; width: 2vw;">&gt;</span><span>Close Air Vents</span><span id="vents-dots" style="margin-left: 1vw; direction: ltr; font-family: \'Courier New\', monospace;"></span>';
+        option1.addEventListener('click', () => {
+            this.game.toggleVents();
+            // 不在这里立即更新，等toggleVents完成后会自动调用updateControlPanelOptions
+        });
         optionsContainer.appendChild(option1);
         
         // Option 2: Restart Cameras
@@ -235,7 +259,7 @@ class UIManager {
         option2.style.padding = '1.5vh 0';
         option2.style.display = 'flex';
         option2.style.alignItems = 'center';
-        option2.style.direction = 'ltr';
+        option2.style.direction = 'ltr'; // 强制从左到右
         option2.innerHTML = '<span class="option-arrow" style="color: transparent; margin-right: 1.5vw; width: 2vw;">&gt;</span><span>Restart Cameras</span><span id="camera-dots" style="margin-left: 1vw; direction: ltr; font-family: \'Courier New\', monospace;"></span><span id="camera-status" style="margin-left: auto; padding-right: 2vw; direction: ltr;"></span>';
         option2.addEventListener('click', () => {
             this.selectControlOption('cameras');
@@ -248,13 +272,18 @@ class UIManager {
         // Click outside to close (only if no operation in progress)
         document.addEventListener('click', (e) => {
             if (!popup.contains(e.target) && e.target.id !== 'vents-btn' && !e.target.closest('#vents-btn')) {
-                if (this.game.state.controlPanelBusy) return;
+                // 检查是否有操作正在进行
+                if (this.game.state.controlPanelBusy) {
+                    // console.log('Cannot close control panel: operation in progress');
+                    return; // 阻止关闭，不显示任何消息
+                }
                 
                 popup.classList.add('hidden');
                 this.game.state.controlPanelOpen = false;
                 this.updateControlPanelArrows();
             }
         });
+        
         document.body.appendChild(popup);
     }
 
@@ -268,6 +297,7 @@ class UIManager {
             if (arrow1) arrow1.style.color = '#0f0';
             if (arrow2) arrow2.style.color = 'transparent';
             
+            // 更新通风口文本（不包括dots span）
             const text1 = option1.querySelector('span:nth-child(2)');
             if (text1) {
                 text1.textContent = this.game.state.ventsClosed ? 'Open Air Vents' : 'Close Air Vents';
@@ -283,7 +313,7 @@ class UIManager {
     updateControlPanelOptions() {
         this.selectControlOption('vents');
         this.updateCameraStatus();
-        this.updateVentsStatus();
+        this.updateVentsStatus(); // 添加通风口状态更新
     }
     
     // Update vents status display (dots animation)
@@ -292,12 +322,14 @@ class UIManager {
         if (!dotsSpan) return;
         
         if (this.game.state.ventsToggling) {
+            // 正在切换，显示点动画
             dotsSpan.style.color = '#0f0'; // Green dots
             if (!dotsSpan.dataset.animating) {
                 dotsSpan.dataset.animating = 'true';
                 this.animateLoadingDots(dotsSpan);
             }
         } else {
+            // 不在切换中，清空点
             dotsSpan.textContent = '';
             delete dotsSpan.dataset.animating;
         }
@@ -318,10 +350,14 @@ class UIManager {
                     this.animateLoadingDots(dotsSpan);
                 }
             }
+            // 只有在摄像头确实故障时才显示ERR
             if (this.game.state.cameraFailed) {
                 statusSpan.style.color = '#f00';
                 statusSpan.textContent = 'ERR';
-            } else statusSpan.textContent = '';
+            } else {
+                // 没有故障时，重启期间不显示ERR
+                statusSpan.textContent = '';
+            }
         } else if (this.game.state.cameraFailed) {
             // Failed, show ERR on right, no dots
             if (dotsSpan) {
@@ -349,6 +385,7 @@ class UIManager {
             if (!element.dataset.animating) return;
             
             element.textContent = states[index];
+            // console.log('Dots animation:', states[index]); // 调试输出
             index = (index + 1) % states.length;
             
             setTimeout(animate, 500); // Switch every 0.5s
@@ -357,8 +394,14 @@ class UIManager {
         animate();
     }
     
+    // Animate display (dots after button, ERR on right) - 不再使用
+    animateLoadingDotsWithERR(element) {
+        // 已废弃，使用 animateLoadingDots 代替
+    }
+    
     // Handle restart camera
     handleRestartCamera() {
+        // 允许在摄像头没有故障时也能重启（作为策略使用）
         if (!this.game.state.cameraRestarting && !this.game.state.controlPanelBusy) {
             // console.log('Restarting cameras...');
             this.game.camera.restartCamera();
@@ -479,6 +522,7 @@ class UIManager {
         
         // Click event
         cameraBtn.addEventListener('click', () => {
+            // console.log('📷 Camera button clicked!');
             this.game.toggleCamera();
             // Delay arrow update, wait for state change
             setTimeout(() => this.updateCameraButtonArrows(), 50);
@@ -487,16 +531,21 @@ class UIManager {
         hotspotsContainer.appendChild(cameraBtn);
     }
 
+    bindCloseCameraButton() {
+        // Close button removed - camera button is now always accessible
+    }
+
     updateCameraButtonArrows() {
         const cameraBtn = document.getElementById('camera-btn');
         if (!cameraBtn) return;
         
+        const arrows = cameraBtn.querySelectorAll('.camera-arrow');
         const isOpen = this.game.state.cameraOpen;
         
         // Update arrow direction
         // Before opening (closed state): arrows point left (0deg)
         // Before closing (open state): arrows point right (180deg)
-        cameraBtn.querySelectorAll('.camera-arrow').forEach((arrow) => {
+        arrows.forEach((arrow) => {
             arrow.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
         });
     }
@@ -504,6 +553,8 @@ class UIManager {
     updateHotspotVisibility(viewPosition) {
         const ventsBtn = document.getElementById('vents-btn');
         const cameraBtn = document.getElementById('camera-btn');
+        
+        // console.log('🔍 updateHotspotVisibility - viewPosition:', viewPosition);
         
         // Show control panel when view is at far left (viewPosition = 0)
         if (ventsBtn) {
@@ -516,6 +567,7 @@ class UIManager {
             const isVisible = viewPosition > 0.85;
             cameraBtn.style.opacity = isVisible ? '1' : '0';
             cameraBtn.style.pointerEvents = isVisible ? 'auto' : 'none';
+            // console.log('📷 Camera button - opacity:', cameraBtn.style.opacity, 'pointerEvents:', cameraBtn.style.pointerEvents);
         }
     }
 
@@ -544,7 +596,9 @@ class UIManager {
 
     hideTooltip() {
         const tooltip = document.getElementById('game-tooltip');
-        if (tooltip) tooltip.style.display = 'none';
+        if (tooltip) {
+            tooltip.style.display = 'none';
+        }
     }
 
     updateViewPosition(viewPosition) {

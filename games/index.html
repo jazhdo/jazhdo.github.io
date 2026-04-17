@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="/darkmode.css">
     <link rel="icon" href="/icon.png">
     <style>
-        /* Game Icons' container */
+        /* Game Icons container */
         #games {
             display: flex;
             gap: 20px;
@@ -59,11 +59,23 @@
         }
         /* Credits */
         #credits {
-            width: 100vw;
-            background-color: darkgray;
+            width: 100%;
             display: flex;
             flex-direction: column;
             text-align: center;
+        }
+        #credits-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-evenly;
+            background-color: gray;
+            user-select: none;
+        }
+        #credits-title:hover {
+            cursor: pointer;
+        }
+        #credits-content {
+            background-color: darkgray;
         }
         footer {
             margin: 0px;
@@ -120,10 +132,12 @@
         </div>
     </div>
     <div id="credits">
+        <div id="credits-title"></div>
+        <div id="credits-content"></div>
     </div>
     <footer>
         <h2 style="display: none;">Footer:</h2>
-        <p id="darktest" class="footer">v0.2.3 - jazhdo</p>
+        <p id="darktest" class="footer">v0.2.4 - jazhdo</p>
         <a class="footer" href="/privacy.html">Privacy</a>
         <a class="footer" href="/terms.html">Terms</a>
         <script type="module" src="/backend.js"></script>
@@ -139,9 +153,9 @@
                         img: "https://github.com/lekug/lekug.github.io"
                     }
                 },
-                "Five Nights at Epstein's": {
-                    url: "./Fnae/",
-                    img: "./Fnae/icon.png",
+                "n1yshi's Five Nights at Epstein's": {
+                    url: "./n1yshi-Fnae/",
+                    img: "./Fnae.png",
                     credits: {
                         game: "https://github.com/n1yshi/Five-Nights-at-Epstein",
                         img: "https://img.itch.zone/aW1nLzI0NTkxMDM1LnBuZw==/360x286%23c/JxdlSn.png"
@@ -181,68 +195,75 @@
                 }
             };
             // Load games
-            async function loadGames() {
-                [...document.getElementsByClassName("game-icon")]?.forEach(e => e.remove());
-                const sort = JSON.parse(localStorage.getItem('game-settings')).sort;
-                const credits = document.getElementById('credits');
-                const creditsTitle = document.createElement('h2');
-                creditsTitle.textContent = 'Credits:';
-                credits.append(creditsTitle);
-                if (sort === "az") gamesSort = Object.keys(games).sort();
-                else if (sort === "za") gamesSort = Object.keys(games).sort().reverse();
-                else if (sort === "reverse") gamesSort = Object.keys(games).reverse();
-                else gamesSort = Object.keys(games);
-                if (gamesSort != Object.keys(games)) console.log("Sorted " + gamesSort.join(', ') + " by " + sort + ".");
-                else console.log("Sorted " + gamesSort.join(', ') + " by no sorting.");
-                gamesSort.forEach(key => {
-                    const name = document.createElement("p");
-                    const source = document.createElement("a");
-                    const imgsrc = document.createElement("a");
-                    const a = document.createElement("a");
-                    const img = document.createElement("img");
-                    const span = document.createElement("span");
-                    const info = games[key];
-                    name.textContent = key;
-                    source.textContent = info.credits.game;
-                    source.href = info.credits.game;
-                    imgsrc.textContent = info.credits.img;
-                    imgsrc.href = info.credits.img;
-                    a.addEventListener("click", () => {
-                        const background = document.createElement("div");
-                        const view = document.createElement("iframe");
-                        const exit = document.createElement("button");
-                        exit.textContent = "X";
-                        exit.id = "exit";
-                        const corners = JSON.parse(localStorage.getItem('game-settings')).exitCorner.split('-');
-                        if (corners[0] == "top") exit.style.top = '0px';
-                        else if (corners[0] == "bottom") exit.style.bottom = '0px';
-                        if (corners[1] == "left") exit.style.left = '0px';
-                        else if (corners[1] == "right") exit.style.right = '0px';
-                        exit.addEventListener("click", () => background.remove());
-                        background.style.backgroundColor = getLightmode() ? "white" : "gray";
-                        background.id = "background";
-                        view.src = (info.url.startsWith("http") ? "" : "/games/") + info.url;
-                        view.id = "game-view";
-                        background.append(exit, view);
-                        document.getElementById("main").after(background);
+            [...document.getElementsByClassName("game-icon")]?.forEach(e => e.remove());
+            const sort = JSON.parse(localStorage.getItem('game-settings')).sort;
+            const credits = document.getElementById('credits');
+            const creditsBar = document.getElementById('credits-title');
+            const creditsContent = document.getElementById('credits-content');
+            const creditsTitle = document.createElement('h2');
+            const show = document.createElement('h2');
+            creditsTitle.textContent = 'Credits:';
+            creditsContent.style.display = 'none';
+            show.textContent = '▲';
+            let showStatus = false;
+            creditsBar.addEventListener('click', () => {
+                showStatus = !showStatus;
+                show.textContent = showStatus ? '▼' : '▲';
+                creditsContent.style.display = showStatus ? '' : 'none';
+            });
+            creditsBar.append(creditsTitle, show);
+            if (sort === "az") gamesSort = Object.keys(games).sort();
+            else if (sort === "za") gamesSort = Object.keys(games).sort().reverse();
+            else if (sort === "reverse") gamesSort = Object.keys(games).reverse();
+            else gamesSort = Object.keys(games);
+            if (gamesSort != Object.keys(games)) console.log("Sorted " + gamesSort.join(', ') + " by " + sort + ".");
+            else console.log("Sorted " + gamesSort.join(', ') + " by no sorting.");
+            gamesSort.forEach(key => {
+                const name = document.createElement("p");
+                const source = document.createElement("a");
+                const imgsrc = document.createElement("a");
+                const a = document.createElement("a");
+                const img = document.createElement("img");
+                const span = document.createElement("span");
+                const info = games[key];
+                name.textContent = key;
+                source.textContent = info.credits.game;
+                source.href = info.credits.game;
+                imgsrc.textContent = info.credits.img;
+                imgsrc.href = info.credits.img;
+                a.addEventListener("click", () => {
+                    const background = document.createElement("div");
+                    const view = document.createElement("iframe");
+                    const exit = document.createElement("button");
+                    exit.textContent = "X";
+                    exit.id = "exit";
+                    const corners = JSON.parse(localStorage.getItem('game-settings')).exitCorner.split('-');
+                    if (corners[0] == "top") exit.style.top = '0px';
+                    else if (corners[0] == "bottom") exit.style.bottom = '0px';
+                    if (corners[1] == "left") exit.style.left = '0px';
+                    else if (corners[1] == "right") exit.style.right = '0px';
+                    exit.addEventListener("click", () => {
+                        background.remove();
+                        document.documentElement.style.overflow = 'auto';
                     });
-                    a.className = "game-icon";
-                    if (!getLightmode()) a.classList.add("darkmode");
-                    img.src = info.img;
-                    span.className = "game-name";
-                    span.textContent = key;
-                    name.append(' Source: ', source, ' Image: ', imgsrc);
-                    a.append(img, span);
-                    document.getElementById("games").appendChild(a);
-                    credits.append(name);
+                    background.style.backgroundColor = getLightmode() ? "white" : "gray";
+                    background.id = "background";
+                    view.src = (info.url.startsWith("http") ? "" : "/games/") + info.url;
+                    view.id = "game-view";
+                    background.append(exit, view);
+                    document.getElementById("main").after(background);
+                    document.documentElement.style.overflow = 'hidden';
                 });
-            }
-            loadGames();
-            // Load credits
-            (() => {
-                const credits = document.getElementById('credits');
-
-            })()
+                a.className = "game-icon";
+                if (!getLightmode()) a.classList.add("darkmode");
+                img.src = info.img;
+                span.className = "game-name";
+                span.textContent = key;
+                name.append(' Source: ', source, ' Image: ', imgsrc);
+                a.append(img, span);
+                document.getElementById("games").appendChild(a);
+                creditsContent.append(name);
+            });
         </script>
     </footer>
 </body>

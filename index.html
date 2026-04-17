@@ -1,159 +1,334 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta name="description" content="This is jazhdo's personal website. Services: Chat, Games, and Blog.">
-    <title>Home - jazhdo</title>
-    <link rel="stylesheet" href="/style.css">
-    <link rel="stylesheet" href="/darkmode.css">
-    <link rel="icon" href="/icon.png">
-</head> 
-<body>
-    <header>
-        <div id="header-top">
-            <a href="/" draggable="false" id="toptitle">jazhdo</a>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta name="description" content="This is jazhdo's personal website. Services: Chat, Games, and Blog." />
+        <title>Home - jazhdo</title>
+        <link rel="stylesheet" href="/style.css" />
+        <link rel="stylesheet" href="/darkmode.css" />
+        <link rel="icon" href="/icon.png" />
+    </head>
+    <body>
+        <header>
+            <div id="header-top">
+                <a href="/" draggable="false" id="toptitle">jazhdo</a>
+            </div>
+            <nav>
+                <a href="/" draggable="false" class="navbutton">Home</a>
+                <a href="/blog/" draggable="false" class="navbutton">Blog</a>
+                <a href="/contact.html" draggable="false" class="navbutton">Contact</a>
+                <a href="/about.html" draggable="false" class="navbutton">About</a>
+            </nav>
+        </header>
+        <div id="main">
+            <h1>Home</h1>
+            <h2>Site Info</h2>
+            <p>This is my personal website where I post stuff.</p>
+            <h2>Branches</h2>
+            <ul>
+                <li><a href="/chat/">Chat Site</a></li>
+                <li><a href="/blog/">Blog Site</a></li>
+            </ul>
+            <h2>Comments/Bugs</h2>
+            <p>
+                <a href="/contact.html">Contact me</a> to tell me about bugs so I can improve this website. <br />
+                Recommendations or small improvements are also greatly appreciated. <br />
+                Also if you ever get stuck anywhere, press the title "jazhdo" to take you back here.
+            </p>
+            <h2 id="until0"></h2>
+            <h2 id="jstestTitle">Javascript Test Results:</h2>
+            <p id="jstest">Javascript is necessary for advanced site operations. Please disable your adblocker or other javascript blocker to access these operations. If you are on a terminal based browser or other browser that doesn't support javascript, please ignore.</p>
+            <button onclick="jstest()" id="jstestButton">Click here to redo the test.</button>
         </div>
-        <nav>
-            <a href="/" draggable="false" class="navbutton">Home</a>
-            <a href="/blog/" draggable="false" class="navbutton">Blog</a>
-            <a href="/contact.html" draggable="false" class="navbutton">Contact</a>
-            <a href="/about.html" draggable="false" class="navbutton">About</a>
-        </nav>
-    </header>
-    <div id="main">
-        <h1>Home</h1>
-        <h2>Site Info</h2>
-        <p>This is my personal website where I post stuff.</p>
-        <h2>Branches</h2>
-        <ul>
-            <li><a href="/chat/">Chat Site</a></li>
-            <li><a href="/blog/">Blog Site</a></li>
-        </ul>
-        <h2>Comments/Bugs</h2>
-        <p>
-            <a href="/contact.html">Contact me</a> to tell me about bugs so I can improve this website. <br>
-            Recommendations or small improvements are also greatly appreciated. <br>
-            Also if you ever get stuck anywhere, press the title "jazhdo" to take you back here.
-        </p>
-        <h2 id="until0"></h2>
-        <h2 id="jstestTitle">Javascript Test Results:</h2>
-        <p id="jstest">
-            Javascript is necessary for advanced site operations. 
-            Please disable your adblocker or other javascript blocker to access these operations. 
-            If you are on a terminal based browser or other browser that doesn't support javascript, please ignore.
-        </p>
-        <button onclick="jstest()" id="jstestButton">Click here to redo the test.</button>
-    </div>
-    <footer>
-        <h2 style="display: none;">Footer:</h2>
-        <p id="darktest" class="footer">v0.2.3 - jazhdo</p>
-        <a class="footer" href="/privacy.html">Privacy</a>
-        <a class="footer" href="/terms.html">Terms</a>
-        <script type="module" src="/backend.js"></script>
-        <script src="/script.js"></script>
-        <script>
-            const holidays = {
-                "Martin Luther King Jr. Day": {
-                    date: (year) => {
-                        let date = new Date(year, 0, 1);
-                        while (date.getDay() !== 1) date.setDate(date.getDate() + 1);
-                        date.setDate(date.getDate() + 14);
-                        return date
+        <footer>
+            <h2 style="display: none">Footer:</h2>
+            <p id="darktest" class="footer">v0.2.4 - jazhdo</p>
+            <a class="footer" href="/privacy.html">Privacy</a>
+            <a class="footer" href="/terms.html">Terms</a>
+            <script type="module" src="/backend.js"></script>
+            <script src="/script.js"></script>
+            <!-- Lunar New Year calculation library -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/lunar-javascript/1.7.4/lunar.js"></script>
+            <script>
+                const holidays = {
+                    "New Year's Day": {
+                        date: (year) => {
+                            return new Date(year, 0, 1);
+                        },
+                        sources: {}
                     },
-                    sources: {
-                        "Wikipedia": "https://en.wikipedia.org/wiki/Martin_Luther_King_Jr._Day",
-                        "Time and Date": "https://www.timeanddate.com/holidays/us/martin-luther-king-day",
-                        "NPS": "https://www.nps.gov/subjects/npscelebrates/mlk-day.htm",
-                        "Britannica": "https://www.britannica.com/topic/Martin-Luther-King-Jr-Day"
+                    "Martin Luther King Jr. Day": {
+                        date: (year) => {
+                            let date = new Date(year, 0, 1);
+                            while (date.getDay() !== 1) date.setDate(date.getDate() + 1);
+                            date.setDate(date.getDate() + 14);
+                            return date
+                        },
+                        sources: {
+                            "Wikipedia": "https://en.wikipedia.org/wiki/Martin_Luther_King_Jr._Day",
+                            "Time and Date": "https://www.timeanddate.com/holidays/us/martin-luther-king-day",
+                            "NPS": "https://www.nps.gov/subjects/npscelebrates/mlk-day.htm",
+                            "Britannica": "https://www.britannica.com/topic/Martin-Luther-King-Jr-Day"
+                        }
                     },
-                },
-                "Valentines Day": {
-                    date: (year) => { return new Date(year, 1, 14) },
-                    sources: {
-                        "none": "https://example.com"
+                    "Groundhog Day": {
+                        date: (year) => {
+                            return new Date(year, 1, 2);
+                        },
+                        sources: {}
+                    },
+                    "Valentines Day": {
+                        date: (year) => {
+                            return new Date(year, 1, 14);
+                        },
+                        sources: {
+                            "none": "https://example.com"
+                        }
+                    },
+                    "Presidents Day": {
+                        date: (year) => {
+                            let date = new Date(year, 1, 1);
+                            while (date.getDay() !== 1) date.setDate(date.getDate() + 1);
+                            date.setDate(date.getDate() + 14);
+                            return date;
+                        },
+                        sources: {}
+                    },
+                    "Lunar New Year": {
+                        date: (year) => {
+                            const solar = Lunar.fromYmd(year, 1, 1).getSolar();
+                            return new Date(solar.getYear(), solar.getMonth() - 1, solar.getDay())
+                        },
+                        sources: {}
+                    },
+                    "Saint Patrick's Day": {
+                        date: (year) => {
+                            return new Date(year, 2, 17);
+                        }
+                    },
+                    "Easter": {
+                        date: (o) => {var t=o%19,r=Math.floor(o/100),e=o%100,a=Math.floor(r/4),f=r%4,l=Math.floor((r+8)/25),h=(19*t+r-a-Math.floor((r-l+1)/3)+15)%30,M=(32+2*f+2*Math.floor(e/4)-h-e%4)%7,n=Math.floor((t+11*h+22*M)/451),s=Math.floor((h+M-7*n+114)/31);return new Date(o,s-1,(h+M-7*n+114)%31+1)},
+                        sources: {}
+                    },
+                    "April Fools": {
+                        date: (year) => {
+                            return new Date(year, 3, 1);
+                        },
+                        sources: {}
+                    },
+                    "Tax Day": {
+                        date: (year) => {
+                            let normal = new Date(year, 3, 15);
+                            if (normal.getDay() == 6) normal = new Date(year, 3, 17);
+                            if (normal.getDay() == 0) normal = new Date(year, 3, 16);
+                            return normal;
+                        },
+                        sources: {}
+                    },
+                    "Earth Day": {
+                        date: (year) => {
+                            return new Date(year, 3, 22);
+                        },
+                        sources: {}
+                    },
+                    "Cinco de Mayo": {
+                        date: (year) => {
+                            return new Date(year, 4, 5);
+                        },
+                        sources: {}
+                    },
+                    "Mother's Day": {
+                        date: (year) => {
+                            let date = new Date(year, 4, 1);
+                            while (date.getDay() !== 0) date.setDate(date.getDate() + 1);
+                            date.setDate(date.getDate() + 7);
+                            return date;
+                        },
+                        sources: {}
+                    },
+                    "Memorial Day": {
+                        date: (year) => {
+                            let date = new Date(year, 4, 31);
+                            while (date.getDay() !== 1) date.setDate(date.getDate() - 1);
+                            return date;
+                        },
+                        sources: {}
+                    },
+                    "Last Day of School": {
+                        date: (year) => {
+                            return new Date(year, 4, 28);
+                        },
+                        sources: {}
+                    },
+                    "Flag Day": {
+                        date: (year) => {
+                            return new Date(year, 5, 14);
+                        },
+                        sources: {}
+                    },
+                    "Juneteenth": {
+                        date: (year) => {
+                            return new Date(year, 5, 19);
+                        },
+                        sources: {}
+                    },
+                    "Father's Day": {
+                        date: (year) => {
+                            let date = new Date(year, 5, 1);
+                            while (date.getDay() !== 0) date.setDate(date.getDate() + 1);
+                            date.setDate(date.getDate() + 14);
+                            return date;
+                        },
+                        sources: {}
+                    },
+                    "Independence Day (USA)": {
+                        date: (year) => {
+                            return new Date(year, 6, 4);
+                        },
+                        sources: {}
+                    },
+                    "Labor Day": {
+                        date: (year) => {
+                            let date = new Date(year, 8, 1);
+                            while (date.getDay() !== 1) date.setDate(date.getDate() + 1);
+                            return date;
+                        },
+                        sources: {}
+                    },
+                    "Columbus Day": {
+                        date: (year) => {
+                            let date = new Date(year, 9, 1);
+                            while (date.getDay() !== 1) date.setDate(date.getDate() + 1);
+                            date.setDate(date.getDate() + 7);
+                            return date;
+                        },
+                        sources: {}
+                    },
+                    "Halloween": {
+                        date: (year) => {
+                            return new Date(year, 9, 31);
+                        },
+                        sources: {}
+                    },
+                    "Day of the Dead": {
+                        date: (year) => {
+                            return new Date(year, 10, 2);
+                        },
+                        sources: {}
+                    },
+                    "Veterans Day": {
+                        date: (year) => {
+                            return new Date(year, 10, 11);
+                        },
+                        sources: {}
+                    },
+                    "Thanksgiving Day": {
+                        date: (year) => {
+                            let date = new Date(year, 10, 1);
+                            while (date.getDay() !== 4) date.setDate(date.getDate() + 1);
+                            date.setDate(date.getDate() + 21);
+                            return date;
+                        },
+                        sources: {}
+                    },
+                    "Christmas Eve": {
+                        date: (year) => {
+                            return new Date(year, 11, 24);
+                        },
+                        sources: {}
+                    },
+                    "Christmas Day": {
+                        date: (year) => {
+                            return new Date(year, 11, 25);
+                        },
+                        sources: {}
+                    },
+                    "New Year's Eve": {
+                        date: (year) => {
+                            return new Date(year, 11, 31);
+                        },
+                        sources: {}
                     }
+                };
+                const today = new Date()
+                Object.entries(holidays).forEach(([key, value]) => {
+                    const date = value.date(today.getFullYear());
+                    if (today.getDate() == date.getDate() && today.getMonth() == date.getMonth()) {
+                        let message = document.createElement('p');
+                        console.log('Showing holiday special.');
+                        message.textContent = `Today is ${key}. Here is some basic info on the day:`;
+                        message.style.textAlign = 'start';
+                        Object.entries(value.sources).forEach(([a, b]) => {
+                            const part = document.createElement('li')
+                            const element = document.createElement('a');
+                            element.href = b;
+                            element.textContent = a;
+                            part.append(element);
+                            message.append(part);
+                        })
+                        window.showAlert(message);
+                    }
+                });
+                function jstest() { ['jstestTitle', 'jstest', 'jstestButton'].forEach((e) => document.getElementById(e).remove()) }
+                function timeS(time, measure) { return (time)?(Math.abs(time) > 1)?`${time} ${measure}s`:`${time} ${measure}`:false }
+                // Magically sets date (elementId is 1-whatever, increase it every iteration)
+                function refreshDate(elementId, date) {
+                    const goal = holidays[date].date;
+                    let totalSeconds = Math.round((goal - new Date()) / 1000);
+                    let message = '';
+                    let sections = [];
+                    [
+                        timeS(Math.floor(totalSeconds/60/60/24/7), 'week'),
+                        timeS(Math.floor(totalSeconds/60/60/24%7), 'day'),
+                        timeS(Math.floor(totalSeconds/60/60%24), 'hour'),
+                        timeS(Math.floor(totalSeconds/60%60), 'minute'),
+                        timeS(Math.floor(totalSeconds%60), 'second')
+                    ].forEach(e => {if (e) sections.push(e)});
+                    if (sections.length >= 3) {
+                        let i;
+                        for (i = 0; i < sections.length - 1; i++) message += sections[i] + ', ';
+                        message += 'and ' + sections[i];
+                    } else if (sections.length == 2) message = `${sections[0]} and ${sections[1]}`;
+                    else if (sections.length == 1) message = `${sections[0]}`;
+                    else alert(`There has been an error with getting how long it is until a date. Please report this error at the contact page`);
+                    let element = document.createElement('p');
+                    element.id = 'until' + elementId;
+                    element.innerText = `${date} (${goal.getMonth()+1}/${goal.getDate()}): ${message}`;
+                    document.getElementById('until' + elementId)?.remove();
+                    document.getElementById('until' + (elementId - 1)).after(element);
                 }
-            };
-            const today = new Date()
-            Object.entries(holidays).forEach(([key, value]) => {
-                const date = value.date(today.getFullYear());
-                if (today.getDate() == date.getDate() && today.getMonth() == date.getMonth()) {
-                    let message = document.createElement('p');
-                    console.log('Showing holiday special.');
-                    message.textContent = `Today is ${key}. Here is some basic info on the day:`;
-                    Object.entries(value.sources).forEach(([a, b]) => {
-                        let element = document.createElement('a');
-                        element.href = a;
-                        element.textContent = b;
-                        message.append(element);
-                    })
-                    window.showAlert(message);
+                Object.entries(holidays).forEach(([key, value]) => {
+                    let temp;
+                    temp = value.date(today.getFullYear());
+                    if (temp < today) temp = value.date(today.getFullYear() + 1);
+                    value.date = temp;
+                });
+                let next = Object.keys(holidays).sort((a, b) => (holidays[a].date - today) - (holidays[b].date - today)).slice(0, Number(localStorage.getItem("holidays")) || 5);
+                function refreshDates() {
+                    // Write code here to determine the closest of the dates by making a array and then splitting the closest few (first few elements) to get which ones to use (Detect once every time its midnight and once on page load)
+                    for (let i = 0; i < next.length; i++) refreshDate(i+1, next[i]);
                 }
-            })
-            function jstest() { ['jstestTitle', 'jstest', 'jstestButton'].forEach((e) => document.getElementById(e).remove()) };
-            function timeS(time, measure) { return (time)?(Math.abs(time) > 1)?`${time} ${measure}s`:`${time} ${measure}`:'' };
-            function refreshDate(elementId, year, month, day, subject) {
-                const now = new Date();
-                let goal = new Date(year, month - 1, day);
-                let until = (goal - now)/1000/60/60/24;
-                while (goal < now) {
-                    year++;
-                    goal = new Date(year, month - 1, day);
+                let holidayDetection = true;
+                const gameLinkLi = document.createElement('li');
+                const gameLinkA = document.createElement('a');
+                gameLinkA.href = '/games/';
+                gameLinkA.textContent = 'Game Site';
+                gameLinkLi.append(gameLinkA);
+                document.querySelector('li').after(gameLinkLi);
+                document.getElementById('until0').innerText = 'Upcoming Important Dates:';
+                refreshDates();
+                jstest();
+                // Wait until almost perfectly the second mark
+                let delays = 0;
+                function initialDelay() {
+                    const now = new Date()
+                    if (now.getMilliseconds() <= (delays>>1)) setInterval(refreshDates, 1000);
+                    else requestAnimationFrame(initialDelay), delays++;
                 }
-                let totalSeconds = Math.round((goal - now) / 1000);
-                let message = '';
-                let sections = [];
-                [
-                    timeS(Math.floor(totalSeconds/60/60/24/7), 'week'),
-                    timeS(Math.floor(totalSeconds/60/60/24%7), 'day'),
-                    timeS(Math.floor(totalSeconds/60/60%24), 'hour'),
-                    timeS(Math.floor(totalSeconds/60%60), 'minute'),
-                    timeS(Math.floor(totalSeconds%60), 'second')
-                ].forEach(e => {if (e) sections.push(e)});
-                if (sections.length >= 3) {
-                    let numberOn = 0
-                    sections.forEach((e) => {
-                        if (sections.length - numberOn > 1) message += `${e}, `
-                        else message += `and ${e}`;
-                        numberOn++;
-                    });
-                } else if (sections.length == 2) message = `${sections[0]} and ${sections[1]}`;
-                else if (sections.length == 1) message = `${sections[0]}`;
-                else alert(`There has been an error with getting how long it is until a date. Please report this error at the contact page`);
-                let element = document.createElement('p');
-                element.id = 'until' + elementId;
-                element.innerText = subject + " (" + month + "/" + day + "): " + message;
-                document.getElementById('until' + elementId)?.remove();
-                document.getElementById('until' + (elementId - 1)).after(element);
-            }
-            function refreshDates() {
-                refreshDate(1, 2026, 2, 14, 'Valentines Day');
-                refreshDate(2, 2026, 2, 16, 'Presidents Day');
-                refreshDate(3, 2026, 2, 17, 'Chinese New Years');
-                refreshDate(4, 2026, 4, 1, 'April Fools Day');
-                refreshDate(5, 2026, 5, 28, 'Last Day of School');
-            }
-            let holidayDetection = true;
-            const gameLinkLi = document.createElement('li');
-            const gameLinkA = document.createElement('a');
-            gameLinkA.href = '/games/';
-            gameLinkA.textContent = 'Game Site';
-            gameLinkLi.append(gameLinkA);
-            document.querySelector('li').after(gameLinkLi);
-            document.getElementById('until0').innerText = 'Upcoming Important Dates:';
-            refreshDates();
-            jstest();
-            // Wait till almost perfectly the second mark
-            let delays = 0;
-            function initialDelay() {
-                const now = new Date()
-                if (now.getMilliseconds() <= ((delays < 100) ? 5 : 20)) setInterval(refreshDates, 1000);
-                else requestAnimationFrame(initialDelay), delays++;
-            }
-            requestAnimationFrame(initialDelay);
-        </script>
-    </footer>
-</body>
+                requestAnimationFrame(initialDelay);
+            </script>
+        </footer>
+    </body>
 </html>

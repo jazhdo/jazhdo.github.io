@@ -299,10 +299,18 @@ class Game {
             hawking: hawkingLevel
         };
         
+        console.log('Starting Custom Night with AI levels:', this.state.customAILevels);
+        
         this.customNightMenu.classList.add('hidden');
-        this.volumeBtn?.classList.add('hidden');
-        this.volumePanel?.classList.add('hidden');
-            
+        
+        // 隐藏音量按钮和面板
+        if (this.volumeBtn) {
+            this.volumeBtn.classList.add('hidden');
+        }
+        if (this.volumePanel) {
+            this.volumePanel.classList.add('hidden');
+        }
+        
         const menuMusic = document.getElementById('menu-music');
         if (menuMusic) {
             menuMusic.pause();
@@ -439,18 +447,32 @@ class Game {
     }
     
     async initGame() {
+        // console.log('🎮 initGame called, currentNight:', this.state.currentNight);
+        
         if (!this.assets.loaded) {
             await this.assets.loadAssets();
         }
         
         this.state.reset();
         
-        this.camera.resetSoundButtonCount();
-        const cameraPanel = document.getElementById('camera-panel');
-        if (cameraPanel) cameraPanel.style.display = '';
+        // console.log('🎮 After state.reset(), currentNight:', this.state.currentNight);
         
+        // 重置摄像头系统的sound按钮计数
+        this.camera.resetSoundButtonCount();
+        
+        // 恢复摄像头面板的display（之前可能被强制隐藏）
+        const cameraPanel = document.getElementById('camera-panel');
+        if (cameraPanel) {
+            cameraPanel.style.display = ''; // 恢复默认
+            // console.log('🎮 Camera panel display restored');
+        }
+        
+        // 显示每晚开始场景（在显示游戏画面之前）
         await this.showNightIntro();
         
+        // console.log('🎮 After showNightIntro(), currentNight:', this.state.currentNight);
+        
+        // 进场动画结束后才显示游戏画面
         this.gameScreen.classList.add('active');
         
         this.ui.currentSceneImg.src = this.assets.images.office.src;
@@ -469,7 +491,7 @@ class Game {
         
         // Start enemy AI
         this.enemyAI.start();
-        this.assets.playSound('ambient', true);
+        
         this.assets.playSound('vents', true);
         
         // Show tutorial
@@ -481,13 +503,17 @@ class Game {
             this.showTutorial('night3');
         }
         
+        // console.log('🎮 Before Golden check, currentNight:', this.state.currentNight);
         
         // Night 5: 必定触发 Golden 霍金彩蛋（放在最后，确保游戏已完全初始化）
         if (this.state.currentNight === 5) {
+            // console.log('🌟 Night 5 detected, triggering Golden Stephen...');
             setTimeout(() => {
                 this.showGoldenStephen();
             }, 1000); // 进入游戏1秒后触发
-        }
+        } // else {
+            // console.log('❌ Not Night 5, currentNight is:', this.state.currentNight);
+        // }
     }
     
     // 初始化风扇动画状态
@@ -575,6 +601,8 @@ class Game {
     
     // Golden 霍金彩蛋效果
     showGoldenStephen() {
+        console.log('🌟 Golden Stephen Hawking appears!');
+        
         // 创建全屏金色霍金图层
         const goldenOverlay = document.createElement('div');
         goldenOverlay.id = 'golden-stephen-overlay';
@@ -709,15 +737,33 @@ class Game {
     }
 
     toggleVents() {
-        if (this.state.controlPanelBusy) return;
+        console.log('toggleVents called, controlPanelBusy:', this.state.controlPanelBusy);
+        
+        // 如果控制面板正忙，不允许操作
+        if (this.state.controlPanelBusy) {
+            console.log('Control panel is busy, please wait...');
+            return;
+        }
+        
+        // 标记控制面板为忙碌状态
         this.state.controlPanelBusy = true;
         this.state.ventsToggling = true;
+        console.log('Starting vent toggle animation...');
+        
+        // 播放心电图音效
         this.assets.playSound('ekg', false, 0.8);
+        
+        // 获取风扇图标
         const ventIcon = document.querySelector('.vent-icon');
+        
         if (this.state.ventsClosed) {
+            // 当前关闭，要打开 -> 风扇从停止加速到快速
+            console.log('Opening vents: fan speeding up');
             if (ventIcon) {
                 ventIcon.classList.remove('stopped', 'slowing');
                 ventIcon.classList.add('speeding-up');
+                
+                // 逐步加速动画
                 setTimeout(() => {
                     ventIcon.style.animation = 'spin-slow 2s linear infinite';
                 }, 0);
@@ -730,9 +776,13 @@ class Game {
                 }, 2000);
             }
         } else {
+            // 当前打开，要关闭 -> 风扇从快速减速到停止
+            console.log('Closing vents: fan slowing down');
             if (ventIcon) {
                 ventIcon.classList.remove('speeding-up');
                 ventIcon.classList.add('slowing');
+                
+                // 逐步减速动画
                 setTimeout(() => {
                     ventIcon.style.animation = 'spin-slow 1.5s linear infinite';
                 }, 0);
@@ -764,28 +814,47 @@ class Game {
         // 4秒后完成切换
         setTimeout(() => {
             this.state.ventsClosed = !this.state.ventsClosed;
+            console.log('Vents:', this.state.ventsClosed ? 'closed' : 'open');
+            
+            // 通知 EnemyAI 通风口状态变化
             this.enemyAI.onVentsChanged(this.state.ventsClosed);
+            
+            // 解除锁定
             this.state.ventsToggling = false;
             this.state.controlPanelBusy = false;
+            console.log('Vent toggle completed');
+            
+            // 更新UI和控制面板选项文本
             this.ui.update();
             this.ui.updateVentsStatus();
             this.ui.updateControlPanelOptions();
         }, 4000);
     }
 
-    toggleCamera() { this.camera.toggle(); }
+    toggleCamera() {
+        // console.log('🎮 Game.toggleCamera() called');
+        // console.log('🎮 Current state - cameraOpen:', this.state.cameraOpen, 'tutorialActive:', this.state.tutorialActive);
+        this.camera.toggle();
+    }
 
     oxygenOut() {
         this.stopGame();
         this.assets.stopSound('ambient');
+        // Oxygen depleted triggers jumpscare
         this.enemyAI.triggerJumpscare();
     }
     
     gameOver(message) {
         this.stopGame();
         this.assets.stopSound('ambient');
+        
+        // 立即隐藏游戏画面
         this.gameScreen.classList.remove('active');
-        if (this.state.cameraOpen) this.camera.close();
+        
+        // 关闭摄像头面板
+        if (this.state.cameraOpen) {
+            this.camera.close();
+        }
         
         // 隐藏摄像头面板
         const cameraPanel = document.getElementById('camera-panel');
@@ -796,11 +865,15 @@ class Game {
         
         // 清理角色图层
         const characterOverlay = document.getElementById('character-overlay');
-        if (characterOverlay) characterOverlay.innerHTML = '';
+        if (characterOverlay) {
+            characterOverlay.innerHTML = '';
+        }
         
         // 隐藏控制面板
         const controlPanel = document.getElementById('control-panel');
-        if (controlPanel) controlPanel.classList.add('hidden');
+        if (controlPanel) {
+            controlPanel.classList.add('hidden');
+        }
         
         this.gameOverScreen(message);
     }
@@ -829,6 +902,7 @@ class Game {
         if (this.state.customNight && this.state.currentNight === 7) {
             const levels = this.state.customAILevels;
             if (levels.epstein === 20 && levels.trump === 20 && levels.hawking === 20) {
+                console.log('🌟 20/20/20 Custom Night completed!');
                 localStorage.setItem('customNight202020', 'true');
             }
         }
@@ -1144,7 +1218,12 @@ class Game {
         // 隐藏按钮
         if (restartBtn) restartBtn.style.display = 'none';
         if (mainMenuBtn) mainMenuBtn.style.display = 'none';
-        if (gameOverStatic) gameOverStatic.currentTime = 0;
+        
+        // Play static video
+        if (gameOverStatic) {
+            gameOverStatic.currentTime = 0;
+            gameOverStatic.play().catch(e => console.log('Failed to play game over static:', e));
+        }
         
         if (win) {
             // Only increase night number if not at max level
@@ -1239,7 +1318,6 @@ class Game {
         // Start enemy AI
         this.enemyAI.start();
         
-        this.assets.playSound('ambient', true);
         this.assets.playSound('vents', true);
         
         // Show tutorial for specific nights
@@ -1251,6 +1329,7 @@ class Game {
         
         // Night 5: 必定触发 Golden 霍金彩蛋
         if (this.state.currentNight === 5) {
+            console.log('🌟 Night 5 detected (continueToNextNight), triggering Golden Stephen...');
             setTimeout(() => {
                 this.showGoldenStephen();
             }, 1000);
@@ -1325,7 +1404,7 @@ class Game {
         if (menuMusic) {
             menuMusic.loop = true;
             menuMusic.currentTime = 0;
-            menuMusic.play().catch(() => {});
+            menuMusic.play().catch(e => console.log('Menu music playback failed:', e));
         }
     }
 }
