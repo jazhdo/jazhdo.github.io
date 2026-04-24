@@ -1,137 +1,121 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <title>Admin - jazhdo</title>
-    <link rel="stylesheet" href="/style.css">
-    <link rel="stylesheet" href="/darkmode.css">
-    <link rel="icon" href="/icon.png">
-</head>
-<body>
-    <header>
-        <div id="header-top">
-            <a href="/" draggable="false" id="toptitle">jazhdo</a>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <title>Admin - jazhdo</title>
+        <link rel="stylesheet" href="/style.css" />
+        <link rel="stylesheet" href="/darkmode.css" />
+        <link rel="icon" href="/icon.png" />
+    </head>
+    <body>
+        <header>
+            <div id="header-top">
+                <a href="/" draggable="false" id="toptitle">jazhdo</a>
+            </div>
+            <nav>
+                <a href="/" draggable="false" class="navbutton">Home</a>
+                <a href="/blog/" draggable="false" class="navbutton">Blog</a>
+                <a href="/contact.html" draggable="false" class="navbutton">Contact</a>
+                <a href="/about.html" draggable="false" class="navbutton">About</a>
+            </nav>
+        </header>
+        <div id="main">
+            <h1 id="adminTitle" style="display: none">Admin Page</h1>
+            <a id="goBack" href="/settings.html" style="display: none">Back</a>
+            <p><a href="/test.html">Test page</a></p>
+            <p id="message-bottom"></p>
         </div>
-        <nav>
-            <a href="/" draggable="false" class="navbutton">Home</a>
-            <a href="/blog/" draggable="false" class="navbutton">Blog</a>
-            <a href="/contact.html" draggable="false" class="navbutton">Contact</a>
-            <a href="/about.html" draggable="false" class="navbutton">About</a>
-        </nav>
-    </header>
-    <div id="main">
-        <h1 id="adminTitle" style="display: none;">Admin Page</h1>
-        <a id="goBack" href="/settings.html" style="display: none;">Back</a>
-        <p><a href="/test.html">Test page</a></p>
-        <p id="message-bottom"></p>
-    </div>
-    <footer>
-        <h2 style="display: none;">Footer:</h2>
-        <p id="darktest" class="footer">v0.2.4 - jazhdo</p>
-        <a class="footer" href="/privacy.html">Privacy</a>
-        <a class="footer" href="/terms.html">Terms</a>
-        <script type="module" src="/backend.js"></script>
-        <script src="/script.js"></script>
-        <script type="module">
-            // v0.2.4
+        <footer>
+            <h2 style="display: none">Footer:</h2>
+            <p id="darktest" class="footer">v0.2.5 - jazhdo</p>
+            <a class="footer" href="/privacy.html">Privacy</a>
+            <a class="footer" href="/terms.html">Terms</a>
+            <script type="module" src="/backend.js"></script>
+            <script src="/script.js"></script>
+            <script type="module">
+                // v0.2.5
 
-            // Firebase stuff
-            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-            import { 
-                getFirestore, collection, getDocs, query, orderBy, doc, getDoc 
-            } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-            import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+                // Firebase stuff
+                import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+                import { getFirestore, collection, getDocs, query, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+                import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-            // Firebase references
-            // https://firebase.google.com/docs/reference/js/app.md
-            // https://firebase.google.com/docs/reference/js/firestore_.md
-            // https://firebase.google.com/docs/reference/js/auth.md
+                // Firebase references
+                // https://firebase.google.com/docs/reference/js/app.md
+                // https://firebase.google.com/docs/reference/js/firestore_.md
+                // https://firebase.google.com/docs/reference/js/auth.md
 
-            // Firebase configuration
-            const firebaseConfig = {
-                apiKey: "AIzaSyAHm5_zvReOaA6RpttJ1KlIhoONis99MKA",
-                authDomain: "jazhdo-backend.firebaseapp.com",
-                projectId: "jazhdo-backend",
-                storageBucket: "jazhdo-backend.firebasestorage.app",
-                messagingSenderId: "535780894340",
-                appId: "1:535780894340:web:ca78bc82bbe1ff0a8204d1"
-            };
+                // Firebase configuration
+                const firebaseConfig = { apiKey: "AIzaSyAHm5_zvReOaA6RpttJ1KlIhoONis99MKA", authDomain: "jazhdo-backend.firebaseapp.com", projectId: "jazhdo-backend", storageBucket: "jazhdo-backend.firebasestorage.app", messagingSenderId: "535780894340", appId: "1:535780894340:web:ca78bc82bbe1ff0a8204d1" };
 
-            // Variables
-            const app = initializeApp(firebaseConfig);
-            const db = getFirestore(app);
-            const auth = getAuth(app);
+                // Variables
+                const app = initializeApp(firebaseConfig);
+                const db = getFirestore(app);
+                const auth = getAuth(app);
 
-            let showMessages = false;
-            function redirectToHome() { window.location.href = "./settings.html"; }
+                let showMessages = false;
+                function redirectToHome() {
+                    window.location.href = "./settings.html";
+                }
 
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    try {
-                        const adminSnap = await getDoc(doc(db, "admins", user.uid));
-                        if (adminSnap.exists()) {
-                            const message = document.createElement("p");
-                            const showButton = document.createElement("button");
-                            showButton.textContent = "Show messages";
-                            showButton.id = "showMessages";
-                            showButton.onclick = () => {
-                                document.querySelectorAll('.posts').forEach(e => {
-                                    e.style.display = showMessages ? 'none' : '';
-                                    document.getElementById('showMessages').innerText = (showMessages ? 'Show' : 'Hide') + ' messages';
-                                });
-                                showMessages = !showMessages;
-                            };
-                            message.textContent = `Welcome.`;
-                            document.getElementById("message-bottom").before(message, showButton);
-                            const snapshot = await getDocs(query(collection(db, "messages"), orderBy("createdAt", "desc")));
-                            snapshot.forEach(doc => {
-                                const box = document.createElement("div");
-                                const id = document.createElement("h2");
-                                const time = document.createElement("p");
-                                const email = document.createElement("p");
+                onAuthStateChanged(auth, async user => {
+                    if (user) {
+                        try {
+                            const adminSnap = await getDoc(doc(db, "admins", user.uid));
+                            if (adminSnap.exists()) {
                                 const message = document.createElement("p");
-                                const data = doc.data();
+                                const showButton = document.createElement("button");
+                                showButton.textContent = "Show messages";
+                                showButton.id = "showMessages";
+                                showButton.onclick = () => {
+                                    document.querySelectorAll(".posts").forEach(e => {
+                                        e.style.display = showMessages ? "none" : "";
+                                        document.getElementById("showMessages").innerText = (showMessages ? "Show" : "Hide") + " messages";
+                                    });
+                                    showMessages = !showMessages;
+                                };
+                                message.textContent = `Welcome.`;
+                                document.getElementById("message-bottom").before(message, showButton);
+                                const snapshot = await getDocs(query(collection(db, "messages"), orderBy("createdAt", "desc")));
+                                snapshot.forEach(doc => {
+                                    const box = document.createElement("div");
+                                    const id = document.createElement("h2");
+                                    const time = document.createElement("p");
+                                    const email = document.createElement("p");
+                                    const message = document.createElement("p");
+                                    const data = doc.data();
 
-                                id.textContent = "Id: " + doc.id;
-                                time.textContent = "Date: " + data.createdAt?.toDate().toLocaleString({
-                                    hour12: false,
-                                    weekday: "long",
-                                    year: "numeric",
-                                    month: "numeric",
-                                    day: "numeric",
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                    second: "2-digit"
+                                    id.textContent = "Id: " + doc.id;
+                                    time.textContent = "Date: " + data.createdAt?.toDate().toLocaleString({ hour12: false, weekday: "long", year: "numeric", month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
+                                    email.textContent = "Contact Method: " + data.contactMethod || "Email: " + data.email;
+                                    message.textContent = data.message;
+
+                                    box.className = "posts";
+                                    box.style.display = "none";
+                                    box.className += document.getElementById("darktest").classList.contains("darkmode") ? " darkmode" : "";
+                                    box.append(id, time, email, message);
+                                    document.getElementById("message-bottom").before(box);
                                 });
-
-                                email.textContent = ("Contact Method: " + data.contactMethod) || ("Email: " + data.email);
-                                message.textContent = data.message;
-
-                                box.className = "posts";
-                                box.style.display = "none";
-                                box.className += document.getElementById("darktest").classList.contains('darkmode') ? ' darkmode' : '';
-                                box.append(id, time, email, message);
-                                document.getElementById("message-bottom").before(box);
-                            });
-                            // document.querySelectorAll('.posts').forEach(e => e.style.display = "");
-                            document.getElementById("adminTitle").style.display = "";
-                            document.getElementById("goBack").style.display = "";
-                            document.getElementById("message-bottom").innerText = "";
-                        } else {
-                            alert("Access denied: You are not an admin. (If you actually are, ask to be added to the admins file)");
-                            redirectToHome();
-                        };
-                    } catch(error) {
-                        window.showAlert(`There was an error getting admin details. Please try again. Error: ${error}`);
-                    };
-                } else {
-                    alert("Please sign in before continuing.");
-                    redirectToHome();
-                };
-            });
-        </script>
-    </footer>
-</body>
+                                // document.querySelectorAll('.posts').forEach(e => e.style.display = "");
+                                document.getElementById("adminTitle").style.display = "";
+                                document.getElementById("goBack").style.display = "";
+                                document.getElementById("message-bottom").innerText = "";
+                            } else {
+                                alert("Access denied: You are not an admin. (If you actually are, ask to be added to the admins file)");
+                                redirectToHome();
+                            }
+                        } catch (error) {
+                            window.showAlert(`There was an error getting admin details. Please try again. Error: ${error}`);
+                        }
+                    } else {
+                        alert("Please sign in before continuing.");
+                        redirectToHome();
+                    }
+                });
+            </script>
+        </footer>
+    </body>
 </html>

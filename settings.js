@@ -1,0 +1,627 @@
+// Firebase stuff
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, query, orderBy, doc, getDoc, setDoc, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import pako from "https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.esm.mjs";
+
+// Firebase references
+// https://firebase.google.com/docs/reference/js/app.md
+// https://firebase.google.com/docs/reference/js/firestore_.md
+// https://firebase.google.com/docs/reference/js/auth.md
+
+// Firebase configuration
+const firebaseConfig = { apiKey: "AIzaSyAHm5_zvReOaA6RpttJ1KlIhoONis99MKA", authDomain: "jazhdo-backend.firebaseapp.com", projectId: "jazhdo-backend", storageBucket: "jazhdo-backend.firebasestorage.app", messagingSenderId: "535780894340", appId: "1:535780894340:web:ca78bc82bbe1ff0a8204d1" };
+
+// Variables
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+let globalUser;
+const pages = {
+    Profile: {
+        login: true,
+        title: "Profile",
+        "User ID": {
+            type: "value",
+            copy: true,
+            value: () => {
+                return globalUser.uid;
+            },
+        },
+        Email: {
+            type: "value",
+            copy: false,
+            value: () => {
+                return globalUser.email;
+            },
+        },
+        "": {
+            type: "form",
+            value: {
+                Username: {
+                    type: "input",
+                    value: async () => {
+                        const usersSnap = await getDoc(doc(db, "users", globalUser.uid));
+                        return usersSnap.data().username || globalUser.uid;
+                    },
+                    set: async value => {
+                        const q = query(collection(db, "users"), where("username", "==", value));
+                        const querySnapshot = await getDocs(q);
+                        const userRef = doc(db, "users", globalUser.uid);
+                        const usersSnap = await getDoc(userRef);
+
+                        if (!querySnapshot.empty && querySnapshot.docs[0].id !== globalUser.uid) {
+                            alert("Username is already taken! Please choose another.");
+                            document.getElementById("username").value = usersSnap.data().username;
+                            return;
+                        }
+                        if (value.length == 28) {
+                            alert("Username has a possibility of being a user id because of it's 28 digits long. Please choose another.");
+                            return;
+                        }
+                        await setDoc(userRef, { username: value }, { merge: true });
+                    },
+                },
+                "Display Name": {
+                    type: "input",
+                    value: async () => {
+                        const usersSnap = await getDoc(doc(db, "users", globalUser.uid));
+                        return usersSnap.data().displayName || globalUser.uid;
+                    },
+                    set: async value => {
+                        await setDoc(doc(db, "users", globalUser.uid), { displayName: value }, { merge: true });
+                    },
+                },
+                Save: { type: "submit" },
+            },
+        },
+        "Profile Pic": { type: "heading" },
+        "Font Color": {
+            type: "select",
+            values: () => {
+                return ["red", "orange", "yellow", "blue", "green", "purple", "brown", "black", "gray", "white"];
+            },
+            value: () => {
+                return JSON.parse(atob(localStorage.getItem("pfp"))).color;
+            },
+            set: async value => {
+                const old = JSON.parse(atob(localStorage.getItem("pfp")));
+                old.color = ["red", "orange", "yellow", "blue", "green", "purple", "brown", "black", "gray", "white"][value];
+                localStorage.setItem("pfp", btoa(JSON.stringify(old)));
+                window.updatePfp();
+                await setDoc(doc(db, "users", globalUser.uid), { pfp: old }, { merge: true });
+            },
+        },
+        "Background Color": {
+            type: "select",
+            values: () => {
+                return ["red", "orange", "yellow", "blue", "green", "purple", "brown", "black", "gray", "white"];
+            },
+            value: () => {
+                return JSON.parse(atob(localStorage.getItem("pfp"))).background;
+            },
+            set: async value => {
+                const old = JSON.parse(atob(localStorage.getItem("pfp")));
+                old.background = ["red", "orange", "yellow", "blue", "green", "purple", "brown", "black", "gray", "white"][value];
+                localStorage.setItem("pfp", btoa(JSON.stringify(old)));
+                window.updatePfp();
+                await setDoc(doc(db, "users", globalUser.uid), { pfp: old }, { merge: true });
+            },
+        },
+        "Border Color": {
+            type: "select",
+            values: () => {
+                return ["red", "orange", "yellow", "blue", "green", "purple", "brown", "black", "gray", "white"];
+            },
+            value: () => {
+                return JSON.parse(atob(localStorage.getItem("pfp"))).border;
+            },
+            set: async value => {
+                const old = JSON.parse(atob(localStorage.getItem("pfp")));
+                old.border = ["red", "orange", "yellow", "blue", "green", "purple", "brown", "black", "gray", "white"][value];
+                localStorage.setItem("pfp", btoa(JSON.stringify(old)));
+                window.updatePfp();
+                await setDoc(doc(db, "users", globalUser.uid), { pfp: old }, { merge: true });
+            },
+        },
+        Letter: {
+            type: "input",
+            value: () => {
+                return JSON.parse(atob(localStorage.getItem("pfp"))).letter;
+            },
+            set: async value => {
+                const old = JSON.parse(atob(localStorage.getItem("pfp")));
+                old.letter = value.split("", 2).join("");
+                localStorage.setItem("pfp", btoa(JSON.stringify(old)));
+                window.updatePfp();
+                await setDoc(doc(db, "users", globalUser.uid), { pfp: old }, { merge: true });
+            },
+        },
+        "Sign Out": {
+            type: "button",
+            set: async () => {
+                let fail = false;
+                try {
+                    await signOut(auth);
+                } catch (err) {
+                    fail = true;
+                    window.showAlert("Logout failed because of error:", err);
+                }
+                if (!fail) {
+                    globalUser = undefined;
+                    showLogin();
+                    await waitUntil(() => globalUser);
+                    const content = document.getElementById("content");
+                    content.innerHTML = "<h1>Profile</h1>";
+                    types(content, pages.Profile);
+                }
+            },
+        },
+    },
+    General: {
+        login: false,
+        title: "General",
+        Theme: {
+            type: "select",
+            values: () => {
+                return ["auto", "light", "dark"];
+            },
+            value: () => {
+                return localStorage.getItem("lightmode");
+            },
+            set: value => {
+                localStorage.setItem("lightmode", ["auto", "light", "dark"][value]);
+                updateMode();
+                document.getElementById("lightmode").textContent = "Current Mode: " + localStorage.getItem("lightmode");
+            },
+        },
+        Games: { type: "heading" },
+        "Exit Button Corner": {
+            type: "select",
+            values: () => {
+                return ["top-left", "top-right", "bottom-left", "bottom-right"];
+            },
+            value: () => {
+                return JSON.parse(localStorage.getItem("g.options")).exitCorner;
+            },
+            set: value => {
+                const current = JSON.parse(localStorage.getItem("g.options"));
+                current.exitCorner = ["top-left", "top-right", "bottom-left", "bottom-right"][value];
+                localStorage.setItem("g.options", JSON.stringify(current));
+            },
+        },
+        "Game Sort": {
+            type: "select",
+            values: () => {
+                return ["none", "reverse", "az", "za"];
+            },
+            value: () => {
+                return JSON.parse(localStorage.getItem("g.options")).sort;
+            },
+            set: value => {
+                const current = JSON.parse(localStorage.getItem("g.options"));
+                current.sort = ["none", "reverse", "az", "za"][value];
+                localStorage.setItem("g.options", JSON.stringify(current));
+            },
+        },
+        Holidays: {
+            type: "select",
+            values: () => {
+                return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28];
+            },
+            value: () => {
+                return Number(localStorage.getItem("holidays")) || 5;
+            },
+            set: value => {
+                localStorage.setItem("holidays", value);
+            },
+        },
+    },
+    Eaglercraft: {
+        login: false,
+        title: "Eaglercraft",
+        "1.8.8 Game Options": { type: "heading" },
+        "Full Bright": {
+            type: "toggle",
+            value: () => {
+                if (!localStorage.getItem("_eaglercraftX.g"))
+                    localStorage.setItem(
+                        "_eaglercraftX.g",
+                        "H4sIAAAAAAAAA3VW23LiOBB9979MinsSvSUEkuzmQo1JUltbW5SQ2liDLLkkGcJ8/bbkG3jgIRV0utXu2+mWUDsw7p9XXVggCZUWosz/jkFZ4cROuAPpXY2jRO/wfy/a0CyjpI+/LHWFoU5oFQQGFAfzIKyjigEZRZtCxIxKIMMop8YJJsGSXrTW608Be+JMARFVdCMPeTrk9bfp9zy3ZDDpRclazxRdo4GgykWSCFZI9GcQpdRODVAH/AEy/aWNrA0YkPSwFBnowqETqeDwlxZqqnkdXoL+HR4NzVPBbIVRTeoIplIX3OPWIWJ1YRgsKNta8u9/kVBMZzkGjW797AolXonBYD4J/lYbAmr1EUcspe5TWLEWMiQzAFMttbFlZP78ItS2e1wY/JZrwfecMm8hJF9pnYMpE8RLHQiHT3tQbEY3JebjL3264xzDaQLmO18m/uwgW2otnchrUU6x/O/qRVs316yovNJowqCxL8FdikHU5ycQm9QhkII8tdb4XaoEW+iq975FP1RS4b2r0Wg4mfRvJ0Fctk6tXH41BJ7q/TP2rHLaHO5YKmAHGZ6ehKpSlYk8o/kL4tJiByQaa/ShBMMOmGtUqhIgpd7fS822d9KBUVjTHVROG+AF8621LjbP6GB1Bd18C2pLQ5XNtXF13h2WJU4p1/vKQlrwed7+Pm5QPE61NryVLrBjsWcaceyos+1xMEqrA0sLtZ2L7/JmoqsaJ9+UEp8Ziu1bXyyb4SPnSJJ4x0rNnRYMXpCioH5SLrC2/ckx+KllkUHge0DjHOi2Cy6Wy7/hQEbX1Tfmb3df8VYoe9yFDwdFM8FefI2bWKh9EpyDWqTCpl/UKIEkOXYXOx7ZicmcC1+U9l6MVVddaficZQYwGmCYUk9yRqbvD7Pp6mt2/7r6XNysHmdvs5/P09X7Arl4rD1fxGTYO4E8pWURRlr/RHBXcKHvhcN5h005OL31iTRohINx71T6SDOoUhj690j0KliT3F7kdMHSKXao0fKY6p7CD5BQHH0f1ndqBqe58wrBhxicQ9ieiteIgsGBZ+373I8frRQwHJ1L+MYJDh7tR0hCp7N4e8BTmdgMh/YL0F1QqBowKHmW21ptC4cV/l1R53AOkh99DL/G/Er5cXvbnJGKe2pwBFw3kITE+SrU57U3Muw3ZxOmy3DQAL+KLCfj1oBV2KJk1CrY3PhR0G8/y43OfaPXZ1GPD9K/aUA/ZcigdSQPpJRIC9Ift6hgWx8+hnV0VeNKVJyMh60Toco4qxyZtDad3mywyZGkORYABwmZHF3JtHbpFKtrKBm3l35rnVXoqI0hKRQLfTpsLTCpMeGjNnn4+TU1V30y6EIDMuxCQ5yVHWhExl1oTCZdaEKuu9A1uelCN+S2C92SPvJBF4pPkTkbLMgqwxWKzA5EORUUVrAzuAlEOiPY4+sgPWtq7Yf+GTzFhSeqnXMqUVAgueUZSdklZwQ0WwvwbYiSDMeSXCCbVozm1WumxX5hx4Prop4XKysBt1hXFChxQRau5VQ5iz83529eFHsGlNQvN8mKQ4JLHvhqT3c4T8K2tBdU+MnAP69jLb6zLojK7RkX2NEXpeHRBPUivWgjEKl+FP2hhUNppnavNL8gx2elZ71gX7RdMl0l6cPEjZ80y+1PO/SATcP8HL5gAweEfy7jO8IT+YIZrzWX1MClpGI76+zS7fA0uJDxYm0Lk1Dc8oz6DdF4+j87aMDCEwwAAA=="
+                    );
+                return (
+                    pako
+                        .ungzip(
+                            Uint8Array.from(atob(localStorage.getItem("_eaglercraftX.g")), c => c.charCodeAt(0)),
+                            { to: "string" }
+                        )
+                        .match(/gamma:[^\n]+/)[0] == "gamma:100.0"
+                );
+            },
+            set: value => {
+                localStorage.setItem(
+                    "_eaglercraftX.g",
+                    btoa(
+                        Array.from(
+                            pako.gzip(
+                                pako
+                                    .ungzip(
+                                        Uint8Array.from(atob(localStorage.getItem("_eaglercraftX.g")), c => c.charCodeAt(0)),
+                                        { to: "string" }
+                                    )
+                                    .replace(/gamma:[^\n]+/, value ? "gamma:100.0" : "gamma:0.0")
+                            )
+                        )
+                            .map(b => String.fromCharCode(b))
+                            .join("")
+                    )
+                );
+            },
+        },
+        "1.12.2 Game Options": { type: "heading" },
+        "Full Bright ": {
+            type: "toggle",
+            value: () => {
+                if (!localStorage.getItem("_eaglercraft_1.12.g"))
+                    localStorage.setItem(
+                        "_eaglercraft_1.12.g",
+                        "dmVyc2lvbjoxMzQzCmludmVydFlNb3VzZTpmYWxzZQptb3VzZVNlbnNpdGl2aXR5OjAuNQpmb3Y6MC4wCmdhbW1hOjAuMApzYXR1cmF0aW9uOjAuMApyZW5kZXJEaXN0YW5jZTo0Cmd1aVNjYWxlOjAKcGFydGljbGVzOjAKYm9iVmlldzp0cnVlCmFuYWdseXBoM2Q6ZmFsc2UKbWF4RnBzOjI2MApmYm9FbmFibGU6dHJ1ZQpkaWZmaWN1bHR5OjIKZmFuY3lHcmFwaGljczpmYWxzZQphbzowCnJlbmRlckNsb3VkczpmYXN0CnJlc291cmNlUGFja3M6W10KaW5jb21wYXRpYmxlUmVzb3VyY2VQYWNrczpbXQpsYXN0U2VydmVyOgpsYW5nOmVuX3VzCmNoYXRWaXNpYmlsaXR5OjAKY2hhdENvbG9yczp0cnVlCmNoYXRMaW5rczp0cnVlCmNoYXRMaW5rc1Byb21wdDp0cnVlCmNoYXRPcGFjaXR5OjEuMAplbmFibGVWc3luYzp0cnVlCmhpZGVTZXJ2ZXJBZGRyZXNzOmZhbHNlCmFkdmFuY2VkSXRlbVRvb2x0aXBzOmZhbHNlCnBhdXNlT25Mb3N0Rm9jdXM6dHJ1ZQp0b3VjaHNjcmVlbjpmYWxzZQpvdmVycmlkZVdpZHRoOjAKb3ZlcnJpZGVIZWlnaHQ6MApoZWxkSXRlbVRvb2x0aXBzOnRydWUKY2hhdEhlaWdodEZvY3VzZWQ6MS4wCmNoYXRIZWlnaHRVbmZvY3VzZWQ6MC40NDM2NjE5NgpjaGF0U2NhbGU6MS4wCmNoYXRXaWR0aDoxLjAKbWlwbWFwTGV2ZWxzOjAKZm9yY2VVbmljb2RlRm9udDpmYWxzZQpyZWR1Y2VkRGVidWdJbmZvOmZhbHNlCnVzZU5hdGl2ZVRyYW5zcG9ydDp0cnVlCmVudGl0eVNoYWRvd3M6dHJ1ZQptYWluSGFuZDpyaWdodAphdHRhY2tJbmRpY2F0b3I6MQpzaG93U3VidGl0bGVzOmZhbHNlCmVuYWJsZVdlYWtBdHRhY2tzOmZhbHNlCmF1dG9KdW1wOnRydWUKdHV0b3JpYWxTdGVwOm1vdmVtZW50Cmhhc1NlZW5GaXJzdExvYWQ6ZmFsc2UKaGFzV29ybGRMaXN0QmVlbkNvbnZlcnRlZDpmYWxzZQplbmFibGVGTkFXU2tpbnM6dHJ1ZQpoYXNIaWRkZW5QaGlzaFdhcm5pbmc6ZmFsc2UKaGlkZURlZmF1bHRVc2VybmFtZVdhcm5pbmc6ZmFsc2UKb2ZDaHVua1VwZGF0ZXM6MQpjaHVua0ZpeDp0cnVlCmh1ZEZwczp0cnVlCmh1ZENvb3Jkczp0cnVlCmZvZzp0cnVlCmtleV9rZXkuYXR0YWNrOi0xMDAKa2V5X2tleS51c2U6LTk5CmtleV9rZXkuZm9yd2FyZDoxNwprZXlfa2V5LmxlZnQ6MzAKa2V5X2tleS5iYWNrOjMxCmtleV9rZXkucmlnaHQ6MzIKa2V5X2tleS5qdW1wOjU3CmtleV9rZXkuc25lYWs6NDIKa2V5X2tleS5zcHJpbnQ6MTkKa2V5X2tleS5kcm9wOjE2CmtleV9rZXkuaW52ZW50b3J5OjE4CmtleV9rZXkuY2hhdDoyMAprZXlfa2V5LnBsYXllcmxpc3Q6MTUKa2V5X2tleS5waWNrSXRlbTotOTgKa2V5X2tleS5jb21tYW5kOjUzCmtleV9rZXkuc2NyZWVuc2hvdDo2MAprZXlfa2V5LnRvZ2dsZVBlcnNwZWN0aXZlOjYzCmtleV9rZXkuc21vb3RoQ2FtZXJhOjAKa2V5X2tleS5zcGVjdGF0b3JPdXRsaW5lczowCmtleV9rZXkuc3dhcEhhbmRzOjMzCmtleV9rZXkuc2F2ZVRvb2xiYXJBY3RpdmF0b3I6NDYKa2V5X2tleS5sb2FkVG9vbGJhckFjdGl2YXRvcjo0NQprZXlfa2V5LmFkdmFuY2VtZW50czozOAprZXlfa2V5LmhvdGJhci4xOjIKa2V5X2tleS5ob3RiYXIuMjozCmtleV9rZXkuaG90YmFyLjM6NAprZXlfa2V5LmhvdGJhci40OjUKa2V5X2tleS5ob3RiYXIuNTo2CmtleV9rZXkuaG90YmFyLjY6NwprZXlfa2V5LmhvdGJhci43OjgKa2V5X2tleS5ob3RiYXIuODo5CmtleV9rZXkuaG90YmFyLjk6MTAKc291bmRDYXRlZ29yeV9tYXN0ZXI6MS4wCnNvdW5kQ2F0ZWdvcnlfbXVzaWM6MS4wCnNvdW5kQ2F0ZWdvcnlfcmVjb3JkOjEuMApzb3VuZENhdGVnb3J5X3dlYXRoZXI6MS4wCnNvdW5kQ2F0ZWdvcnlfYmxvY2s6MS4wCnNvdW5kQ2F0ZWdvcnlfaG9zdGlsZToxLjAKc291bmRDYXRlZ29yeV9uZXV0cmFsOjEuMApzb3VuZENhdGVnb3J5X3BsYXllcjoxLjAKc291bmRDYXRlZ29yeV9hbWJpZW50OjEuMApzb3VuZENhdGVnb3J5X3ZvaWNlOjEuMAptb2RlbFBhcnRfY2FwZTp0cnVlCm1vZGVsUGFydF9qYWNrZXQ6dHJ1ZQptb2RlbFBhcnRfbGVmdF9zbGVldmU6dHJ1ZQptb2RlbFBhcnRfcmlnaHRfc2xlZXZlOnRydWUKbW9kZWxQYXJ0X2xlZnRfcGFudHNfbGVnOnRydWUKbW9kZWxQYXJ0X3JpZ2h0X3BhbnRzX2xlZzp0cnVlCm1vZGVsUGFydF9oYXQ6dHJ1ZQo"
+                    );
+                return atob(localStorage.getItem("_eaglercraft_1.12.g")).match(/gamma:[^\n]+/)[0] == "gamma:100.0";
+            },
+            set: value => {
+                localStorage.setItem("_eaglercraft_1.12.g", btoa(atob(localStorage.getItem("_eaglercraft_1.12.g")).replace(/gamma:[^\n]+/, value ? "gamma:100.0" : "gamma:0.0")));
+            },
+        },
+    },
+    Dev: {
+        login: true,
+        title: "Developer Settings & Tools",
+        Eruda: {
+            type: "toggle",
+            value: () => {
+                return Boolean(Number(localStorage.getItem("eruda")));
+            },
+            set: value => {
+                localStorage.setItem("eruda", Number(value));
+            },
+        },
+    },
+};
+
+// Check and update mode
+function updateMode() {
+    const mode = getLightmode();
+    document.querySelectorAll("*").forEach(e => (mode ? e.classList.remove("darkmode") : e.classList.add("darkmode")));
+    console.log("[Lightmode]: Color theme updated to " + (mode ? "light" : "dark") + ".");
+}
+// Return whether or not lightmode should be used
+function getLightmode() {
+    let mode = localStorage.getItem("lightmode");
+    switch (mode) {
+        case "dark":
+            return false;
+        case "light":
+            return true;
+        case "auto":
+            if (window.matchMedia("(prefers-color-scheme: light)").matches) return true;
+            if (window.matchMedia("(prefers-color-scheme: dark)").matches) return false;
+            else {
+                console.log("[Lightmode Error]: Mode was auto, but no type was detected. Defaulting to light mode.");
+                return true;
+            }
+        default:
+            console.error("[Lightmode Error]: localStorage item 'lightmode' returned neither dark, light, or auto. Defaulting to light mode.");
+            return true;
+    }
+}
+async function copy(text) {
+    try {
+        await navigator.clipboard.writeText(text);
+        console.log(`[Copy]: Copied message: "${text}"`);
+    } catch (e) {
+        console.log("[Copy Error]:", e);
+    }
+}
+async function types(content, json) {
+    for (const [key, value] of Object.entries(json)) {
+        if (key === "login" || key === "title") continue;
+        switch (value.type) {
+            case "heading":
+                const heading = document.createElement("h2");
+                heading.textContent = key;
+                content.append(heading);
+                break;
+            case "select":
+                const select = document.createElement("select");
+                const selectP = document.createElement("p");
+                const values = await value.values();
+                const preSelected = await value.value();
+                select.addEventListener("change", async event => await value.set(Number(event.target.value)));
+                selectP.textContent = key;
+                selectP.className = "select";
+                values.forEach((e, i) => {
+                    const option = document.createElement("option");
+                    option.value = i;
+                    if (preSelected == e) option.setAttribute("selected", "");
+                    option.textContent = e;
+                    select.append(option);
+                });
+                selectP.append(select);
+                content.append(selectP);
+                break;
+            case "input":
+                const label = document.createElement("label");
+                const input = document.createElement("input");
+                label.textContent = key;
+                input.value = await value.value();
+                input.addEventListener("change", async event => {
+                    await value.set(event.target.value);
+                });
+                label.append(input);
+                content.append(label);
+                break;
+            case "toggle":
+                const toggleP = document.createElement("p");
+                const toggleLabel = document.createElement("label");
+                const toggleInput = document.createElement("input");
+                const span = document.createElement("span");
+                toggleP.textContent = key;
+                [toggleP, toggleLabel, toggleInput, span].forEach(e => (e.className = "toggle"));
+                toggleInput.type = "checkbox";
+                if (await value.value()) toggleInput.checked = true;
+                toggleInput.addEventListener("change", async event => {
+                    await value.set(event.target.checked);
+                });
+                toggleLabel.append(toggleInput, span);
+                toggleP.append(toggleLabel);
+                content.append(toggleP);
+                break;
+            case "value":
+                const p = document.createElement("p");
+                const innerText = await value.value();
+                p.textContent = key + ": " + innerText;
+                if (value.copy) {
+                    const copyElement = document.createElement("a");
+                    copyElement.textContent = "Copy";
+                    copyElement.className = "copy";
+                    copyElement.addEventListener("click", () => {
+                        copy(innerText);
+                    });
+                    p.append(copyElement);
+                }
+                content.append(p);
+                break;
+            case "button":
+                const button = document.createElement("button");
+                button.textContent = key;
+                button.addEventListener("click", async () => {
+                    await value.set();
+                });
+                content.append(button);
+                break;
+            case "form":
+                const form = document.createElement("form");
+                let submitFuncs = [];
+                for (const [a, b] of Object.entries(value.value)) {
+                    switch (b.type) {
+                        case "input":
+                            const label = document.createElement("label");
+                            const input = document.createElement("input");
+                            const originalValue = await b.value();
+                            label.textContent = a;
+                            input.value = originalValue;
+                            submitFuncs.push([input, originalValue, b.set]);
+                            label.append(input);
+                            form.append(label);
+                            break;
+                        case "submit":
+                            const submit = document.createElement("button");
+                            submit.type = "submit";
+                            submit.textContent = a;
+                            form.append(submit);
+                            break;
+                    }
+                }
+                form.addEventListener("submit", e => {
+                    e.preventDefault();
+                    submitFuncs.forEach(async ([a, b, c], i) => {
+                        if (a.value !== b) (await c(a.value), (submitFuncs[i][1] = a.value));
+                    });
+                });
+                content.append(form);
+                break;
+            default:
+                console.log("An error occurred when finding what type a element is (type: " + value.type + ")");
+        }
+    }
+}
+async function load(json) {
+    if (json.login) {
+        showLogin();
+        await waitUntil(() => globalUser);
+    }
+    const content = document.getElementById("content");
+    const title = document.createElement("h1");
+    content.innerHTML = "";
+    title.textContent = json.title;
+    content.append(title);
+    types(content, json);
+}
+function waitUntil(condition, after = () => {}) {
+    return new Promise(resolve => {
+        const checkInterval = setInterval(() => {
+            if (condition()) {
+                clearInterval(checkInterval);
+                after();
+                resolve();
+            }
+        }, 100); // Check every 100 milliseconds
+    });
+}
+function showLogin() {
+    if (globalUser) return;
+    const menu = document.getElementById("menu");
+    const side = document.createElement("div");
+    const background = document.createElement("div");
+    const title = document.createElement("h1");
+    const rules = document.createElement("p");
+    const form = document.createElement("form");
+    const email = document.createElement("label");
+    const emailInput = document.createElement("input");
+    const password = document.createElement("label");
+    const passwordInput = document.createElement("input");
+    const show = document.createElement("a");
+    const submit = document.createElement("button");
+    const other = document.createElement("button");
+    let header = document.getElementsByTagName("header")[0].getBoundingClientRect().height;
+    let footer = document.getElementsByTagName("footer")[0].getBoundingClientRect().height;
+    let menuWidth = menu.getBoundingClientRect().width;
+    let loginOption = true;
+
+    side.id = "login-sidebar";
+    side.style.height = "calc(100vh - " + (header + footer) + "px)";
+    side.style.width = menuWidth + "px";
+    background.id = "login";
+    if (!getLightmode()) background.className = "darkmode";
+    background.style.height = side.style.height;
+    background.style.width = "calc(100vw - " + menuWidth + "px)";
+    background.style.left = menuWidth + "px";
+    title.textContent = "Login";
+    email.textContent = "Email";
+    emailInput.type = "email";
+    emailInput.placeholder = "ex. user@example.com";
+    emailInput.setAttribute("required", "");
+    password.textContent = "Password";
+    passwordInput.type = "password";
+    passwordInput.placeholder = "ex. password1234";
+    passwordInput.setAttribute("required", "");
+    show.textContent = "show";
+    show.id = "show-password";
+    submit.type = "submit";
+    submit.textContent = "Login";
+    other.textContent = "Sign up instead";
+    other.id = "login-other";
+
+    function resize() {
+        let header = document.getElementsByTagName("header")[0].getBoundingClientRect().height;
+        let footer = document.getElementsByTagName("footer")[0].getBoundingClientRect().height;
+        let menuWidth = menu.getBoundingClientRect().width;
+        background.style.height = "calc(100vh - " + (header + footer) + "px)";
+        background.style.width = "calc(100vw - " + menuWidth + "px)";
+        background.style.left = menuWidth + "px";
+    }
+
+    side.addEventListener("click", e => {
+        const toClick = document.elementFromPoint(e.clientX, e.clientY);
+        if (toClick) {
+            background.remove();
+            window.removeEventListener("resize", resize);
+            toClick.click();
+            side.remove();
+        }
+    });
+    form.addEventListener("submit", async e => {
+        e.preventDefault();
+
+        // Get entered user credentials
+        const userEmail = emailInput.value.trim();
+        const userPass = passwordInput.value.trim();
+
+        if (loginOption) {
+            console.log("Logging in...");
+            let error = false;
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, userEmail, userPass);
+                window.showAlert(`You have successfully logged in with email address ${userCredential.user.email}.`);
+            } catch (e) {
+                const errorCodes = { "auth/invalid-email": "That is a invalid email. Please enter a valid one.", "auth/wrong-password": "You have entered the wrong password. Please try again.", "auth/user-not-found": "You have not yet signed up. Please do so by clicking the 'Sign up' button below.", "auth/user-disabled": "A admin of this site has disabled your account. Please go to the contact page and submit a message to learn more or appeal.", "auth/too-many-requests": "Unusual activity has been detected from this source. Please wait a while and then try again.", "auth/unauthorized-domain": "You cannot sign in with a email address ending in that domain. Please try another. (I do not make the rules, firebase does)", "auth/invalid-credential": "The credentials that you have entered are invalid." };
+                window.showAlert(errorCodes[e.code] || `Your login has failed because of error: ${e}. Please report this error with code ${e.code} to the developers.`);
+                error = true;
+            }
+            if (!error) (background.remove(), window.removeEventListener("click", resize), side.remove());
+        } else {
+            let loginError = false;
+            try {
+                await createUserWithEmailAndPassword(auth, userEmail, userPass);
+            } catch (error) {
+                loginError = true;
+                const signUpErrors = { "auth/weak-password": "Your password must be at least 6 characters long.", "auth/email-already-in-use": "This email is already linked to a account. Please try another email.", "auth/too-many-requests": "Unusual activity has been detected from this source. Please wait a while and then try again." };
+                window.showAlert(signUpErrors[error.code] || `Account creation error: ${error}. Please report this error with code ${error.code} to the developers.`);
+            }
+            if (!loginError) {
+                let error = false;
+                try {
+                    const userCredential = await signInWithEmailAndPassword(auth, userEmail, userPass);
+                    const user = userCredential.user;
+                    window.showAlert(`You have successfully logged in with your email address: ${user.email}.`);
+                } catch (e) {
+                    window.showAlert(`Automatic sign in after sign up error: ${e}. Please report this error with code ${e.code} to the developers`);
+                    error = true;
+                }
+                if (!error) (background.remove(), window.removeEventListener("click", resize), side.remove());
+            }
+        }
+    });
+    show.addEventListener("click", () => {
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            show.textContent = "hide";
+        } else if (passwordInput.type === "text") {
+            passwordInput.type = "password";
+            show.textContent = "show";
+        }
+    });
+    other.addEventListener("click", () => {
+        const text = [
+            ["Login", "", "Login", "Sign up instead"],
+            ["Sign Up", "Requirements: Valid email address, 6+ characters password", "Sign Up", "Login instead"],
+        ][(title, rules, submit, other)].forEach((e, i) => {
+            e.textContent = text[Number(loginOption)][i];
+        });
+        loginOption = !loginOption;
+    });
+    window.addEventListener("resize", resize);
+
+    form.append(email, emailInput, password, passwordInput, show, submit);
+    background.append(title, rules, form, other);
+    document.getElementById("main").append(side, background);
+    waitUntil(
+        () => {
+            return Boolean(globalUser);
+        },
+        () => {
+            background.remove();
+            window.removeEventListener("resize", resize);
+            side.remove();
+        }
+    );
+}
+(() => {
+    const menu = document.getElementById("menu");
+    menu.innerHTML = "";
+    Object.entries(pages).forEach(([key, value], index) => {
+        const separater = document.createElement("hr");
+        const menuItem = document.createElement("h1");
+        menuItem.textContent = key;
+        menuItem.addEventListener("click", () => {
+            load(value);
+        });
+        if (index !== 0) menu.append(separater);
+        menu.append(menuItem);
+    });
+})();
+load(pages.General);
+
+// What to do after firebase loads or auth change detected
+onAuthStateChanged(auth, async user => {
+    if (user) {
+        globalUser = user;
+        // If user is logged in
+        console.log(`User Email: ${user.email}`);
+        console.log(`User UID: ${user.uid}`);
+    } else {
+        // Stuff to do if user is signed out while on page.
+        globalUser = undefined;
+    }
+});

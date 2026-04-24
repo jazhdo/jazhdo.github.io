@@ -1,7 +1,7 @@
-/* v0.2.4 */
+/* v0.2.5 */
 
 /* Heading/Navigation */
-header{
+header {
     background-color: lightgreen;
     padding: 3vw 2vw 1vw 2vw;
     display: flex;
@@ -11,7 +11,7 @@ div#header-top {
     display: flex;
     width: 100%;
 }
-#toptitle{
+#toptitle {
     padding: 0vw 0vw 0vw 3vw;
     margin: 0px;
     font-size: 4vw;
@@ -29,6 +29,9 @@ a#login-link {
     margin-left: auto;
     display: flex;
 }
+a#login-link:hover {
+    cursor: pointer;
+}
 #pfp {
     --cross-size: clamp(40px, 2vw, 100px);
     border-radius: 1000vw;
@@ -42,12 +45,12 @@ a#login-link {
 #pfp p {
     font-size: clamp(16px, 1.5vw, 32px);
 }
-a.navbutton{
+a.navbutton {
     border: 0px;
     padding: 0.5vw 1vw;
     margin: 0px 0.4vw;
     font-size: 3vw;
-    background-color: #A4FFA4;
+    background-color: #a4ffa4;
     border-radius: 5vw;
     color: black;
     font-family: Arial;
@@ -56,11 +59,11 @@ a.navbutton{
     user-select: none;
     display: inline;
 }
-a.navbutton:hover{
-    background-color: #A4FFA4;
+a.navbutton:hover {
+    background-color: #a4ffa4;
     cursor: pointer;
 }
-nav{
+nav {
     padding: 0px;
     padding-top: 1vw;
     margin: 0px;
@@ -73,29 +76,29 @@ nav{
 }
 
 /* Default for buttons (during testing before actual styles) */
-button:hover{
+button:hover {
     background-color: darkgreen;
     cursor: pointer;
     border-radius: 100px;
 }
-button{
+button {
     border-radius: 100px;
     background-color: rgb(164, 255, 164);
     border-color: lightgreen;
     margin: 1vw;
     width: fit-content;
 }
-a{
+a {
     text-decoration: none;
 }
-.contactlink{
+.contactlink {
     font-weight: bold;
 }
-#main{
+#main {
     margin: 2% 5%;
     flex-grow: 1;
 }
-body{
+body {
     margin: 0px;
     padding: 0px;
     border: 0px;
@@ -103,32 +106,37 @@ body{
     flex-direction: column;
     min-height: 100vh;
 }
-p, li, a#goBack{
+p,
+li,
+a#goBack {
     font-size: 1.5vw;
     margin: 0.5vw 1.5vw;
 }
-label, input, textarea{
+label,
+input,
+textarea {
     margin: 0.5vw 1.5vw;
 }
-ul, ol {
+ul,
+ol {
     padding-left: 1vw;
 }
-.webview{
+.webview {
     height: 100vh;
     width: 100vw;
     margin: 0px;
     padding: 0px;
     border: 0px;
 }
-h1{
+h1 {
     font-size: 2.5vw;
     margin: 1vw;
 }
-h2{
+h2 {
     font-size: 2vw;
     margin: 1vw;
 }
-footer{
+footer {
     background-color: lightgreen;
     padding: 1vw 0px;
     margin-top: 2vw;
@@ -140,7 +148,8 @@ footer{
     -moz-user-select: none;
     user-select: none;
 }
-.footer, button.footer{
+.footer,
+button.footer {
     display: inline-block;
     color: black;
     margin: 1vw;
@@ -148,17 +157,17 @@ footer{
     padding: 0px;
     border: 0px;
 }
-button.footer:hover{
+button.footer:hover {
     background-color: lightgreen;
 }
-#lightmode{
+#lightmode {
     display: inline-block;
     font-family: "Times New Roman", Times;
     background-color: lightgreen;
 }
 
 /* Cookies Banner */
-#cookies{
+#cookies {
     background-color: lightgreen;
     position: fixed;
     bottom: 0px;
@@ -174,13 +183,13 @@ button.footer:hover{
     border-top-style: solid;
     border-bottom-style: solid;
 }
-.cookieheading{
+.cookieheading {
     position: relative;
     padding: 1vw;
     margin-bottom: 0px;
     font-weight: bold;
 }
-.cookiebutton{
+.cookiebutton {
     position: relative;
     display: inline;
     width: 10vw;
@@ -201,7 +210,7 @@ button.footer:hover{
 button.counter {
     margin: 0px;
     border-radius: 0px;
-    background-color:rgb(164, 255, 164);
+    background-color: rgb(164, 255, 164);
     border: lightgreen 4px solid;
     padding: 1vw;
     font-size: 2vw;
@@ -220,7 +229,7 @@ div.counter {
 /* Blog */
 .blogheader {
     text-align: center;
-    background-color:lightgreen;
+    background-color: lightgreen;
     font-size: 0px;
     padding: 0px;
     margin: 0px;
@@ -246,15 +255,15 @@ a.blogfind {
 a.blogfind:hover {
     background-color: darkgreen;
 }
-a.blogbutton{
+a.blogbutton {
     border: 0px;
-    padding: .5vw 1.5vw;
+    padding: 0.5vw 1.5vw;
     margin: 5px;
     font-size: 2vw;
     background-color: rgb(164, 255, 164);
     border-radius: 100px;
     color: black;
-    font-family: Arial
+    font-family: Arial;
 }
 
 /* Contact form */
@@ -262,7 +271,7 @@ textarea {
     width: 50vw;
     height: 15vw;
 }
-button.form{
+button.form {
     margin: 0.5vw 1.5vw;
 }
 
@@ -300,203 +309,216 @@ div.posts {
 }
 
 /* The modifications of the webpage for different screen sizes (Increase in size for smaller screen widthes) */
-/* To be turned into clamp sizes */
+/* To be turned into clamp sizes in css recode */
 @media (max-width: 450px) {
-    nav{
+    nav {
         flex-direction: column;
     }
-    a.navbutton{
+    a.navbutton {
         padding: 1vw 3vw;
         font-size: 8vw;
         margin: 0vw;
     }
-    a.blogbutton{
+    a.blogbutton {
         padding: 1vw 3vw;
         font-size: 8vw;
     }
-    a.blogfind{
+    a.blogfind {
         font-size: 8vw;
     }
-    #toptitle{
+    #toptitle {
         font-size: 10vw;
     }
-    p, li{
+    p,
+    li {
         font-size: 5vw;
     }
-    h1{
+    h1 {
         font-size: 8vw;
     }
-    h2{
+    h2 {
         font-size: 6vw;
     }
-    .footer, button.footer{
+    .footer,
+    button.footer {
         font-size: 5vw;
     }
-    .cookiebutton{
+    .cookiebutton {
         display: inline;
         padding: 1vw 35vw 1vw 5vw;
     }
-    button.counter{
+    button.counter {
         font-size: 8vw;
     }
-    a#login-link{
+    a#login-link {
         font-size: 8vw;
     }
-    #customAlert{
+    #customAlert {
         top: 30vh;
         left: 10vw;
         right: 10vw;
     }
 }
 @media (min-width: 451px) and (max-width: 700px) {
-    nav{
+    nav {
         flex-direction: column;
     }
-    a.navbutton{
+    a.navbutton {
         padding: 0.5vw 2vw;
         font-size: 6vw;
     }
-    a.blogbutton, a.blogfind{
+    a.blogbutton,
+    a.blogfind {
         font-size: 6vw;
     }
-    #toptitle{
+    #toptitle {
         font-size: 9vw;
     }
-    p, li{
+    p,
+    li {
         font-size: 4vw;
     }
-    h1{
+    h1 {
         font-size: 6vw;
     }
-    h2{
+    h2 {
         font-size: 5vw;
     }
-    .cookiebutton{
+    .cookiebutton {
         padding: 1vw 22vw 1vw 3vw;
     }
-    .footer, button.footer{
+    .footer,
+    button.footer {
         font-size: 4vw;
     }
-    a#login-link{
+    a#login-link {
         font-size: 6vw;
     }
-    #customAlert{
+    #customAlert {
         top: 35vh;
         left: 20vw;
         right: 20vw;
     }
 }
 @media (min-width: 701px) and (max-width: 950px) {
-    nav{
+    nav {
         flex-direction: row;
     }
-    a.navbutton{
+    a.navbutton {
         padding: 0.5vw 2vw;
         font-size: 5vw;
     }
-    a.blogbutton, a.blogfind{
+    a.blogbutton,
+    a.blogfind {
         font-size: 5vw;
     }
-    #toptitle{
+    #toptitle {
         font-size: 6.5vw;
     }
-    p, li{
+    p,
+    li {
         font-size: 3vw;
     }
-    h1{
+    h1 {
         font-size: 5vw;
     }
-    h2{
+    h2 {
         font-size: 4vw;
     }
-    .footer, button.footer{
+    .footer,
+    button.footer {
         font-size: 3vw;
     }
-    .cookiebutton{
+    .cookiebutton {
         font-size: 3vw;
         padding: 1vw 12vw 1vw 2vw;
     }
-    a#login-link{
+    a#login-link {
         font-size: 5vw;
     }
-    #customAlert{
+    #customAlert {
         top: 35vh;
         left: 20vw;
         right: 20vw;
     }
 }
 @media (min-width: 1400px) and (max-width: 1700px) {
-    nav{
+    nav {
         flex-direction: row;
     }
-    a.navbutton{
-        padding: .25vw 1vw;
+    a.navbutton {
+        padding: 0.25vw 1vw;
         font-size: 2.5vw;
     }
-    a.blogbutton, a.blogfind{
+    a.blogbutton,
+    a.blogfind {
         font-size: 2.5vw;
     }
-    #toptitle{
+    #toptitle {
         font-size: 4vw;
     }
-    p, li{
+    p,
+    li {
         font-size: 1.5vw;
     }
-    h1{
+    h1 {
         font-size: 3vw;
     }
-    h2{
+    h2 {
         font-size: 2vw;
     }
-    .cookiebutton{
+    .cookiebutton {
         font-size: 1.5vw;
     }
-    a#login-link{
+    a#login-link {
         font-size: 2.5vw;
     }
 }
-@media (min-width: 1701px){
-    nav{
+@media (min-width: 1701px) {
+    nav {
         flex-direction: row;
     }
-    a.navbutton{
+    a.navbutton {
         padding: 6px 18px;
         font-size: 2vw;
     }
-    a.blogbutton, a.blogfind{
+    a.blogbutton,
+    a.blogfind {
         font-size: 2vw;
     }
-    #toptitle{
+    #toptitle {
         font-size: 50px;
     }
-    p, li{
+    p,
+    li {
         font-size: 20px;
         margin: 0.5vw;
     }
-    h1{
+    h1 {
         font-size: 30px;
         margin: 0.5vw;
     }
-    h2{
+    h2 {
         font-size: 25px;
         margin: 0.5vw;
     }
-    .footer, button.footer{
+    .footer,
+    button.footer {
         font-size: 1.2vw;
         margin: 0vw 1vw;
     }
-    .cookiebutton{
+    .cookiebutton {
         font-size: 1vw;
         padding: 1vw 0vw;
     }
-    button{
+    button {
         margin: 0px;
     }
-    button.counter{
+    button.counter {
         font-size: 1vw;
         padding: 0.5vw;
     }
-    a#login-link{
+    a#login-link {
         font-size: 2vw;
     }
 }

@@ -1,4 +1,4 @@
-/* v0.2.4 */
+/* v0.2.5 */
 
 #main {
     margin: 0px;
@@ -129,6 +129,9 @@ footer {
     display: flex;
     justify-content: space-between;
 }
+#content.darkmode {
+    background-color: dimgray;
+}
 
 /* Login Screen */
 #login-sidebar {
@@ -142,6 +145,9 @@ footer {
     text-align: center;
     align-items: center;
 }
+#login.darkmode {
+    background-color: dimgray;
+}
 #login h1 {
     margin-top: 5vh;
 }
@@ -152,6 +158,13 @@ footer {
 }
 #login-other {
     margin: 10vw 0px;
+}
+#login #show-password {
+    color: blue;
+    user-select: none;
+}
+#login #show-password:hover {
+    cursor: pointer;
 }
 #login button:hover {
     background-color: green;
